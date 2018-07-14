@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<th:block th:include="/includes/_include"></th:block>
+</head>
+
+<body>
+	<th:block th:include="/_header"></th:block>
+	
+	<section class="container-fluid p-3 bg-light">
+            
+      <div class="col-md-4 mx-auto p-3 bg-white">
+	     <div class="">
+
+	         <h4 class="mx-auto">Login to Bring a Souvenir </h4>
+	         <br>
+	         <!-- /login?error=true -->
+	         <th:block th:if="${#session != null && #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}">
+	             <div th:if= "${#request.getParameter('error') == 'true'}"
+	                style="color: red; margin: 10px 0px;">
+	                Login Failed!!!<br /> Reason :
+	                <span th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}"></span>
+	             </div>
+	         </th:block>
+	     
+	     </div>
+	      
+         <form method="POST"
+            th:action="@{/j_spring_security_check}">
+                   
+              <div class="form-group">
+			    <input type="email" name="userName" class="form-control" placeholder="Email address">
+			  </div>
+			  <div class="form-group">
+			    <input type="password" name="password" class="form-control" placeholder="Password">
+			  </div>
+
+			  <div class="form-group mt-2">
+			  <button type="submit" class="btn btn-primary">Login</button>
+			</div>
+         </form>
+          
+         <span class="error-message" th:utext="${error}"></span>
+         
+         <hr>
+         
+         or, <a href="/admin/createAccount">Create a new account</a>
+         
+      </div>
+
+	</section>
+
+	<th:block th:include="/_footer"></th:block>
+
+</body>
+</html>

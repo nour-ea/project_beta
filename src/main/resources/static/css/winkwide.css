@@ -1,0 +1,55 @@
+html, body {
+	height: 100%;
+}
+
+/*change primary color*/
+.text-primary {
+  color: #0079bf !important;
+}
+
+.text-secondary {
+  color: #B8FEEF !important;
+}
+
+.btn-primary{
+  background-color: #0079bf !important;
+  border: #0079bf !important;
+  color: white !important;
+}
+
+.btn-primary:hover{
+  background-color: #393c45 !important;
+  border: #393c45 !important;
+}
+
+.bg-primary{
+  background-color: #0079bf !important;
+}
+
+.pagination .page-link {
+	 color : #0079bf;
+}
+.pagination .active .page-link {
+		background-color: #0079bf;
+		border-color: #0079bf;
+}
+
+/* special text styles*/
+
+.microtext {
+  font-size: 12px;
+  color: grey;
+  font-weight: lighter;
+  text-transform: lowercase !important;
+  vertical-align: middle;
+}
+
+.mini-icons {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.luxtext {
+  font-size: 12px;
+  text-transform: uppercase;
+}
