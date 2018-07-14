@@ -5,5 +5,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.platformia.winkwide.entity.Media;
 
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RepositoryRestResource(excerptProjection = NoMediaVerified.class)
 public interface MediaRepository extends JpaRepository<Media, Long> {}
