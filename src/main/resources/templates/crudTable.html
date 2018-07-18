@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>        
+	<!-- Bootstrap & Fa -->      
+      <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">     
+      <script src="/vendor/jquery/jquery.min.js"></script>
+      <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+      <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+              
+	  <!-- Angular JS & UI Grid libraries -->
+	  <link rel="stylesheet" href="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+      <script src="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.js"></script>
+      <script th:src="@{/apps/crudApp.js}"></script>
+
+
+      
+      
+    </head>
+    
+    <body ng-app="crudApp">
+        	 	<script> app.value('objectModel','media'); </script>
+        			
+    			<!-- data tables and visualization -->
+				<div class="row m-2  rounded bg-light" id="tableRow">
+					<div class="m-4 w-100" style=" font-size:12px">
+					
+				        <div id="crudCtrl" ng-controller="crudCtrl as vm" >
+				            <div ui-grid="gridOptions" class="grid" ui-grid-pagination>
+				            </div>
+				            
+				            				 
+				 
+							<!-- Delete a display modal -->
+							<div class="modal fade" id="deleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteObjectModal" aria-hidden="true">
+							  <div class="modal-dialog" role="document">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <h5 class="modal-title" id="exampleModalLabel">Delete a Display</h5>
+							        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							          <span aria-hidden="true">&times;</span>
+							        </button>
+							      </div>
+							      <div class="modal-body">
+							        
+							        <h3 class="modal-title" id="exampleModalLabel">Are your sure ?</h3>
+					
+							      </div>
+							      <div class="modal-footer">
+							        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+							        <button ng-click="deleteTargetObject()" type="button" class="btn btn-primary">Delete Display</button>
+							      </div>
+							    </div>
+							  </div>
+							</div>
+				            
+				            
+				            
+				            
+				            
+				        </div>
+				        
+				    </div>
+				 </div>
+				 
+				        
+    </body>
+    
+</html>
