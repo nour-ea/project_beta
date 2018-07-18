@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platformia.winkwide.form.MediaForm;
 
 import lombok.Data;
 
@@ -44,39 +43,6 @@ public class Media implements Serializable {
     @Column(name = "verified", length = 1, nullable = false, columnDefinition = "TINYINT(1)")
     @JsonIgnore
     private boolean verified;
-    
-       
-    public Media() {
 
-	}
-
-
-	public Media(String name, String mediaType, String format, String url, int size, boolean verified) {
-		this.name = name;
-		this.mediaType = mediaType;
-		this.format = format;
-		this.url = url;
-		this.size = size;
-		this.verified = verified;
-	}
-
-
-	public Media(MediaForm mediaForm) {
-		this.name = mediaForm.getName();
-		this.mediaType = mediaForm.getMediaType();
-		this.format = mediaForm.getFormat();
-		this.url = mediaForm.getUrl();
-		this.size = mediaForm.getSize();
-		this.verified = mediaForm.isVerified();
-	}
-	
-	public void update(MediaForm mediaForm) {
-		this.name = mediaForm.getName();
-		this.mediaType = mediaForm.getMediaType();
-		this.format = mediaForm.getFormat();
-		this.url = mediaForm.getUrl();
-		this.size = mediaForm.getSize();
-		this.verified = mediaForm.isVerified();
-	}
 	
 }

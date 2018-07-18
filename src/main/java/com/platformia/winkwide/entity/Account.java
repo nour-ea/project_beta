@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.platformia.winkwide.form.AccountForm;
-import com.platformia.winkwide.security.SecurityUtils;
+import com.platformia.winkwide.utils.SecurityUtils;
 
 import lombok.Data;
 

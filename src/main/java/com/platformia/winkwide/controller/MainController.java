@@ -15,6 +15,11 @@ public class MainController {
 			return "index";
 		}
 		
+		@RequestMapping("/crudTable")
+		public String crudTable() {
+			return "crudTable";
+		}
+		
 		@RequestMapping("/403")
 		public String accessDenied() {
 			return "403";

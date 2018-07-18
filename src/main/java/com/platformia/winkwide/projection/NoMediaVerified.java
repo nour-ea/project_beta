@@ -1,11 +1,11 @@
-package com.platformia.winkwide.repository;
+package com.platformia.winkwide.projection;
 
 import org.springframework.data.rest.core.config.Projection;
 
 import com.platformia.winkwide.entity.Media;
 
 @Projection(name = "noMediaVerified", types = { Media.class }) 
-interface NoMediaVerified {
+public interface NoMediaVerified {
 
 	   	String getName();
 	    

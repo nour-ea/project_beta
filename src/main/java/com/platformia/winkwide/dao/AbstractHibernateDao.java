@@ -9,8 +9,6 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Criteria;
 import org.hibernate.Filter;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,9 +20,6 @@ public abstract class AbstractHibernateDao<T extends Serializable> {
 
 	@PersistenceContext
 	EntityManager entityManager;
-	
-	//@Autowired
-	//SessionFactory sessionFactory;
 
 	protected Class<T> entityClass;
 

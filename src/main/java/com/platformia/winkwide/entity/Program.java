@@ -22,7 +22,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "Programs", uniqueConstraints={@UniqueConstraint(columnNames={"start_time","end_time","display_id"})})
-public class ProgramEntry implements Serializable {
+public class Program implements Serializable {
 
 
 	private static final long serialVersionUID = -7262692782376526578L;
@@ -33,6 +33,12 @@ public class ProgramEntry implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
 
+	@Column(name = "display_id", nullable = false)
+	    private Long displayId;
+	    
+	@Column(name = "media_loop", length = 128, columnDefinition = "JSON")
+	    private String mediaLoop;
+	    
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_time", nullable = false)
@@ -43,21 +49,17 @@ public class ProgramEntry implements Serializable {
 	@Column(name = "end_time", nullable = false)
 	private java.util.Date endTime;
 	
-    @Column(name = "display_id", nullable = false)
-    private Long displayId;
-    
-    @Column(name = "media_loop", length = 128, columnDefinition = "JSON")
-    private String mediaLoop;
+ 
  
     @Column(name = "utilization", columnDefinition = "Decimal")
     private BigDecimal utilization;
 
     
-    public ProgramEntry() {
+    public Program() {
 	
 	}
 
-	public ProgramEntry(Date startTime, Date endTime, Long displayId, String mediaLoop, BigDecimal utilization) {
+	public Program(Date startTime, Date endTime, Long displayId, String mediaLoop, BigDecimal utilization) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.displayId = displayId;
@@ -65,7 +67,7 @@ public class ProgramEntry implements Serializable {
 		this.utilization = utilization;
 	}    
     
-	public ProgramEntry(ProgramEntryForm programEntryForm) {
+	public Program(ProgramEntryForm programEntryForm) {
 		this.startTime = programEntryForm.getStartTime();
 		this.endTime = programEntryForm.getEndTime();
 		this.displayId = programEntryForm.getDisplayId();

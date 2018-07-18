@@ -1,4 +1,4 @@
-package com.platformia.winkwide.security;
+package com.platformia.winkwide.utils;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  

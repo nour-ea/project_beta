@@ -21,7 +21,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "Reports", uniqueConstraints={@UniqueConstraint(columnNames={"display_time","display_id", "media_id"})})
-public class ReportEntry implements Serializable {
+public class Report implements Serializable {
 
 
 	private static final long serialVersionUID = -4747357433130949274L;
@@ -44,17 +44,17 @@ public class ReportEntry implements Serializable {
     private String mediaId;
 
 
-	public ReportEntry() {
+	public Report() {
 		
 	}
 
-    public ReportEntry(Date displayTime, Long displayId, String mediaId) {
+    public Report(Date displayTime, Long displayId, String mediaId) {
 		this.displayTime = displayTime;
 		this.displayId = displayId;
 		this.mediaId = mediaId;
 	}
 
-    public ReportEntry(ReportEntryForm reportEntryForm ) {
+    public Report(ReportEntryForm reportEntryForm ) {
 		this.displayTime = reportEntryForm.getDisplayTime();
 		this.displayId = reportEntryForm.getDisplayId();
 		this.mediaId = reportEntryForm.getMediaId();
