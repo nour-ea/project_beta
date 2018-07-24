@@ -1,8 +1,8 @@
 /*Data Tables plugin*/
 
 $(document).ready(function() {
-    $('#myDataTable').DataTable( {
+    $('#crudTable').DataTable( {
         "scrollX": true
     } );
     
-} );
+} )

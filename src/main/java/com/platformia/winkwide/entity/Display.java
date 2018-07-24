@@ -22,7 +22,7 @@ public class Display implements Serializable {
 	private static final long serialVersionUID = 5033990271444402965L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
     

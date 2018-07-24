@@ -1,70 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>        
-	<!-- Bootstrap & Fa -->      
-      <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">     
-      <script src="/vendor/jquery/jquery.min.js"></script>
-      <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-      <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-              
-	  <!-- Angular JS & UI Grid libraries -->
-	  <link rel="stylesheet" href="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.css">
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-      <script src="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.js"></script>
-      <script th:src="@{/apps/crudApp.js}"></script>
+<head>
+<!-- Bootstrap & Fa -->
+<link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<link href="/vendor/font-awesome/css/font-awesome.min.css"
+	rel="stylesheet" type="text/css">
+
+<!-- Angular JS & UI Grid libraries -->
+<link rel="stylesheet"
+	href="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script
+	src="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.js"></script>
+<script th:src="@{/apps/crudApp.js}"></script>
 
 
-      
-      
-    </head>
-    
-    <body ng-app="crudApp">
-        	 	<script> app.value('objectModel','media'); </script>
-        			
-    			<!-- data tables and visualization -->
-				<div class="row m-2  rounded bg-light" id="tableRow">
-					<div class="m-4 w-100" style=" font-size:12px">
+</head>
+
+<body ng-app="crudApp" ng-controller="crudCtrl as vm">
+
+	<!-- configure angular app with object name -->
+	<script> app.value('objectModel','media'); </script>
+
+	<!-- Specific filters and New Actions -->
+	<div class="row m-2 rounded bg-light">
+		<div class="m-2 w-100">
+			<form>
+
+				<div class="form-row pt-2">
+
+					<div class="col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0 float-left">
+						Filter Medias by size:
+						<div>
+							<input type="text" name="sizeMin" class="form-control" placeholder="max size" 
+								ng-model="specificFilters.sizeMin" ng-change="getCollectionData()">
+							<input type="text" name="sizeMax" class="form-control" placeholder="min size"
+								ng-model="specificFilters.sizeMax" ng-change="getCollectionData()">
+						</div>
+					</div>
+
+					<div class="ml-auto col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0">
+						<button ng-click="setFormData('','create')" type="button" class="btn btn-block btn-primary float-right" data-toggle="modal" data-target="#createEditObjectModal">
+							<i class="fa fa-plus fa-fw"></i>&nbsp; New Object
+						</button>
+					</div>
+
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="row m-2  rounded bg-light" id="tableRow">
+		<div class="m-4 w-100" style="font-size: 12px">
+
+			<!-- data tables and visualization -->
+			<div id="crudTable">
+				<div ui-grid="gridOptions" class="grid" ui-grid-pagination></div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Create / Edit an object modal -->
+	<div class="modal fade" id="createEditObjectModal" tabindex="-1">
+		<div class="modal-dialog modal-lg" >
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="createEditObjectModalLabel">Create an Object</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body m-1 p-1">		
+					<form class="m-2">
 					
-				        <div id="crudCtrl" ng-controller="crudCtrl as vm" >
-				            <div ui-grid="gridOptions" class="grid" ui-grid-pagination>
-				            </div>
-				            
-				            				 
-				 
-							<!-- Delete a display modal -->
-							<div class="modal fade" id="deleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteObjectModal" aria-hidden="true">
-							  <div class="modal-dialog" role="document">
-							    <div class="modal-content">
-							      <div class="modal-header">
-							        <h5 class="modal-title" id="exampleModalLabel">Delete a Display</h5>
-							        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							          <span aria-hidden="true">&times;</span>
-							        </button>
-							      </div>
-							      <div class="modal-body">
-							        
-							        <h3 class="modal-title" id="exampleModalLabel">Are your sure ?</h3>
-					
-							      </div>
-							      <div class="modal-footer">
-							        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-							        <button ng-click="deleteTargetObject()" type="button" class="btn btn-primary">Delete Display</button>
-							      </div>
-							    </div>
-							  </div>
-							</div>
-				            
-				            
-				            
-				            
-				            
-				        </div>
-				        
-				    </div>
-				 </div>
-				 
-				        
-    </body>
-    
+						<!-- specific form fields for each object-->
+						 <div class="form-group row">
+						    <label class="col-sm-2 col-form-label">Name</label>
+						    <div class="col-sm-10">
+								<input type="text" name="name" class="form-control" ng-model="formData.name" text="formData.name">	
+							</div>				
+						</div>
+						 <div class="form-group row">
+						    <label class="col-sm-2 col-form-label">Media Type:</label>
+						    <div class="col-sm-10">
+								<input type="text" name="mediaType" class="form-control" ng-model="formData.mediaType" >
+							</div>				
+						</div>
+						 <div class="form-group row">
+						    <label class="col-sm-2 col-form-label">Format:</label>
+						    <div class="col-sm-10">
+								<input type="text" name="format" class="form-control"  ng-model="formData.format">	
+							</div>				
+						</div>
+						 <div class="form-group row">
+						    <label class="col-sm-2 col-form-label">Url</label>
+						    <div class="col-sm-10">
+								<input type="text" name="url" class="form-control" ng-model="formData.url">	
+							</div>				
+						</div>
+						 <div class="form-group row">
+						    <label class="col-sm-2 col-form-label">Size</label>
+						    <div class="col-sm-10">
+								<input type="number" name="size" class="form-control"  ng-model="formData.size">	
+							</div>				
+						</div>
+
+					</form>	
+																									
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button id="createEditObjectModalAction" ng-click="createTargetObject()" type="button" class="btn btn-primary" data-dismiss="modal">Create</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+		<!-- Delete an object modal -->
+	<div class="modal fade" id="deleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteObjectModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="deleteObjectModalLabel">Delete an Object</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete that Object?</p>
+					<!-- specific form fields for each object-->
+					<br>
+					Name: {{formData.name}} <br>
+					Media Type: {{formData.mediaType}} <br>
+					Format: {{formData.format}} <br>
+					Url: {{formData.url}} <br>
+					Size: {{formData.size}} <br>		
+				</div>
+				<div class="modal-footer">
+					<button ng-click="cleanFormData()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button ng-click="deleteTargetObject()" type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</body>
+
 </html>

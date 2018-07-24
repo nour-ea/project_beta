@@ -29,7 +29,7 @@ public class Program implements Serializable {
 
 	//Id should be the combination of dates and display id
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 
