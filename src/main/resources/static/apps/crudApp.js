@@ -4,15 +4,16 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	    function ($scope, objectModel, CRUDService) {
 	    		
 		// Define the Object Target for the CRUD App (Display, Media...)
-		var objectTarget = objectModel;
-		var collectionTarget = objectTarget + 's';
+		$scope.objectTarget = objectModel;
+		$scope.collectionTarget = $scope.objectTarget + 's';
 		
 		// Define Pagination options & Specific filters for GetAll Request to fill the UI Grid  
-		var paginationOptions = {pageNumber: 1, pageSize: 5, sortColumns: [], filterColumns: []};
+		$scope.paginationOptions = {pageNumber: 1, pageSize: 5, sortColumns: [], filterColumns: []};
 		$scope.specificFilters = {};
 				
 		// Define Edit / Delete target object url link and fill $scope.formData
-		var targetObjectUrl = '/api/'+collectionTarget;
+		var targetObjectUrl = '/api/'+$scope.collectionTarget;
+		$scope.schema = {};
 		$scope.formData = {};
 
 		$scope.setFormData = function(url, operation){
@@ -30,22 +31,23 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		};
 
 		// Define HTML for edition buttons
-		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary" ><i class="fa fa-tv fa-fw"></i></button>';
-		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil fa-fw"></i></button>';
-		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteObjectModal" > <i class="fa fa-remove fa-fw"></i></button>';
+		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary ml-5" ><i class="fa fa-tv fa-fw"></i></button>';
+		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary ml-1" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil fa-fw"></i></button>';
+		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger ml-1" data-toggle="modal" data-target="#deleteObjectModal" > <i class="fa fa-remove fa-fw"></i></button>';
 		var actionButtonsHTML = viewButtonHTML + editButtonHTML + deleteButtonHTML;
 		
 		// Define a function to Get Data Scheme from REST Api
 		$scope.getColumnList = function(){
 			var columnList = [];
-			CRUDService.getScheme(collectionTarget).success(function(data){
-				angular.forEach(data.properties, function(value, key) {
-					if(value.type=='string')
-						this.push({ field: key , name: value.title, enableFiltering:true });
+			CRUDService.getScheme($scope.objectTarget).success(function(data){
+				$scope.schema = data;
+				angular.forEach(data, function(value, key) {
+					if(value.type=='String')
+						this.push({ field: value.name , name: value.title, enableFiltering:true });
 					else
-						this.push({ field: key , name: value.title, enableFiltering:false });
+						this.push({ field: value.name , name: value.title, enableFiltering:false });
 					}, columnList);
-				columnList.push({ fied: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false });
+				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false });
 			});
 			return columnList;
 		};
@@ -53,14 +55,14 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		// Define a function to Get Data Collection from REST Api
 	    $scope.getCollectionData = function() {
 		
-		     CRUDService.getAll(collectionTarget, 
-				paginationOptions.pageNumber, 
-				paginationOptions.pageSize, 
-				paginationOptions.sortColumns,
-				paginationOptions.filterColumns,
+		     CRUDService.getAll($scope.collectionTarget, 
+				$scope.paginationOptions.pageNumber, 
+				$scope.paginationOptions.pageSize, 
+				$scope.paginationOptions.sortColumns,
+				$scope.paginationOptions.filterColumns,
 				$scope.specificFilters)
 		        .success(function(data){
-		          	$scope.gridOptions.data = data._embedded[collectionTarget];
+		          	$scope.gridOptions.data = data._embedded[$scope.collectionTarget];
 					angular.forEach($scope.gridOptions.data, function(value, key) {
 						value.actionLink =  value['_links']['self']['href'];
 						});
@@ -74,7 +76,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		// Define UI grid options & define update function
 	    $scope.gridOptions = {
 	        paginationPageSizes: [5, 10, 20, 50],
-	        paginationPageSize: paginationOptions.pageSize,
+	        paginationPageSize: $scope.paginationOptions.pageSize,
 	        enableColumnMenus:false,
 	    		useExternalPagination: true,
 			useExternalSorting: true,
@@ -85,18 +87,18 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	           	$scope.gridApi = gridApi;
 	           	$scope.gridApi.pagination.on.paginationChanged(
 	             	$scope, function (newPage, pageSize) {
-				     	paginationOptions.pageNumber = newPage;
-		     		 	paginationOptions.pageSize = pageSize;
+				     	$scope.paginationOptions.pageNumber = newPage;
+		     		 	$scope.paginationOptions.pageSize = pageSize;
 						$scope.getCollectionData();
 				 	});
 				$scope.gridApi.core.on.sortChanged(
 					$scope, function (grid, sortColumns) {
-						paginationOptions.sortColumns = sortColumns;
+						$scope.paginationOptions.sortColumns = sortColumns;
 						$scope.getCollectionData();
 				 	});
 		        $scope.gridApi.core.on.filterChanged(
 		        		$scope, function() {
-		        			paginationOptions.filterColumns = this.grid.columns;
+		        			$scope.paginationOptions.filterColumns = this.grid.columns;
 						$scope.getCollectionData();
 	        			});
 			}
@@ -104,7 +106,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	
 	//Define the Create function
 	$scope.createTargetObject = function(){			
-		CRUDService.createOne(collectionTarget, $scope.formData).success(function(data){
+		CRUDService.createOne($scope.collectionTarget, $scope.formData).success(function(data){
 			console.log('created object');
 			$scope.getCollectionData();
 		});
@@ -131,31 +133,34 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	//Define the Clean form function
 	$scope.cleanFormData = function(){			
 		$scope.formData = {};
+		$scope.objectForm.$setPristine();
 	};
 	
 	//Parametrize Create/Edit modal
 	$scope.customizeCreateEditModal = function(operation){
 	
+		//build modal canvas
 		if(operation == 'create'){
-			angular.element(createEditObjectModalLabel).html("Create " + objectTarget);
+			angular.element(createEditObjectModalLabel).html("Create " + $scope.objectTarget);
 			angular.element(createEditObjectModalAction).html("Create");
 			angular.element(createEditObjectModalAction).attr("ng-click", "createTargetObject()");
 			angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
 				});
 			
 		}else if(operation == 'edit'){
-			angular.element(createEditObjectModalLabel).html("Edit " + objectTarget);
+			angular.element(createEditObjectModalLabel).html("Edit " + $scope.objectTarget);
 			angular.element(createEditObjectModalAction).html("Update");
 			angular.element(createEditObjectModalAction).attr("ng-click", "editTargetObject()");
 			angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
 				$scope.cleanFormData();
 				});
 		}else if(operation == 'delete'){
-			angular.element(deleteObjectModalLabel).html("Delete " + objectTarget);
+			angular.element(deleteObjectModalLabel).html("Delete " + $scope.objectTarget);
 			angular.element(deleteObjectModal).on('hide.bs.modal', function (e) {
 				$scope.cleanFormData();
 				});
 		}
+		
 	};
 	
 }]);
@@ -167,7 +172,7 @@ app.service('CRUDService',['$http', function ($http) {
 	    function getScheme(target) {
 	        return $http({
 	          method: 'GET',
-	            url: '/api/profile/'+target,
+	            url: '/api/schema/'+target,
 	            headers: {'Accept' : 'application/schema+json'}
 	        });
 	    };
