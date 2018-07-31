@@ -9,29 +9,18 @@
 <body>
 	<th:block th:include="/_header"></th:block>
 	
-	<section class="container-fluid p-3 bg-light">
+	<section class="container-fluid p-3 bg-welcome" >
             
-      <div class="col-md-4 mx-auto p-3 bg-white">
+      <div class="col-md-4 mx-auto p-3 bg-white rounded">
 	     <div class="">
-
-	         <h4 class="mx-auto">Login to Bring a Souvenir </h4>
-	         <br>
-	         <!-- /login?error=true -->
-	         <th:block th:if="${#session != null && #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}">
-	             <div th:if= "${#request.getParameter('error') == 'true'}"
-	                style="color: red; margin: 10px 0px;">
-	                Login Failed!!!<br /> Reason :
-	                <span th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}"></span>
-	             </div>
-	         </th:block>
-	     
+	         <h4 class="mx-auto">Login to WinkWide </h4>
 	     </div>
 	      
          <form method="POST"
             th:action="@{/j_spring_security_check}">
                    
               <div class="form-group">
-			    <input type="email" name="userName" class="form-control" placeholder="Email address">
+			    <input type="email" name="userName" class="form-control" placeholder="Email address" autofocus>
 			  </div>
 			  <div class="form-group">
 			    <input type="password" name="password" class="form-control" placeholder="Password">
@@ -41,9 +30,14 @@
 			  <button type="submit" class="btn btn-primary">Login</button>
 			</div>
          </form>
-          
-         <span class="error-message" th:utext="${error}"></span>
-         
+         <br>
+	     <!-- /login?error=true -->
+	     <th:block th:if="${#session != null && #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}">
+	          <div th:if= "${#request.getParameter('error') == 'true'}" >
+	             <small class="text-danger"> Login Failed!<br /> Reason :</small>
+	             <small class="text-danger" th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}"></small>
+	          </div>
+	     </th:block>         
          <hr>
          
          or, <a href="/admin/createAccount">Create a new account</a>

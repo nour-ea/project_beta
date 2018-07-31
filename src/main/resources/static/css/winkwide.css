@@ -53,3 +53,23 @@ html, body {
   font-size: 12px;
   text-transform: uppercase;
 }
+
+/*animation styles*/
+.no-js #loader { display: none;  }
+.js #loader { display: block; position: absolute; left: 100px; top: 0; }
+.se-pre-con {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background: url(/img/animations/logo.gif) center no-repeat #fff;
+}
+
+/*Welcome background*/
+.bg-welcome {
+	background-image: url(/img/backgrounds/welcome_background.jpg);
+	background-size: 100%;
+  	min-height: 80vh !important;
+}

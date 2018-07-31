@@ -14,9 +14,9 @@
 <body ng-app="AccountManagement" ng-controller="CreateAccountController">
 	<th:block th:include="/_header"></th:block>
 	
-	<section class="container-fluid p-3 bg-light">
+	<section class="container-fluid p-3 bg-welcome">
 
-		<div class="col-md-4 mx-auto p-3 bg-white">
+		<div class="col-md-4 mx-auto p-3 bg-white rounded">
 		     
 		 <div class="">
 	         <h4 class="mx-auto">Create a new account </h4>
@@ -69,10 +69,11 @@
 			<div class="form-group mt-2">
 				<button type="submit" class="btn btn-primary" ng-disabled="userForm.$invalid" >Create Account</button>		
 	         <hr>	         
-	         or, <a href="/admin/login">Login with your account</a>			
+	         or, <a href="/login">Login with your account</a>			
 			</div>
 			
-		 </form> 
+		 </form>
+		 </div> 
 		
 	     
 	     

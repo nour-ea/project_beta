@@ -12,7 +12,7 @@ import org.springframework.validation.Validator;
 import com.platformia.winkwide.dao.DaoFilter;
 import com.platformia.winkwide.dao.GenericHibernateDao;
 import com.platformia.winkwide.entity.Display;
-import com.platformia.winkwide.form.DisplayForm;
+
 
 @Component
 public class DisplayValidator implements Validator {
@@ -23,49 +23,49 @@ public class DisplayValidator implements Validator {
 	// The classes are supported by this validator.
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return clazz == DisplayForm.class;
+		return clazz == Display.class;
 	}
 
 	@Override
-	public void validate(Object target, Errors errors) {
-		DisplayForm displayForm = (DisplayForm) target;
+	public void validate(Object obj, Errors errors) {
+		Display display = (Display) obj;
 
-		// Check the fields of displayForm.
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty.displayForm.name");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "NotEmpty.displayForm.brand");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "brand", "NotEmpty.displayForm.brand");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "size", "NotEmpty.displayForm.size");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shopCoverage", "NotEmpty.displayForm.shopCoverage");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mac", "NotEmpty.displayForm.mac");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "smart", "NotEmpty.displayForm.smart");
+		// Check the fields of display.
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty.display.name");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "NotEmpty.display.brand");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "brand", "NotEmpty.display.brand");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "size", "NotEmpty.display.size");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shopCoverage", "NotEmpty.display.shopCoverage");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mac", "NotEmpty.display.mac");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "smart", "NotEmpty.display.smart");
 
 		// Check mac adress format
-		if (displayForm.getMac() != null) {
+		if (display.getMac() != null) {
 
-			if (!Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").matcher(displayForm.getMac()).matches()) {
-				errors.rejectValue("mac", "Pattern.displayForm.mac");
+			if (!Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").matcher(display.getMac()).matches()) {
+				errors.rejectValue("mac", "Pattern.display.mac");
 			} else {
  			
 				//Request db with a filter on display mac address to check if it already exists
 				displayDAO.setEntityClass(Display.class);
 				ArrayList<DaoFilter> macFilters = new ArrayList<DaoFilter>();
-				macFilters.add(new DaoFilter("eq", "orderAsc", "mac", displayForm.getMac(), null));
+				macFilters.add(new DaoFilter("eq", "orderAsc", "mac", display.getMac(), null));
 				ArrayList<Display> dbDisplays = (ArrayList<Display>) displayDAO.findAll(macFilters);
 				
 				//Create request case
-				if(displayForm.getId()==null) {
+				if(display.getId()==null) {
 					if (dbDisplays != null && !dbDisplays.isEmpty()) {
 						// A Display with that MAC address already exists.
-						errors.rejectValue("mac", "Duplicate.displayForm.mac");
+						errors.rejectValue("mac", "Duplicate.display.mac");
 					}
 				}
 				//Update request case
 				else {
 					if (dbDisplays != null && !dbDisplays.isEmpty()) {
 						// A Display with that MAC address already exists.
-						for (Display display : dbDisplays) {
-						 if(display.getId()!=displayForm.getId())
-							 errors.rejectValue("mac", "Duplicate.displayForm.mac");
+						for (Display d : dbDisplays) {
+						 if(d.getId()!=d.getId())
+							 errors.rejectValue("mac", "Duplicate.display.mac");
 						}
 					}
 				}

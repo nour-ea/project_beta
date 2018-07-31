@@ -32,6 +32,17 @@
 	
 }
 
+.sidenav .disabled-link {
+	color: #5a5a5a;
+}
+
+
+/*When navigation link corresponds to open section*/
+.sidenav .currentNav {
+	color: #090c14;
+	background-color: #F1F1F1;	
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
 	.sidenav {

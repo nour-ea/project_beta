@@ -9,18 +9,22 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import com.platformia.winkwide.form.ReportEntryForm;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter @Setter @NoArgsConstructor
 @Entity
-@Table(name = "Reports", uniqueConstraints={@UniqueConstraint(columnNames={"display_time","display_id", "media_id"})})
+@Table(name = "Reports", uniqueConstraints={@UniqueConstraint(columnNames={"start_time","end_time","display_id"})})
 public class Report implements Serializable {
 
 
@@ -31,39 +35,26 @@ public class Report implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-
+	
+    @ManyToOne
+    @JoinColumn(name="display_id")
+    private Display display;
+    
+    @ManyToOne
+    @JoinColumn(name="media_id")
+    private Media media;
+	
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "display_time", nullable = false)
-	private java.util.Date displayTime;
+	@Column(name = "start_time", nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd HH:mm a")
+	private Date startTime;
 	
-    @Column(name = "display_id", nullable = false)
-    private Long displayId;
-    
-    @Column(name = "media_id", length = 128, columnDefinition = "JSON")
-    private String mediaId;
+	@Basic
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "end_time", nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd HH:mm a")
+	private Date endTime;
 
-
-	public Report() {
-		
-	}
-
-    public Report(Date displayTime, Long displayId, String mediaId) {
-		this.displayTime = displayTime;
-		this.displayId = displayId;
-		this.mediaId = mediaId;
-	}
-
-    public Report(ReportEntryForm reportEntryForm ) {
-		this.displayTime = reportEntryForm.getDisplayTime();
-		this.displayId = reportEntryForm.getDisplayId();
-		this.mediaId = reportEntryForm.getMediaId();
-	}
-    
-    public void update(ReportEntryForm reportEntryForm ) {
-		this.displayTime = reportEntryForm.getDisplayTime();
-		this.displayId = reportEntryForm.getDisplayId();
-		this.mediaId = reportEntryForm.getMediaId();
-	}
 
 }

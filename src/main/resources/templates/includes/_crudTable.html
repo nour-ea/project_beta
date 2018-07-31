@@ -1,0 +1,137 @@
+
+	<!-- DATA TABLE -->
+	<div class="row m-2  rounded bg-light" id="tableRow">
+		<div class="m-4 w-100" style="font-size: 12px">
+			<div id="crudTable">
+				<div ui-grid="gridOptions" class="grid" ui-grid-pagination ui-grid-selection ui-grid-exporter></div>
+			</div>
+
+		</div>
+	</div>
+
+
+	<!-- CREATE / EDIT an object modal -->
+	<div class="modal fade" id="createEditObjectModal" tabindex="-1">
+		<div class="modal-dialog modal-lg" >
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="createEditObjectModalLabel">Create an Object</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				
+				<form id="objectForm" name="objectForm" class="m-2">
+				<div class="modal-body m-1 p-1">								
+						<!-- automatic form fields for each object-->
+						 <div ng-repeat="field in schema" class="form-group row">
+						 
+						    <label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
+						    		class="col-sm-2 col-form-label">{{field.title}}</label>
+						    
+						    <!-- case of a Textfield -->
+						    <div ng-if="field.type=='String'" class="col-sm-10">
+								<input type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" required>
+								<small ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
+							</div>
+							
+							<!-- case of a Boolean -->
+						    <div ng-if="field.type=='boolean'" class="col-sm-10">
+								<select type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" required>
+									<option ng-selected="formData[field.name] == true">true</option>
+									<option ng-selected="formData[field.name] == false">false</option>
+								</select>
+								<small ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
+							</div> 
+							
+							<!-- case of a Number -->
+						    <div ng-if="field.type=='int' || field.type=='Long' " class="col-sm-10">
+								<input type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" ng-pattern="/^[0-9]*$/" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" required>
+								<small ng-show="objectForm[field.name].$error.required && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
+								<small ng-show="!objectForm[field.name].$error.required  && objectForm[field.name].$error.pattern && !objectForm[field.name].$pristine" class="text-danger">&nbsp field {{field.title}} must be a number </small>				
+							</div>
+							
+							<!-- case of a Decimal -->
+						    <div ng-if="field.type=='BigDecimal' " class="col-sm-10">
+								<input type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" required>
+								<small ng-show="objectForm[field.name].$error.required && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
+								<small ng-show="!objectForm[field.name].$error.required  && objectForm[field.name].$error.pattern && !objectForm[field.name].$pristine" class="text-danger">&nbsp field {{field.title}} must be a decimal </small>				
+							</div>
+																			
+							<!-- case of a Date -->
+						    <div ng-if="field.type=='Date'" class="col-sm-10 input-append date form_datetime row">
+								<div class="col-sm-10 pr-0">
+								<input type="text" name="{{field.name}}" class="form-control form-control-sm small mt-1 " readonly  placeholder="yyyy-MM-dd hh:mm" ng-model="formData[field.name]" required>
+								</div>
+								<div class="col-sm-2 p-1">
+									<div class="mt-1">
+										<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
+    										<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
+									</div>
+    								</div>																											
+						 	</div>
+						 	
+						 	<!-- case of a Program -->
+						 	<label ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
+						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
+						 			<div ui-grid="displaysGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						 	</div>
+						 	<div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
+						 			<div ui-grid="programDisplaysGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						 	</div>
+						 	
+						 	<label ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-2 col-form-label">Medias</label>
+						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
+						 			<div ui-grid="mediasGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						 	</div>
+						 	<div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
+						 			<div ui-grid="programMediasGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						 	</div>
+						 	
+						</div>
+							
+				</div>
+												
+				<!-- add specific form fields here -->
+
+				<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button id="createEditObjectModalAction" ng-click="createTargetObject()" type="button" class="btn btn-primary" data-dismiss="modal" ng-disabled="objectForm.$invalid">Create</button>
+				</div>
+				</form>	
+																									
+			</div>
+		</div>
+	</div>
+
+
+	<!-- DELETE an object modal -->
+	<div class="modal fade" id="deleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteObjectModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="deleteObjectModalLabel">Delete an Object</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete that {{objectTarget}}?</p>
+					<br>
+					<!-- automatic form fields for each object-->
+					<div ng-repeat="field in schema" class="ml-2">
+					<p ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1">
+						{{field.title}} : {{formData[field.name]}} <br>
+					</p>
+					</div>
+
+					<!-- add specific form fields here-->
+					
+				</div>
+				<div class="modal-footer">
+					<button ng-click="cleanFormData()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button ng-click="deleteTargetObject()" type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>

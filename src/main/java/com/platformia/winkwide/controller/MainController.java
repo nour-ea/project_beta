@@ -15,39 +15,54 @@ public class MainController {
 			return "index";
 		}
 		
+		@RequestMapping("/displays")
+		public String displays() {
+			return "displays";
+		}
+		
+		@RequestMapping("/medias")
+		public String medias() {
+			return "medias";
+		}
+		
+		@RequestMapping("/programs")
+		public String programs() {
+			return "programs";
+		}
+		
+		@RequestMapping("/reports")
+		public String reports() {
+			return "reports";
+		}
+
+		
 		@RequestMapping("/crudTable")
 		public String crudTable() {
-			return "crudTable";
+			return "include/_crudTable";
 		}
 		
 		@RequestMapping("/403")
 		public String accessDenied() {
 			return "403";
 		}
-	
-	   // GET: Show Products Page
-	   @RequestMapping(value = { "/productsList" }, method = RequestMethod.GET)
-	   public String productsList(Model model) {
-	 
-	      return "products";
-	   }   
-	
+		
+			
 	   // GET: Show Login Page
-	   @RequestMapping(value = { "/admin/login" }, method = RequestMethod.GET)
+	   @RequestMapping(value = { "/login" }, method = RequestMethod.GET)
 	   public String login(Model model) {
 	 
 	      return "login";
 	   }
 	   
 	   // GET: Show Create Account Page
-	   @RequestMapping(value = { "/admin/createAccount" }, method = RequestMethod.GET)
+	   @RequestMapping(value = { "/createAccount" }, method = RequestMethod.GET)
 	   public String createAccount(Model model) {
 	 
 	      return "createAccount";
 	   }
 	   
 	   // GET: Show Account Info Page
-	   @RequestMapping(value = { "/admin/accountInfo" }, method = RequestMethod.GET)
+	   @RequestMapping(value = { "/accountInfo" }, method = RequestMethod.GET)
 	   public String accountInfo(Model model) {
 	 
 	      UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

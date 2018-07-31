@@ -20,7 +20,7 @@ public class Account implements Serializable {
 	private static final long serialVersionUID = 7377377702416850270L;
 
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
-    public static final String ROLE_SELLER = "ROLE_SELLER";
+    public static final String ROLE_SELLER = "ROLE_PARTNER";
 	public static final String ROLE_CLIENT = "ROLE_CLIENT";
 	
     @Id

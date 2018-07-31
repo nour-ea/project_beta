@@ -47,8 +47,9 @@ app.controller("CreateAccountController", function($scope, $http) {
 		
 		//if status is OK then show confirmation
 		if(status=='OK'){
-			alert("account created : " + message);
+			alert("account created : \n" + message);
 			_clearFormData();
+			window.location.href = '/login';
 		}
 		
 		//if status is BAD_REQUEST then highlight where form error are

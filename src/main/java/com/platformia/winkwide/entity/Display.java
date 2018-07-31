@@ -2,19 +2,22 @@ package com.platformia.winkwide.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.platformia.winkwide.form.DisplayForm;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import lombok.Data;
-
-@Data
+@Getter @Setter @NoArgsConstructor
 @Entity
 @Table(name = "Displays")
 public class Display implements Serializable {
@@ -29,7 +32,7 @@ public class Display implements Serializable {
     @Column(name = "name", length = 128, nullable = false, unique=true)
     private String name;
     
-    @Column(name = "address", length = 128, nullable = false, columnDefinition = "JSON")
+    @Column(name = "address", length = 128, nullable = false)
     private String address;
     
     @Column(name = "brand", length = 128, nullable = false)
@@ -47,43 +50,10 @@ public class Display implements Serializable {
     @Column(name = "smart", length = 1, nullable = false, columnDefinition = "TINYINT(1)")
     private boolean smart;
     
+    @OneToMany(mappedBy="display", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+    private List<Program> programs;
     
-    
-    public Display() {
-
-	}
-    
-    
-	public Display(Long id, String name, String address, String brand, int size, BigDecimal shopCoverage, String mac, boolean smart) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.address = address;
-		this.brand = brand;
-		this.size = size;
-		this.shopCoverage = shopCoverage;
-		this.mac = mac;
-		this.smart = smart;
-	}
-
-	public Display(DisplayForm displayForm) {
-		this.name = displayForm.getName();
-		this.address = displayForm.getAddress();
-		this.brand = displayForm.getBrand();
-		this.size = displayForm.getSize();
-		this.shopCoverage = displayForm.getShopCoverage();
-		this.mac = displayForm.getMac();
-		this.smart = displayForm.isSmart();
-	}
-	
-	public void update(DisplayForm displayForm) {
-		this.name = displayForm.getName();
-		this.address = displayForm.getAddress();
-		this.brand = displayForm.getBrand();
-		this.size = displayForm.getSize();
-		this.shopCoverage = displayForm.getShopCoverage();
-		this.mac = displayForm.getMac();
-		this.smart = displayForm.isSmart();
-	}
+    @OneToMany(mappedBy="display", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+    private List<Report> reports;
 	
 }

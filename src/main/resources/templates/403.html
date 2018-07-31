@@ -1,19 +1,40 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-   <head>
-      <meta charset="UTF-8">
-      <title>Access Denied</title>
-      <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
-   </head>
-    
-   <body>
-    
-      <th:block th:include="/_header"></th:block>
-       
-      <div class="page-title">Access Denied!</div>
-      <h3 style="color:red;">Sorry, you can not access this page!</h3>
-       
-      <th:block th:include="/_footer"></th:block>
-       
-   </body>
+<head>
+<meta charset="UTF-8">
+<title>WinkWide</title>
+<th:block th:include="/includes/_include"></th:block>
+<script th:src="@{/apps/crudApp.js}"></script>
+
+</head>
+
+<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+	<th:block th:include="/_header"></th:block>
+		
+		<section class="row" id="mainContent">
+			<th:block th:include="/_navigation"></th:block>
+			<div class="col m-4">
+			
+				<!-- CONTEXT INFORMATION -->
+				<div class="row m-2 rounded bg-light" id="contextRow">
+					<div class="col m-2 ml-auto">	
+					<p class="text-primary font-weight-bold float-left" href="">Unauthorized Access </p>
+					</div>
+						
+				</div>
+				
+
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+						
+							<p class="text-danger">Sorry, you cannot access this page</p>
+					</div>
+				</div>
+															
+			</div>
+		</section>
+
+	<th:block th:include="/_footer"></th:block>
+
+</body>
 </html>

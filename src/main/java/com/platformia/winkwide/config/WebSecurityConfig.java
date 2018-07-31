@@ -43,12 +43,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	      
 	 
 	      // Requires login with role ROLE_CLIENT, ROLE_SELLER, or ROLE_ADMIN.
-	      // If not, it will redirect to /admin/login.
-	      http.authorizeRequests().antMatchers("/admin/accountInfo")//
-	            .access("hasAnyRole('ROLE_CLIENT', 'ROLE_SELLER', 'ROLE_ADMIN')");
+	      // If not, it will redirect to /login.
+	      http.authorizeRequests().antMatchers("/")
+	      		.access("hasAnyRole('ROLE_CLIENT', 'ROLE_PARTNER', 'ROLE_ADMIN')");
+
+	      http.authorizeRequests().antMatchers("/accountInfo")//
+	            .access("hasAnyRole('ROLE_CLIENT', 'ROLE_PARTNER', 'ROLE_ADMIN')");
 	 
-	      // Pages only for SELLER or ADMIN
-	      http.authorizeRequests().antMatchers("/product").access("hasAnyRole('ROLE_SELLER', 'ROLE_ADMIN')");
+	      // Pages only for ADMIN
+	      http.authorizeRequests().antMatchers("/displays").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/medias").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/programs").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/programs").access("hasAnyRole('ROLE_ADMIN')");
 	 
 	      // When user login, role XX.
 	      // But access to the page requires the YY role,
@@ -60,15 +66,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 
 	            //
 	            .loginProcessingUrl("/j_spring_security_check") // Submit URL
-	            .loginPage("/admin/login")//
+	            .loginPage("/login")//
 	            .defaultSuccessUrl("/")//
-	            .failureUrl("/admin/login?error=true")//
+	            .failureUrl("/login?error=true")//
 	            .usernameParameter("userName")//
 	            .passwordParameter("password")
 	 
 	            // Configuration for the Logout page.
 	            // (After logout, go to home page)
-	            .and().logout().logoutUrl("/admin/logout").logoutSuccessUrl("/");
+	            .and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
 	 
 	   }
 	

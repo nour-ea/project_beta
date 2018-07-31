@@ -1,28 +1,28 @@
-<div id="navigation" class="font-weight-bold">
-            <ul class="sidenav ">
+<div id="navigation" class="font-weight-bold" ng-class="{ 'currentNav' : currentPath === '/displays' }" >
+            <ul class="sidenav " ng-class="{ 'currentNav' : currentPath === '/displays' }" >
                 <li>
-                    <a href="#">Displays</a>
+                    <a href="/displays" ng-class="{ 'currentNav' : currentPath === '/displays' }" >Displays</a>
                 </li>
                 <li>
-                    <a href="#">Media</a>
+                    <a href="/medias" ng-class="{ 'currentNav' : currentPath === '/medias' }" >Medias</a>
                 </li>
                 <li>
-                    <a href="#">Central Program</a>
+                    <a href="/programs" ng-class="{ 'currentNav' : currentPath === '/programs' }" >Programs</a>
                 </li>
                 <li>
-                    <a href="#">Central Report</a>
+                    <a href="/reports" ng-class="{ 'currentNav' : currentPath === '/reports' }" >Reports</a>
                 </li>
                 <li>
-                    <a href="#">Partners</a>
+                    <a class="disabled-link" href="/" ng-class="{ 'currentNav' : currentPath === '/partners' }" >Partners</a>
                 </li>
                 <li>
-                    <a href="#">Clients</a>
+                    <a class="disabled-link" href="/" ng-class="{ 'currentNav' : currentPath === '/clients' }" >Clients</a>
                 </li>
 				<li>
-                    <a href="#">Operations</a>
+                    <a class="disabled-link" href="/" ng-class="{ 'currentNav' : currentPath === '/operations' }" >Operations</a>
                 </li>
                 <li>
-                    <a href="#">Billing</a>
+                    <a class="disabled-link" href="/" ng-class="{ 'currentNav' : currentPath === '/billing' }" >Billing</a>
                 </li>
 
             </ul>

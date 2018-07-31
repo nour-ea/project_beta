@@ -38,7 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
  
         List<GrantedAuthority> grantList = new ArrayList<GrantedAuthority>();
  
-        // ROLE_CLIENT, ROLE_SELLER, ROLE_ADMIN
+        // ROLE_CLIENT, ROLE_PARTNER, ROLE_ADMIN
         GrantedAuthority authority = new SimpleGrantedAuthority(role);
  
         grantList.add(authority);
@@ -48,10 +48,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
  
-        UserDetails userDetails = (UserDetails) new User(account.getUserName(), //
+        UserDetails userDetails = (UserDetails) new User( account.getFirstName(), //
                 account.getEncrytedPassword(), enabled, accountNonExpired, //
                 credentialsNonExpired, accountNonLocked, grantList);
- 
+         
         return userDetails;
     }
  
