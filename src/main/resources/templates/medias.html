@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>WinkWide</title>
+<th:block th:include="/includes/_include"></th:block>
+<script th:src="@{/apps/crudApp.js}"></script>
+
+</head>
+
+<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+	<th:block th:include="/_header"></th:block>
+		
+		<section class="row" id="mainContent">
+			<th:block th:include="/_navigation"></th:block>
+			<div class="col m-4">
+			
+				<!-- CONTEXT INFORMATION -->
+				<div class="row m-2 rounded bg-light" id="contextRow">
+					<div class="col m-2 ml-auto">	
+					<p class="text-primary font-weight-bold float-left" href="/medias">Administration / Medias</p>
+					</div>
+						
+				</div>
+				
+				
+				<!-- CONFIGURE ANGULAR CRUD APP with object name -->
+				<script> app.value('objectModel','media'); </script>
+				
+				
+				<!-- SPECIFIC FILTERS and Create Button -->
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+						
+							<!-- add specific filters here -->
+							<div class="form-row pt-2" ng-form name="specificForm">
+			
+								<div class="col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0 float-left">
+									<small>Filter by size</small>
+									<div>
+										<input type="text" name="sizeMin" class="form-control form-control-sm mt-1" placeholder="min size" 
+											ng-model="specificFilters.sizeMin" ng-change="getCollectionData()"
+											ng-pattern="/^[0-9]*$/" >
+											<small ng-show="specificForm.sizeMin.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
+										<input type="text" name="sizeMax" class="form-control form-control-sm mt-1" placeholder="max size"
+											ng-model="specificFilters.sizeMax" ng-change="getCollectionData()"
+											ng-pattern="/^[0-9]*$/" >
+											<small ng-show="specificForm.sizeMax.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
+									</div>
+								</div>
+								
+			
+								<div class="ml-auto col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0">
+									<button ng-click="setFormData('','create')" type="button" class="btn btn-block btn-primary float-right" data-toggle="modal" data-target="#createEditObjectModal">
+										<i class="fa fa-plus fa-fw"></i>&nbsp; New {{objectTarget}}
+									</button>
+								</div>
+			
+							</div>
+					</div>
+				</div>
+				
+				
+				<!-- CRUD Table and Modals-->
+				<th:block th:include="/includes/_crudTable"></th:block>
+															
+			</div>
+		</section>
+
+	<th:block th:include="/_footer"></th:block>
+
+</body>
+</html>

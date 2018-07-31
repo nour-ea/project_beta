@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>WinkWide</title>
+<th:block th:include="/includes/_include"></th:block>
+<script th:src="@{/apps/crudApp.js}"></script>
+
+</head>
+
+<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+	<th:block th:include="/_header"></th:block>
+		
+		<section class="row" id="mainContent">
+			<th:block th:include="/_navigation"></th:block>
+			<div class="col m-4">
+			
+				<!-- CONTEXT INFORMATION -->
+				<div class="row m-2 rounded bg-light" id="contextRow">
+					<div class="col m-2 ml-auto">	
+					<p class="text-primary font-weight-bold float-left" href="/index">Administration / Welcome </p>
+					</div>
+						
+				</div>
+				
+
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+						
+							<p>Welcome to WinWide Administration Portal.</p>
+							<p>To manage the WinkWide Network, please choose an Administration Section on the left panel.</p>
+					</div>
+				</div>
+															
+			</div>
+		</section>
+
+	<th:block th:include="/_footer"></th:block>
+
+</body>
+</html>
