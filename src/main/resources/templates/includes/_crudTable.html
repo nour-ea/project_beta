@@ -61,7 +61,7 @@
 							<!-- case of a Date -->
 						    <div ng-if="field.type=='Date'" class="col-sm-10 input-append date form_datetime row">
 								<div class="col-sm-10 pr-0">
-								<input type="text" name="{{field.name}}" class="form-control form-control-sm small mt-1 " readonly  placeholder="yyyy-MM-dd hh:mm" ng-model="formData[field.name]" required>
+								<input type="text" name="{{field.name}}" class="form-control form-control-sm small mt-1 " readonly  placeholder="yyyy-mm-dd hh:mm" ng-model="formData[field.name]" required>
 								</div>
 								<div class="col-sm-2 p-1">
 									<div class="mt-1">
@@ -73,19 +73,27 @@
 						 	
 						 	<!-- case of a Program -->
 						 	<label ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
-						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
-						 			<div ui-grid="displaysGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-4">
+						 			<div ui-grid="displaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
 						 	</div>
-						 	<div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
-						 			<div ui-grid="programDisplaysGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-1">
+						 			<button id="displaysGridAddButton" ng-click="addSelectedObjects('display')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
+						 			<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('display')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
+						 	</div>
+						 	<div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-4">
+						 			<div ui-grid="selectedDisplaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
 						 	</div>
 						 	
-						 	<label ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-2 col-form-label">Medias</label>
-						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
-						 			<div ui-grid="mediasGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						 	<label ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
+						    <div ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-4">
+						 			<div ui-grid="mediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
 						 	</div>
-						 	<div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-5 form-control">
-						 			<div ui-grid="programMediasGridOptions" class="grid small" ui-grid-pagination></div>						 		
+						    <div ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-1">
+						 			<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
+						 			<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
+						 	</div>
+						 	<div ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-4">
+						 			<div ui-grid="selectedMediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
 						 	</div>
 						 	
 						</div>
@@ -96,7 +104,7 @@
 
 				<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button id="createEditObjectModalAction" ng-click="createTargetObject()" type="button" class="btn btn-primary" data-dismiss="modal" ng-disabled="objectForm.$invalid">Create</button>
+						<button id="createEditObjectModalAction" ng-click="createTargetObject()" type="button" class="btn btn-primary" ng-disabled="objectForm.$invalid">Create</button>
 				</div>
 				</form>	
 																									
@@ -130,7 +138,7 @@
 				</div>
 				<div class="modal-footer">
 					<button ng-click="cleanFormData()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button ng-click="deleteTargetObject()" type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
+					<button ng-click="deleteTargetObject()" type="button" class="btn btn-primary">Delete</button>
 				</div>
 			</div>
 		</div>

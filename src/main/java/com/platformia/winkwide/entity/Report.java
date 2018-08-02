@@ -36,6 +36,18 @@ public class Report implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
 	
+	@Basic
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "start_time", nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
+	private Date startTime;
+	
+	@Basic
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "end_time", nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
+	private Date endTime;
+
     @ManyToOne
     @JoinColumn(name="display_id")
     private Display display;
@@ -43,18 +55,5 @@ public class Report implements Serializable {
     @ManyToOne
     @JoinColumn(name="media_id")
     private Media media;
-	
-	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "start_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd HH:mm a")
-	private Date startTime;
-	
-	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "end_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd HH:mm a")
-	private Date endTime;
-
 
 }

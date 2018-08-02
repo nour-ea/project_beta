@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -50,10 +49,10 @@ public class Display implements Serializable {
     @Column(name = "smart", length = 1, nullable = false, columnDefinition = "TINYINT(1)")
     private boolean smart;
     
-    @OneToMany(mappedBy="display", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+    @OneToMany(mappedBy="display")
     private List<Program> programs;
     
-    @OneToMany(mappedBy="display", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+    @OneToMany(mappedBy="display")
     private List<Report> reports;
 	
 }

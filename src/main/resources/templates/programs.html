@@ -40,7 +40,7 @@
 									<div class="input-append date form_datetime row">
 										<div class="col-sm-10 pr-0">
 										<input type="text" name="startTimeMin" class="form-control form-control-sm small mt-1 " readonly  placeholder="min start time" 
-											ng-model="specificFilters.startTimeMin" ng-change="getCollectionData()">
+											ng-model="specificFilters.startTimeMin" ng-change="setGridOptionsData()">
 										</div>
 										<div class="col-sm-2 p-1">
 											<div class="mt-1">
@@ -52,7 +52,7 @@
 									<div class="input-append date form_datetime row">
 										<div class="col-sm-10 pr-0">
 										<input type="text" name="startTimeMax" class="form-control form-control-sm small mt-1 " readonly  placeholder="max start time" 
-											ng-model="specificFilters.startTimeMax" ng-change="getCollectionData()">
+											ng-model="specificFilters.startTimeMax" ng-change="setGridOptionsData()">
 										</div>
 										<div class="col-sm-2 p-1">
 											<div class="mt-1">
@@ -68,7 +68,7 @@
 									<div class="input-append date form_datetime row">
 										<div class="col-sm-10 pr-0">
 										<input type="text" name="endTimeMin" class="form-control form-control-sm small mt-1 " readonly  placeholder="min end time" 
-											ng-model="specificFilters.endTimeMin" ng-change="getCollectionData()">
+											ng-model="specificFilters.endTimeMin" ng-change="setGridOptionsData()">
 										</div>
 										<div class="col-sm-2 p-1">
 											<div class="mt-1">
@@ -80,7 +80,7 @@
 									<div class="input-append date form_datetime row">
 										<div class="col-sm-10 pr-0">
 										<input type="text" name="endTimeMax" class="form-control form-control-sm small mt-1 " readonly  placeholder="max end time" 
-											ng-model="specificFilters.endTimeMax" ng-change="getCollectionData()">
+											ng-model="specificFilters.endTimeMax" ng-change="setGridOptionsData()">
 										</div>
 										<div class="col-sm-2 p-1">
 											<div class="mt-1">
@@ -95,7 +95,7 @@
 									<small>Filter by display Id Id</small>
 									<div>										
 										<input type="text" name="displayId" class="form-control form-control-sm mt-1" placeholder="display Id" 
-											ng-model="specificFilters.displayId" ng-change="getCollectionData()"
+											ng-model="specificFilters.displayId" ng-change="setGridOptionsData()"
 											ng-pattern="/^[0-9]*$/" >
 											<small ng-show="specificForm.displayId.$error.pattern" class="text-danger">&nbsp field must be a number </small>																	
 									</div>

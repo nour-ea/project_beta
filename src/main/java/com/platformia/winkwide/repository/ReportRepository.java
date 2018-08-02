@@ -24,10 +24,10 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 	public Page<Report> findByCustomFilters(
 			@Param("displayId") Long displayId,
 			@Param("mediaId") Long mediaId, 
-			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-mm-dd hh:mm a") Date startTimeMin,
-			@Param("startTimeMax") @DateTimeFormat(pattern = "yyyy-mm-dd hh:mm a") Date startTimeMax,
-			@Param("endTimeMin") @DateTimeFormat(pattern = "yyyy-mm-dd hh:mm a") Date endTimeMin,
-			@Param("endTimeMax") @DateTimeFormat(pattern = "yyyy-mm-dd hh:mm a") Date endTimeMax,
+			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date startTimeMin,
+			@Param("startTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date startTimeMax,
+			@Param("endTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date endTimeMin,
+			@Param("endTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date endTimeMax,
 			Pageable p);
 	
 }
