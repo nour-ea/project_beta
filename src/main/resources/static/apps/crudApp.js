@@ -21,6 +21,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		var targetObjectUrl = '/api/'+$scope.collectionTarget;
 		$scope.schema = {};
 		$scope.formData = {};
+		$scope.isCreateModalType = true; //to differentiate create and edit modal
 
 		$scope.setFormData = function(url, operation){
 			if(operation == 'edit' || operation == 'delete') {
@@ -31,15 +32,27 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					console.log('setting form data');
 					
 					//SPECIFIC for program creation and edition
-					$scope.setFormSelectionData('selectedDisplaysGridOptions',$scope.formData._links.display.href, 'display');
-					$scope.setFormSelectionData('selectedMediasGridOptions',$scope.formData._links.medias.href, 'medias');
+					if($scope.objectTarget == 'program'){
+						$scope.setFormSelectionData('selectedDisplaysGridOptions',$scope.formData._links.display.href, 'display');
+						$scope.setFormSelectionData('selectedMediasGridOptions',$scope.formData._links.medias.href, 'medias');
+					}
 					//------------------------------------------
 				});
 			}
 			
-			$scope.customizeCreateEditModal(operation);
-			
+			//check if createEditModal is of type Create
+			$scope.isCreateModalType = (operation == 'create'); 
+			//set clear-formData-on-hide if the modal is of type edit or delete
+			if(operation == 'edit')
+				angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
+					$scope.cleanFormData();
+				});
+			if(operation == 'edit')
+				angular.element(deleteObjectModal).on('hide.bs.modal', function (e) {
+					$scope.cleanFormData();
+				});
 		};
+		
 
 		// Define HTML for edition buttons
 		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary ml-1" ><i class="fa fa-eye fa-fw"></i></button>';
@@ -52,10 +65,18 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			var columnList = [];
 			CRUDService.getScheme($scope.objectTarget).success(function(data){
 				$scope.schema = data;
+				
+				//SPECIFIC for programs and reports list
 				angular.forEach(data, function(value, key) {
 					if(value.type=='Display')
 						this.push({ field: 'display' , name: 'Display', enableFiltering:false });
-					else if(value.type=='String')
+					if(value.type=='Media')
+						this.push({ field: 'media' , name: 'Media', enableFiltering:false });
+				}, columnList);
+				// ---------------------------------------
+				
+				angular.forEach(data, function(value, key) {
+					if(value.type=='String')
 						this.push({ field: value.name , name: value.title, enableFiltering:true });
 					else if( ['boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(value.type) !== -1)
 						this.push({ field: value.name , name: value.title, enableFiltering:false });
@@ -186,38 +207,38 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		$scope.objectForm.$setPristine();
 	};
 	
-	//Parametrize Create/Edit modal
-	$scope.customizeCreateEditModal = function(operation){
 	
-		//build modal canvas
-		if(operation == 'create'){
-			angular.element(createEditObjectModalLabel).html("Create " + $scope.objectTarget);
-			angular.element(createEditObjectModalAction).html("Create");
-			angular.element(createEditObjectModalAction).attr("ng-click", "createTargetObject()");
-			angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
-				});
-			
-		}else if(operation == 'edit'){
-			angular.element(createEditObjectModalLabel).html("Edit " + $scope.objectTarget);
-			angular.element(createEditObjectModalAction).html("Update");
-			angular.element(createEditObjectModalAction).attr("ng-click", "editTargetObject()");
-			angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
-				$scope.cleanFormData();
-				});
-		}else if(operation == 'delete'){
-			angular.element(deleteObjectModalLabel).html("Delete " + $scope.objectTarget);
-			angular.element(deleteObjectModal).on('hide.bs.modal', function (e) {
-				$scope.cleanFormData();
-				});
-		}
-		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// START OF SPECIFIC
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	
+	//Specific to Media File Upload
+	$scope.previewFile = function (input) { 
+				$scope.formData.file    = input.files[0];
+				
+			    var reader = new FileReader();
+			    reader.onload = function(e) {
+			    	angular.element(mediaPreview).attr("src", e.target.result);
+				}
+			    reader.readAsDataURL(input.files[0]);
+
 	};
 	
 	
 	
 	
-	// START OF SPECIFIC
-	// ----------------------------------------------------------------------
 	// Specific UI tables and data for programs displays and media management
 	
 	// Define All Displays table
@@ -360,20 +381,22 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				});                                                      
 		 };		
 		
-		
-	// Get Form Grids Data from REST Api on modal show
-	angular.element(createEditObjectModal).on('shown.bs.modal', function (e) {
-		$scope.setFormCollectionData('displaysGridOptions','displays', $scope.displaysPaginationOptions);
-		$scope.setFormCollectionData('mediasGridOptions','medias', $scope.mediasPaginationOptions);
-		});
 	
-	// Remove Form Grids Data from REST Api on modal hide
-	angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
-		$scope.displaysGridOptions.data = [];
-		$scope.mediasGridOptions.data = [];
-		$scope.selectedDisplaysGridOptions.data = [];
-		$scope.selectedMediasGridOptions.data = [];
-		});
+	if($scope.objectTarget == 'program'){
+		// Get Form Grids Data from REST Api on modal show
+		angular.element(createEditObjectModal).on('shown.bs.modal', function (e) {
+			$scope.setFormCollectionData('displaysGridOptions','displays', $scope.displaysPaginationOptions);
+			$scope.setFormCollectionData('mediasGridOptions','medias', $scope.mediasPaginationOptions);
+			});
+		
+		// Remove Form Grids Data from REST Api on modal hide
+		angular.element(createEditObjectModal).on('hidden.bs.modal', function (e) {
+			$scope.displaysGridOptions.data = [];
+			$scope.mediasGridOptions.data = [];
+			$scope.selectedDisplaysGridOptions.data = [];
+			$scope.selectedMediasGridOptions.data = [];
+			});
+	}
 	
 	// Define functions for select/de-select display and medias
 	$scope.addSelectedObjects = function(object){
@@ -454,7 +477,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					
 	};
 	
-	// Util function to transform selected list into string
+	// Utility function to transform selected list into string
 	$scope.selectedToLinks = function(selectedObjects){
 		var str ='';
 		selectedObjects.forEach(function(obj){
@@ -526,6 +549,21 @@ app.service('CRUDService',['$http', function ($http) {
 	    };
 	    
 	    function createOne(target, data) {
+	    	if(target=='medias'){
+	    		var formData = new FormData();
+	    		formData.append("name", data.name);
+	    		formData.append("mediaType", data.mediaType);
+	    		formData.append("file", data.file); 
+		        return $http({
+			          method: 'POST',
+			          	url: '/api/medias/uploads',
+			            data: formData,
+			            transformRequest: angular.identity,
+			            headers: {'Content-Type': undefined}
+			        });
+	    	}
+	    		
+	    		
 	        return $http({
 	          method: 'POST',
 	          	url: '/api/'+target,
@@ -534,6 +572,20 @@ app.service('CRUDService',['$http', function ($http) {
 	    };
 	
 	    function updateOne(url, data) {
+	    	if(url.indexOf('/api/medias') !== -1){
+	    		var formData = new FormData();
+	    		formData.append("name", data.name);
+	    		formData.append("mediaType", data.mediaType);
+	    		formData.append("file", data.file); 
+		        return $http({
+			          method: 'POST',
+			          	url: '/api/medias/updates',
+			            data: formData,
+			            transformRequest: angular.identity,
+			            headers: {'Content-Type': undefined}
+			        });	
+	    	}
+	    		
 	        return $http({
 	          method: 'PATCH',
 	            url: url,

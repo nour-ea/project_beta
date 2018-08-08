@@ -43,7 +43,7 @@ public class Media implements Serializable {
     private String url;
  
     @Column(name = "size", nullable = false)
-    private int size;
+    private Long size;
 	
     @Column(name = "verified", length = 1, nullable = false, columnDefinition = "TINYINT(1)")
     @JsonIgnore

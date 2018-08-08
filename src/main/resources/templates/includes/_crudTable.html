@@ -15,16 +15,19 @@
 		<div class="modal-dialog modal-lg" >
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="createEditObjectModalLabel">Create an Object</h5>
+					<h5 class="modal-title" id="createEditObjectModalLabel">{{isCreateModalType ? 'Create '+objectTarget : 'Edit '+objectTarget}}</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 				
 				<form id="objectForm" name="objectForm" class="m-2">
-				<div class="modal-body m-1 p-1">								
-						<!-- automatic form fields for each object-->
-						 <div ng-repeat="field in schema" class="form-group row">
+				<div class="modal-body m-1 p-1">		
+										
+						<!-- AUTOMATIC form fields for each object -->
+						<!-- ------------------------------------- -->
+						
+						<div ng-repeat="field in schema" ng-if="objectTarget!='media'" class="form-group row">
 						 
 						    <label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
 						    		class="col-sm-2 col-form-label">{{field.title}}</label>
@@ -70,41 +73,89 @@
 									</div>
     								</div>																											
 						 	</div>
-						 	
-						 	<!-- case of a Program -->
-						 	<label ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
-						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-4">
-						 			<div ui-grid="displaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-						 	</div>
-						    <div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-1">
-						 			<button id="displaysGridAddButton" ng-click="addSelectedObjects('display')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
-						 			<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('display')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
-						 	</div>
-						 	<div ng-if="objectTarget=='program' && field.type=='Display'" class="col-sm-4">
-						 			<div ui-grid="selectedDisplaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-						 	</div>
-						 	
-						 	<label ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
-						    <div ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-4">
-						 			<div ui-grid="mediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-						 	</div>
-						    <div ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-1">
-						 			<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
-						 			<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
-						 	</div>
-						 	<div ng-if="objectTarget=='program' && field.type=='List'" class="col-sm-4">
-						 			<div ui-grid="selectedMediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-						 	</div>
-						 	
 						</div>
+
+						<!-- add SCHEMA RELATED specific form fields here -->
+						<!-- -------------------------------------------- -->
+						
+						<!-- case of a Program -->
+						<div ng-repeat="field in schema" ng-if="objectTarget=='program'" class="form-group row">
+
+							 <label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
+							 <div ng-if="field.type=='Display'" class="col-sm-4">
+							 	<div ui-grid="displaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+							 </div>
+							 <div ng-if="field.type=='Display'" class="col-sm-1">
+							 	<button id="displaysGridAddButton" ng-click="addSelectedObjects('display')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
+							 	<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('display')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
+							 </div>
+							 <div ng-if="field.type=='Display'" class="col-sm-4">
+							 	<div ui-grid="selectedDisplaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+							 </div>
+							 	
+							 <label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
+							 <div ng-if="field.type=='List'" class="col-sm-4">
+							 	<div ui-grid="mediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+							 </div>
+							 <div ng-if="field.type=='List'" class="col-sm-1">
+							 	<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
+							 	<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
+							 </div>
+							 <div ng-if="field.type=='List'" class="col-sm-4">
+							 	<div ui-grid="selectedMediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+							 </div>				 	
+						</div>
+						
+						<!-- add MANUALLY SET specific form fields here -->
+						<!-- ------------------------------------------ -->
+						
+						<!-- case of a Media -->
+						<div ng-if="objectTarget=='media'">
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Name</label>
+							    <div class="col-sm-10">
+									<input type="text" class="form-control" name="name" ng-model="formData.name" ng-class="{ 'is-invalid' : objectForm.name.$invalid && !objectForm.name.$pristine }" required>
+									<small ng-show="objectForm.name.$invalid && !objectForm.name.$pristine" class="text-danger"> &nbsp field Name is required </small>
+								</div>
+							</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Media Type</label>
+							    <div class="col-sm-10">
+									<select type="text" class="form-control" name="mediaType" ng-model="formData.mediaType" ng-class="{ 'is-invalid' : objectForm.mediaType.$invalid && !objectForm.mediaType.$pristine }" required>
+										<option ng-selected="formData.mediaType=='ads'">ads</option>
+										<option ng-selected="formData.mediaType=='info'">info</option>
+										<option ng-selected="formData.mediaType=='private'">private</option>
+										<option ng-selected="formData.mediaType=='other'">other</option>
+									</select>
+									<small ng-show="objectForm.mediaType.$invalid && !objectForm.mediaType.$pristine" class="text-danger"> &nbsp field Media Type is required </small>
+								</div>
+							</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Media File</label>
+							    <div class="col-sm-10">
+									<input type="file" class="form-control" name="file" id="file" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.file.$invalid && !objectForm.file.$pristine }">
+									<small ng-show="objectForm.file.$invalid && !objectForm.file.$pristine" class="text-danger"> &nbsp field Media File is required </small>
+								</div>
+							</div>
+							<div ng-if="isCreateModalType" class="form-group row">
+								<label class="col-sm-2 col-form-label">Preview</label>
+							    <div class="col-sm-10">
+									<embed id="mediaPreview" alt="Media Preview" class="form-control w-50">
+								</div>
+							</div>
+							<div ng-if="!isCreateModalType" class="form-group row">
+								<label class="col-sm-2 col-form-label">Preview</label>
+							    <div class="col-sm-10">
+									<embed src="{{formData.url}}" alt="Media Preview" class="form-control w-50">
+								</div>
+							</div>
+						</div>	
 							
 				</div>
 												
-				<!-- add specific form fields here -->
-
 				<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button id="createEditObjectModalAction" ng-click="createTargetObject()" type="button" class="btn btn-primary" ng-disabled="objectForm.$invalid">Create</button>
+						<button id="createEditObjectModalAction" ng-click="isCreateModalType ? createTargetObject() : updateTargetObject()" type="button" class="btn btn-primary" ng-disabled="objectForm.$invalid">{{isCreateModalType ? 'Create' : 'Update'}}</button>
 				</div>
 				</form>	
 																									
@@ -115,10 +166,10 @@
 
 	<!-- DELETE an object modal -->
 	<div class="modal fade" id="deleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteObjectModal" aria-hidden="true">
-		<div class="modal-dialog" role="document">
+		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="deleteObjectModalLabel">Delete an Object</h5>
+					<h5 class="modal-title" id="deleteObjectModalLabel">Delete {{objectTarget}}</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -126,15 +177,61 @@
 				<div class="modal-body">
 					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete that {{objectTarget}}?</p>
 					<br>
-					<!-- automatic form fields for each object-->
-					<div ng-repeat="field in schema" class="ml-2">
-					<p ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1">
-						{{field.title}} : {{formData[field.name]}} <br>
-					</p>
-					</div>
 
-					<!-- add specific form fields here-->
+					<!-- AUTOMATIC form fields for each object -->
+					<!-- ------------------------------------- -->
+						
+					<div ng-repeat="field in schema" ng-if="objectTarget!='media'" class="form-group row">
+						<label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
+							class="col-sm-2 col-form-label">{{field.title}}</label>
+						<div ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
+							class="col-sm-10">
+							<div class="form-control">{{formData[field.name]}}</div>
+						</div>
+					</div>
 					
+					<!-- add SCHEMA RELATED specific form fields here -->
+					<!-- -------------------------------------------- -->
+						
+					<!-- case of a Program -->
+					<div ng-repeat="field in schema" ng-if="objectTarget=='program'" class="form-group row">
+						<label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
+						<div ng-if="field.type=='Display'" class="col-sm-10">
+						 		<div ui-grid="selectedDisplaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+						</div>
+						 	
+						<label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
+						<div ng-if="field.type=='List'" class="col-sm-10">
+								<div ui-grid="selectedMediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+						</div>
+					</div>		
+
+					<!-- add MANUALLY SET specific form fields here -->
+					<!-- ------------------------------------------ -->
+							
+					<!-- case of a Media -->
+					<div ng-if="objectTarget=='media'">
+						<div class="form-group row">						
+							<label class="col-sm-2 col-form-label">Name</label>
+						    <div class="col-sm-10">
+								<div class="form-control">{{formData.name}}</div>
+							</div>
+						</div>
+						<div class="form-group row">						
+							<label class="col-sm-2 col-form-label">Media Type</label>
+						    <div class="col-sm-10">
+								<div class="form-control">{{formData.mediaType}}</div>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-2 col-form-label">Preview</label>
+						    <div class="col-sm-10">
+								<embed src="{{formData.url}}" alt="Media Preview" class="form-control w-50">
+							</div>
+						</div>
+					</div>						
+					
+						
 				</div>
 				<div class="modal-footer">
 					<button ng-click="cleanFormData()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

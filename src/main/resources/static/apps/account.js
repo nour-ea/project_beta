@@ -1,6 +1,6 @@
 var app = angular.module("AccountManagement", []);
 
-//Form Validation, password confirmation
+//Directive for form Validation, password confirmation
 app.directive("matchPassword", function () {
     return {
         require: "ngModel",

@@ -31,4 +31,6 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
 			@Param("sizeMax") Integer sizeMax,
 			Pageable p);
 	
+	public Media findByName( String name);
+	
 }

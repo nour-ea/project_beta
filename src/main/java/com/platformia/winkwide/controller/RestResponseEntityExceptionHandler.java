@@ -16,11 +16,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.platformia.winkwide.exception.ApiError;
+import com.platformia.winkwide.exception.FileStorageException;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler({ RepositoryConstraintViolationException.class })
+	@ExceptionHandler({ RepositoryConstraintViolationException.class, FileStorageException.class })
 	@ResponseBody
 	public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
 		RepositoryConstraintViolationException nevEx = (RepositoryConstraintViolationException) ex;
