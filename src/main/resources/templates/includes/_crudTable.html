@@ -3,7 +3,7 @@
 	<div class="row m-2  rounded bg-light" id="tableRow">
 		<div class="m-4 w-100" style="font-size: 12px">
 			<div id="crudTable">
-				<div ui-grid="gridOptions" class="grid" ui-grid-pagination ui-grid-selection ui-grid-exporter></div>
+				<div ui-grid="mainGrid" class="grid" ui-grid-pagination ui-grid-selection ui-grid-exporter></div>
 			</div>
 
 		</div>
@@ -15,7 +15,7 @@
 		<div class="modal-dialog modal-lg" >
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="createEditObjectModalLabel">{{isCreateModalType ? 'Create '+objectTarget : 'Edit '+objectTarget}}</h5>
+					<h5 class="modal-title" id="createEditObjectModalLabel">{{isCreateModalType ? 'Create '+targetObject : 'Edit '+targetObject}}</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -27,7 +27,7 @@
 						<!-- AUTOMATIC form fields for each object -->
 						<!-- ------------------------------------- -->
 						
-						<div ng-repeat="field in schema" ng-if="objectTarget!='media'" class="form-group row">
+						<div ng-repeat="field in schema" ng-if="targetObject!='media'" class="form-group row">
 						 
 						    <label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
 						    		class="col-sm-2 col-form-label">{{field.title}}</label>
@@ -79,38 +79,41 @@
 						<!-- -------------------------------------------- -->
 						
 						<!-- case of a Program -->
-						<div ng-repeat="field in schema" ng-if="objectTarget=='program'" class="form-group row">
-
-							 <label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
-							 <div ng-if="field.type=='Display'" class="col-sm-4">
-							 	<div ui-grid="displaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-							 </div>
-							 <div ng-if="field.type=='Display'" class="col-sm-1">
-							 	<button id="displaysGridAddButton" ng-click="addSelectedObjects('display')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
-							 	<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('display')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
-							 </div>
-							 <div ng-if="field.type=='Display'" class="col-sm-4">
-							 	<div ui-grid="selectedDisplaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-							 </div>
-							 	
-							 <label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
-							 <div ng-if="field.type=='List'" class="col-sm-4">
-							 	<div ui-grid="mediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-							 </div>
-							 <div ng-if="field.type=='List'" class="col-sm-1">
-							 	<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
-							 	<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
-							 </div>
-							 <div ng-if="field.type=='List'" class="col-sm-4">
-							 	<div ui-grid="selectedMediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-							 </div>				 	
+						<div ng-repeat="field in schema" ng-if="targetObject=='program'">
+							<div  class="form-group row">
+								 <label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
+								 <div ng-if="field.type=='Display'" class="col-sm-4">
+								 	<div ui-grid="displaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+								 </div>
+								 <div ng-if="field.type=='Display'" class="col-sm-1">
+								 	<button id="displaysGridAddButton" ng-click="addSelectedObjects('display')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
+								 	<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('display')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
+								 </div>
+								 <div ng-if="field.type=='Display'" class="col-sm-4">
+								 	<div ui-grid="selectedDisplaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+								 </div>
+							</div>						
+							
+							<div  class="form-group row">		 	
+								 <label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
+								 <div ng-if="field.type=='List'" class="col-sm-4">
+								 	<div ui-grid="mediasGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+								 </div>
+								 <div ng-if="field.type=='List'" class="col-sm-1">
+								 	<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
+								 	<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
+								 </div>
+								 <div ng-if="field.type=='List'" class="col-sm-4">
+								 	<div ui-grid="selectedMediasGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+								 </div>				 	
+							</div>
 						</div>
 						
 						<!-- add MANUALLY SET specific form fields here -->
 						<!-- ------------------------------------------ -->
 						
 						<!-- case of a Media -->
-						<div ng-if="objectTarget=='media'">
+						<div ng-if="targetObject=='media'">
 							<div class="form-group row">						
 								<label class="col-sm-2 col-form-label">Name</label>
 							    <div class="col-sm-10">
@@ -137,16 +140,10 @@
 									<small ng-show="objectForm.file.$invalid && !objectForm.file.$pristine" class="text-danger"> &nbsp field Media File is required </small>
 								</div>
 							</div>
-							<div ng-if="isCreateModalType" class="form-group row">
+							<div class="form-group row">
 								<label class="col-sm-2 col-form-label">Preview</label>
 							    <div class="col-sm-10">
-									<embed id="mediaPreview" alt="Media Preview" class="form-control w-50">
-								</div>
-							</div>
-							<div ng-if="!isCreateModalType" class="form-group row">
-								<label class="col-sm-2 col-form-label">Preview</label>
-							    <div class="col-sm-10">
-									<embed src="{{formData.url}}" alt="Media Preview" class="form-control w-50">
+									<embed id="mediaPreview" src="{{formData.url}}" alt="Media Preview" class="form-control w-50">
 								</div>
 							</div>
 						</div>	
@@ -169,19 +166,19 @@
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="deleteObjectModalLabel">Delete {{objectTarget}}</h5>
+					<h5 class="modal-title" id="deleteObjectModalLabel">Delete {{targetObject}}</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 				<div class="modal-body">
-					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete that {{objectTarget}}?</p>
+					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete that {{targetObject}}?</p>
 					<br>
 
 					<!-- AUTOMATIC form fields for each object -->
 					<!-- ------------------------------------- -->
 						
-					<div ng-repeat="field in schema" ng-if="objectTarget!='media'" class="form-group row">
+					<div ng-repeat="field in schema" ng-if="targetObject!='media'" class="form-group row">
 						<label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
 							class="col-sm-2 col-form-label">{{field.title}}</label>
 						<div ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
@@ -194,23 +191,23 @@
 					<!-- -------------------------------------------- -->
 						
 					<!-- case of a Program -->
-					<div ng-repeat="field in schema" ng-if="objectTarget=='program'" class="form-group row">
-						<label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
+					<div ng-repeat="field in schema" ng-if="targetObject=='program'" class="form-group row">
+<!-- 						<label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
 						<div ng-if="field.type=='Display'" class="col-sm-10">
-						 		<div ui-grid="selectedDisplaysGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+						 		<div ui-grid="selectedDisplaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
 						</div>
 						 	
 						<label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
 						<div ng-if="field.type=='List'" class="col-sm-10">
-								<div ui-grid="selectedMediasGridOptions" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-						</div>
+								<div ui-grid="selectedMediasGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+						</div> -->
 					</div>		
 
 					<!-- add MANUALLY SET specific form fields here -->
 					<!-- ------------------------------------------ -->
 							
 					<!-- case of a Media -->
-					<div ng-if="objectTarget=='media'">
+					<div ng-if="targetObject=='media'">
 						<div class="form-group row">						
 							<label class="col-sm-2 col-form-label">Name</label>
 						    <div class="col-sm-10">

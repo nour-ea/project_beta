@@ -10,15 +10,15 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		$scope.currentPath = window.location.pathname;
 		
 		// Define the Object Target for the CRUD App (Display, Media...)
-		$scope.objectTarget = objectModel;
-		$scope.collectionTarget = $scope.objectTarget + 's';
+		$scope.targetObject = objectModel;
+		$scope.targetCollection = $scope.targetObject + 's';
 		
 		// Define Pagination options & Specific filters for GetAll Request to fill the UI Grid  
 		$scope.paginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
 		$scope.specificFilters = {};
 				
 		// Define Edit / Delete target object url link and fill $scope.formData
-		var targetObjectUrl = '/api/'+$scope.collectionTarget;
+		var targetObjectUrl = '/api/'+$scope.targetCollection;
 		$scope.schema = {};
 		$scope.formData = {};
 		$scope.isCreateModalType = true; //to differentiate create and edit modal
@@ -32,9 +32,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					console.log('setting form data');
 					
 					//SPECIFIC for program creation and edition
-					if($scope.objectTarget == 'program'){
-						$scope.setFormSelectionData('selectedDisplaysGridOptions',$scope.formData._links.display.href, 'display');
-						$scope.setFormSelectionData('selectedMediasGridOptions',$scope.formData._links.medias.href, 'medias');
+					if($scope.targetObject == 'program'){
+						$scope.setFormSelectionData('selectedDisplaysGrid',$scope.formData._links.display.href, 'display');
+						$scope.setFormSelectionData('selectedMediasGrid',$scope.formData._links.medias.href, 'medias');
 					}
 					//------------------------------------------
 				});
@@ -54,16 +54,19 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		};
 		
 
-		// Define HTML for edition buttons
+		// Define HTML template for edition buttons
 		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary ml-1" ><i class="fa fa-eye fa-fw"></i></button>';
 		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary ml-1" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil fa-fw"></i></button>';
 		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger ml-1" data-toggle="modal" data-target="#deleteObjectModal" > <i class="fa fa-remove fa-fw"></i></button>';
 		var actionButtonsHTML = '<div class="m-1">' + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
 		
+		// Define HTML template for media thumbnails
+		var thumbnailHTML = '<img src="{{row.entity.url}}" alt="No Image Found" class="m-1" height="80%" >'
+		
 		// Define a function to Get Data Scheme from REST Api
 		$scope.getColumnList = function(){
 			var columnList = [];
-			CRUDService.getScheme($scope.objectTarget).success(function(data){
+			CRUDService.getScheme($scope.targetObject).success(function(data){
 				$scope.schema = data;
 				
 				//SPECIFIC for programs and reports list
@@ -76,7 +79,13 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				// ---------------------------------------
 				
 				angular.forEach(data, function(value, key) {
-					if(value.type=='String')
+					
+					//SPECIFIC for media thumbnail
+					if(value.name=='url' && $scope.targetObject == 'media')
+						this.push({ field: value.name , name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering:false });
+					// ---------------------------------------
+					
+					else if(value.type=='String')
 						this.push({ field: value.name , name: value.title, enableFiltering:true });
 					else if( ['boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(value.type) !== -1)
 						this.push({ field: value.name , name: value.title, enableFiltering:false });
@@ -105,11 +114,11 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		};
 		
 		// Define a function to set Grid Options data
-	    $scope.setGridOptionsData = function() {
+	    $scope.setGridData = function() {
 		
 		     $scope.getCollectionData(
-				'gridOptions',
-				$scope.collectionTarget, 
+				'mainGrid',
+				$scope.targetCollection, 
 				$scope.paginationOptions.pageNumber, 
 				$scope.paginationOptions.pageSize, 
 				$scope.paginationOptions.sortColumns,
@@ -118,10 +127,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		 };
 		
 		// Get Grid Data from REST Api
-		$scope.setGridOptionsData();
+		$scope.setGridData();
 	 	
 		// Define UI grid options & define update function
-	    $scope.gridOptions = {
+	    $scope.mainGrid = {
 			rowHeight: 40,
 		    enableGridMenu: true,
 		    enableSelectAll: true,
@@ -141,34 +150,34 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	             	$scope, function (newPage, pageSize) {
 				     	$scope.paginationOptions.pageNumber = newPage;
 		     		 	$scope.paginationOptions.pageSize = pageSize;
-						$scope.setGridOptionsData();
+						$scope.setGridData();
 				 	});
 				$scope.gridApi.core.on.sortChanged(
 					$scope, function (grid, sortColumns) {
 						$scope.paginationOptions.sortColumns = sortColumns;
-						$scope.setGridOptionsData();
+						$scope.setGridData();
 				 	});
 		        $scope.gridApi.core.on.filterChanged(
 		        	$scope, function() {
-		        		$scope.paginationOptions.filterColumns = this.grid.columns;
-						$scope.setGridOptionsData();
+		        		$scope.paginationOptions.filterColumns = this.grid.columns.filter(c => c.enableFiltering == true);
+						$scope.setGridData();
 	        			});
 			}
 	    };
 	
 	//Define the Create function
 	$scope.createTargetObject = function(){			
-		CRUDService.createOne($scope.collectionTarget, $scope.formData).success(function(data){
+		CRUDService.createOne($scope.targetCollection, $scope.formData).success(function(data){
 			
 			//SPECIFIC for program creation
-			if($scope.objectTarget == 'program'){
-				$scope.addLinkedObjects(data._links.display.href, $scope.selectedDisplaysGridOptions.data);
-				$scope.addLinkedObjects(data._links.medias.href, $scope.selectedMediasGridOptions.data);
+			if($scope.targetObject == 'program'){
+				$scope.addLinkedObjects(data._links.display.href, $scope.selectedDisplaysGrid.data);
+				$scope.addLinkedObjects(data._links.medias.href, $scope.selectedMediasGrid.data);
 			}
 			//------------------------------
 			
 			console.log('created object');
-			$scope.setGridOptionsData();
+			$scope.setGridData();
 			angular.element(createEditObjectModal).modal('hide');
 		});
 	};
@@ -178,15 +187,15 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		CRUDService.updateOne(targetObjectUrl, $scope.formData).success(function(data){
 			
 			//SPECIFIC for program update
-			if($scope.objectTarget == 'program'){
-				$scope.updateLinkedObjects($scope.formData._link.display.href, $scope.selectedDisplaysGridOptions.data);
-				$scope.updateLinkedObjects($scope.formData._link.medias.href, $scope.selectedMediasGridOptions.data);
+			if($scope.targetObject == 'program'){
+				$scope.updateLinkedObjects($scope.formData._links.display.href, $scope.selectedDisplaysGrid.data);
+				$scope.updateLinkedObjects($scope.formData._links.medias.href, $scope.selectedMediasGrid.data);
 			}
 			//----------------------------
 			
 			console.log('edited object');
 			$scope.cleanFormData();
-			$scope.setGridOptionsData();
+			$scope.setGridData();
 			angular.element(createEditObjectModal).modal('hide');
 		});
 	};
@@ -196,7 +205,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		CRUDService.deleteOne(targetObjectUrl).success(function(data){
 			console.log('deleted object');
 			$scope.cleanFormData();
-			$scope.setGridOptionsData();
+			$scope.setGridData();
 			angular.element(deleteObjectModal).modal('hide');
 		});
 	};
@@ -243,7 +252,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	
 	// Define All Displays table
 	$scope.displaysPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
-	$scope.displaysGridOptions = {
+	$scope.displaysGrid = {
 			rowHeight:40,
 		    enableSelectAll: true,
 	        paginationPageSizes: [5, 10, 20, 50],
@@ -261,24 +270,24 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	             	$scope, function (newPage, pageSize) {
 				     	$scope.displaysPaginationOptions.pageNumber = newPage;
 		     		 	$scope.displaysPaginationOptions.pageSize = pageSize;
-						$scope.setFormCollectionData('displaysGridOptions','displays', $scope.displaysPaginationOptions);
+						$scope.setFormCollectionData('displaysGrid','displays', $scope.displaysPaginationOptions);
 				 	});
 				$scope.displaysGridApi.core.on.sortChanged(
 					$scope, function (grid, sortColumns) {
 						$scope.displaysPaginationOptions.sortColumns = sortColumns;
-						$scope.setFormCollectionData('displaysGridOptions','displays', $scope.displaysPaginationOptions);
+						$scope.setFormCollectionData('displaysGrid','displays', $scope.displaysPaginationOptions);
 				 	});
 		        $scope.displaysGridApi.core.on.filterChanged(
 		        	$scope, function() {
 		        		$scope.displaysPaginationOptions.filterColumns = this.grid.columns;
-						$scope.setFormCollectionData('displaysGridOptions','displays', $scope.displaysPaginationOptions);
+						$scope.setFormCollectionData('displaysGrid','displays', $scope.displaysPaginationOptions);
 	        		});
 			}
 	    };
 		
 	// Define All Medias table
 	$scope.mediasPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
-	$scope.mediasGridOptions = {
+	$scope.mediasGrid = {
 			rowHeight:40,
 		    enableSelectAll: true,
 	        paginationPageSizes: [5, 10, 20, 50],
@@ -290,24 +299,24 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			useExternalFiltering: true,
 	        columnDefs: [	{ field: 'name', name: 'Name'},
 							{ field: 'mediaType', name: 'Media type'},
-							{ field: 'url', name: 'Url', enableFiltering: false }] ,
+							{ field: 'url', name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering: false }] ,
 	        onRegisterApi: function(gridApi) {
 	           	$scope.mediasGridApi = gridApi;
 	           	$scope.mediasGridApi.pagination.on.paginationChanged(
 	             	$scope, function (newPage, pageSize) {
 				     	$scope.mediasPaginationOptions.pageNumber = newPage;
 		     		 	$scope.mediasPaginationOptions.pageSize = pageSize;
-						$scope.setFormCollectionData('mediasGridOptions','medias', $scope.mediasPaginationOptions);
+						$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
 				 	});
 				$scope.mediasGridApi.core.on.sortChanged(
 					$scope, function (grid, sortColumns) {
 						$scope.mediasPaginationOptions.sortColumns = sortColumns;
-						$scope.setFormCollectionData('mediasGridOptions','medias', $scope.mediasPaginationOptions);
+						$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
 				 	});
 		        $scope.mediasGridApi.core.on.filterChanged(
 		        	$scope, function() {
 		        		$scope.mediasPaginationOptions.filterColumns = this.grid.columns;
-						$scope.setFormCollectionData('mediasGridOptions','medias', $scope.mediasPaginationOptions);
+						$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
 	        		});
 			}
 	    };
@@ -327,7 +336,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		
 	// Define Selected Displays table
 	$scope.selectedDisplaysPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
-	$scope.selectedDisplaysGridOptions = {
+	$scope.selectedDisplaysGrid = {
 			rowHeight:40,
 		    enableSelectAll: true,
 	        paginationPageSizes: [5, 10, 20, 50],
@@ -347,7 +356,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		
 	// Define Selected Medias table
 	$scope.selectedMediasPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
-	$scope.selectedMediasGridOptions = {
+	$scope.selectedMediasGrid = {
 			rowHeight:40,
 		    enableSelectAll: true,
 	        paginationPageSizes: [5, 10, 20, 50],
@@ -359,7 +368,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			useExternalFiltering: false,
 			columnDefs: [	{ field: 'name', name: 'Name'},
 							{ field: 'mediaType', name: 'Media type'},
-							{ field: 'url', name: 'Url', enableFiltering: false }],
+							{ field: 'url', name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering: false }],
 			onRegisterApi: function(gridApi) {
 								$scope.selectedMediasGridApi = gridApi;
 							}
@@ -381,20 +390,20 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				});                                                      
 		 };		
 		
-	
-	if($scope.objectTarget == 'program'){
+	//Program CreateEditmodal filling
+	if($scope.targetObject == 'program'){
 		// Get Form Grids Data from REST Api on modal show
 		angular.element(createEditObjectModal).on('shown.bs.modal', function (e) {
-			$scope.setFormCollectionData('displaysGridOptions','displays', $scope.displaysPaginationOptions);
-			$scope.setFormCollectionData('mediasGridOptions','medias', $scope.mediasPaginationOptions);
+			$scope.setFormCollectionData('displaysGrid','displays', $scope.displaysPaginationOptions);
+			$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
 			});
 		
 		// Remove Form Grids Data from REST Api on modal hide
 		angular.element(createEditObjectModal).on('hidden.bs.modal', function (e) {
-			$scope.displaysGridOptions.data = [];
-			$scope.mediasGridOptions.data = [];
-			$scope.selectedDisplaysGridOptions.data = [];
-			$scope.selectedMediasGridOptions.data = [];
+			$scope.displaysGrid.data = [];
+			$scope.mediasGrid.data = [];
+			$scope.selectedDisplaysGrid.data = [];
+			$scope.selectedMediasGrid.data = [];
 			});
 	}
 	
@@ -402,11 +411,11 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	$scope.addSelectedObjects = function(object){
 		
 		if(object == 'display'){
-			if($scope.displaysGridApi.selection.getSelectedRows().length == 1){
+			if($scope.displaysGridApi.selection.getSelectedCount() == 1){
 				$scope.displaysGridApi.selection.getSelectedRows().forEach(function(display){
-					if($scope.selectedDisplaysGridOptions.data.filter(d => d.name == display.name).length < 1){
-						$scope.selectedDisplaysGridOptions.data = [];
-						$scope.selectedDisplaysGridOptions.data.push(display);
+					if($scope.selectedDisplaysGrid.data.filter(d => d.name == display.name).length < 1){
+						$scope.selectedDisplaysGrid.data = [];
+						$scope.selectedDisplaysGrid.data.push(display);
 					}
 				});
 				$scope.displaysGridApi.selection.clearSelectedRows();
@@ -416,10 +425,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		}
 		
 		if(object == 'medias'){
-			if($scope.mediasGridApi.selection.getSelectedRows().length > 0){
+			if($scope.mediasGridApi.selection.getSelectedCount() > 0){
 				$scope.mediasGridApi.selection.getSelectedRows().forEach(function(media){
-					if($scope.selectedMediasGridOptions.data.filter(m => m.name == media.name).length < 1)
-						$scope.selectedMediasGridOptions.data.push(media);
+					if($scope.selectedMediasGrid.data.filter(m => m.name == media.name).length < 1)
+						$scope.selectedMediasGrid.data.push(media);
 				});
 				$scope.mediasGridApi.selection.clearSelectedRows();
 			}
@@ -429,10 +438,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	$scope.removeSelectedObjects = function(object){
 		
 		if(object == 'display'){
-			if($scope.selectedDisplaysGridApi.selection.getSelectedRows().length > 0){
+			if($scope.selectedDisplaysGridApi.selection.getSelectedCount() > 0){
 				$scope.selectedDisplaysGridApi.selection.getSelectedRows().forEach(function(display){
-						$scope.selectedDisplaysGridOptions.data.splice(
-								$scope.selectedDisplaysGridOptions.data.indexOf(display), 1);
+						$scope.selectedDisplaysGrid.data.splice(
+								$scope.selectedDisplaysGrid.data.indexOf(display), 1);
 				});
 			$scope.selectedDisplaysGridApi.selection.clearSelectedRows();
 			}
@@ -441,10 +450,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		}
 		
 		if(object == 'medias'){
-			if($scope.selectedMediasGridApi.selection.getSelectedRows().length > 0){
+			if($scope.selectedMediasGridApi.selection.getSelectedCount() > 0){
 				$scope.selectedMediasGridApi.selection.getSelectedRows().forEach(function(media){
-						$scope.selectedMediasGridOptions.data.splice(
-								$scope.selectedMediasGridOptions.data.indexOf(media), 1);
+						$scope.selectedMediasGrid.data.splice(
+								$scope.selectedMediasGrid.data.indexOf(media), 1);
 				});
 			$scope.selectedMediasGridApi.selection.clearSelectedRows();
 			}

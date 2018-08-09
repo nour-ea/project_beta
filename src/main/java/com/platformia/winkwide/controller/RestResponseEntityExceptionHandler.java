@@ -21,13 +21,11 @@ import com.platformia.winkwide.exception.FileStorageException;
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler({ RepositoryConstraintViolationException.class, FileStorageException.class })
+	@ExceptionHandler({ RepositoryConstraintViolationException.class })
 	@ResponseBody
 	public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
 		RepositoryConstraintViolationException nevEx = (RepositoryConstraintViolationException) ex;
 
-		// String errors = nevEx.getErrors().getAllErrors().stream()
-		// .map(p -> p.toString()).collect(Collectors.joining("\n"));
 
 		//send back list of errors
 		HttpStatus httpStatus = HttpStatus.NOT_ACCEPTABLE;
@@ -37,6 +35,25 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 		for (FieldError error : nevEx.getErrors().getFieldErrors()) {
 	        errors.add(error.getField() + ": " + error.getCode());
 	    }
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+		return new ResponseEntity<Object>(new ApiError(httpStatus, message, errors),
+				httpHeaders, httpStatus);
+	}
+	
+	@ExceptionHandler({ FileStorageException.class })
+	@ResponseBody
+	public ResponseEntity<Object> handleFileStorageException(Exception ex, WebRequest request) {
+		FileStorageException nevEx = (FileStorageException) ex;
+
+
+		//send back list of errors
+		HttpStatus httpStatus = HttpStatus.FAILED_DEPENDENCY;
+		String message = "Review your request please !" ;
+		List<String> errors = new ArrayList<String>();
+	        errors.add("FileSorageException: " + nevEx.getMessage());
+
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 

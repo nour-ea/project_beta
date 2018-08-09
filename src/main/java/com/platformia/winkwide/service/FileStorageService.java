@@ -1,7 +1,6 @@
 package com.platformia.winkwide.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,7 +77,7 @@ public class FileStorageService {
             media.setVerified(verified);
             
             return media;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
     }
@@ -93,7 +92,7 @@ public class FileStorageService {
             // Delete File
             Files.delete(targetLocation);
             
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new FileStorageException("Could not delete file at " + url + ". Please try again!", ex);
         }
     }

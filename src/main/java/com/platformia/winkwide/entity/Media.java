@@ -3,6 +3,7 @@ package com.platformia.winkwide.entity;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -49,10 +50,10 @@ public class Media implements Serializable {
     @JsonIgnore
     private boolean verified;
     
-    @ManyToMany(mappedBy = "medias")
+    @ManyToMany(mappedBy = "medias", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     private List<Program> programs;
     
-    @OneToMany(mappedBy="media")
+    @OneToMany(mappedBy="media", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE })
     private List<Report> reports;
     
     

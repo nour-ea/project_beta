@@ -39,11 +39,11 @@
 									<small>Filter by size</small>
 									<div>
 										<input type="text" name="sizeMin" class="form-control form-control-sm mt-1" placeholder="min size" 
-											ng-model="specificFilters.sizeMin" ng-change="setGridOptionsData()"
+											ng-model="specificFilters.sizeMin" ng-change="setGridData()"
 											ng-pattern="/^[0-9]*$/" >
 											<small ng-show="specificForm.sizeMin.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
 										<input type="text" name="sizeMax" class="form-control form-control-sm mt-1" placeholder="max size"
-											ng-model="specificFilters.sizeMax" ng-change="setGridOptionsData()"
+											ng-model="specificFilters.sizeMax" ng-change="setGridData()"
 											ng-pattern="/^[0-9]*$/" >
 											<small ng-show="specificForm.sizeMax.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
 									</div>
@@ -52,11 +52,11 @@
 									<small>Filter by shop coverage</small>
 									<div>
 										<input type="text" name="shopCoverageMin" class="form-control form-control-sm mt-1" placeholder="min coverage" 
-											ng-model="specificFilters.shopCoverageMin" ng-change="setGridOptionsData()"
+											ng-model="specificFilters.shopCoverageMin" ng-change="setGridData()"
 											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
 											<small ng-show="specificForm.shopCoverageMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
 										<input type="text" name="shopCoverageMax" class="form-control form-control-sm mt-1" placeholder="max coverage"
-											ng-model="specificFilters.shopCoverageMax" ng-change="setGridOptionsData()"
+											ng-model="specificFilters.shopCoverageMax" ng-change="setGridData()"
 											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
 											<small ng-show="specificForm.shopCoverageMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
 											
