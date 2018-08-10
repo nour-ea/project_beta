@@ -9,23 +9,23 @@
 </head>
 
 <body  ng-app="crudApp" ng-controller="crudCtrl as vm">
-	<th:block th:include="/_header"></th:block>
+	<th:block th:include="/portal/_header"></th:block>
 		
 		<section class="row" id="mainContent">
-			<th:block th:include="/_navigation"></th:block>
+			<th:block th:include="/portal/_navigation"></th:block>
 			<div class="col m-4">
 			
 				<!-- CONTEXT INFORMATION -->
 				<div class="row m-2 rounded bg-light" id="contextRow">
 					<div class="col m-2 ml-auto">	
-					<p class="text-primary font-weight-bold float-left" href="/medias">Administration / Medias</p>
+					<p class="text-primary font-weight-bold float-left" href="/portal/displays">Administration / Displays</p>
 					</div>
 						
 				</div>
 				
 				
 				<!-- CONFIGURE ANGULAR CRUD APP with object name -->
-				<script> app.value('objectModel','media'); </script>
+				<script> app.value('objectModel','display'); </script>
 				
 				
 				<!-- SPECIFIC FILTERS and Create Button -->
@@ -48,11 +48,25 @@
 											<small ng-show="specificForm.sizeMax.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
 									</div>
 								</div>
+								<div class="col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0 float-left">
+									<small>Filter by shop coverage</small>
+									<div>
+										<input type="text" name="shopCoverageMin" class="form-control form-control-sm mt-1" placeholder="min coverage" 
+											ng-model="specificFilters.shopCoverageMin" ng-change="setGridData()"
+											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
+											<small ng-show="specificForm.shopCoverageMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
+										<input type="text" name="shopCoverageMax" class="form-control form-control-sm mt-1" placeholder="max coverage"
+											ng-model="specificFilters.shopCoverageMax" ng-change="setGridData()"
+											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
+											<small ng-show="specificForm.shopCoverageMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
+											
+									</div>
+								</div>
 								
 			
 								<div class="ml-auto col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0">
 									<button ng-click="setFormData('','create')" type="button" class="btn btn-block btn-primary float-right" data-toggle="modal" data-target="#createEditObjectModal">
-										<i class="fa fa-plus fa-fw"></i>&nbsp; New {{objectTarget}}
+										<i class="fa fa-plus fa-fw"></i>&nbsp; New {{targetObject}}
 									</button>
 								</div>
 			
@@ -67,7 +81,7 @@
 			</div>
 		</section>
 
-	<th:block th:include="/_footer"></th:block>
+	<th:block th:include="/portal/_footer"></th:block>
 
 </body>
 </html>

@@ -9,16 +9,16 @@
 </head>
 
 <body  ng-app="crudApp" ng-controller="crudCtrl as vm">
-	<th:block th:include="/_header"></th:block>
+	<th:block th:include="/portal/_header"></th:block>
 		
 		<section class="row" id="mainContent">
-			<th:block th:include="/_navigation"></th:block>
+			<th:block th:include="/portal/_navigation"></th:block>
 			<div class="col m-4">
 			
 				<!-- CONTEXT INFORMATION -->
 				<div class="row m-2 rounded bg-light" id="contextRow">
 					<div class="col m-2 ml-auto">	
-					<p class="text-primary font-weight-bold float-left" href="/programs">Administration / Programs</p>
+					<p class="text-primary font-weight-bold float-left" href="/portal/programs">Administration / Programs</p>
 					</div>
 						
 				</div>
@@ -103,7 +103,7 @@
 			
 								<div class="ml-auto col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0">
 									<button ng-click="setFormData('','create')" type="button" class="btn btn-block btn-primary float-right" data-toggle="modal" data-target="#createEditObjectModal">
-										<i class="fa fa-plus fa-fw"></i>&nbsp; New {{objectTarget}}
+										<i class="fa fa-plus fa-fw"></i>&nbsp; New {{targetObject}}
 									</button>
 								</div>
 			
@@ -118,7 +118,7 @@
 			</div>
 		</section>
 
-	<th:block th:include="/_footer"></th:block>
+	<th:block th:include="/portal/_footer"></th:block>
 
 </body>
 </html>

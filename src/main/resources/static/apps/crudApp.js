@@ -1,5 +1,6 @@
 var app = angular.module('crudApp', ['ui.grid','ui.grid.pagination', 'ui.grid.selection', 'ui.grid.exporter']);
 
+
 // CRUD CONTROLLER
 // -------------------------------------------------------------------------
 // All mighty controller
@@ -44,12 +45,12 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			$scope.isCreateModalType = (operation == 'create'); 
 			//set clear-formData-on-hide if the modal is of type edit or delete
 			if(operation == 'edit')
-				angular.element(createEditObjectModal).on('hide.bs.modal', function (e) {
-					$scope.cleanFormData();
+				angular.element(createEditObjectModal).on('hidden.bs.modal', function (e) {
+					$scope.clearFormData();
 				});
-			if(operation == 'edit')
-				angular.element(deleteObjectModal).on('hide.bs.modal', function (e) {
-					$scope.cleanFormData();
+			if(operation == 'delete')
+				angular.element(deleteObjectModal).on('hidden.bs.modal', function (e) {
+					$scope.clearFormData();
 				});
 		};
 		
@@ -194,7 +195,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			//----------------------------
 			
 			console.log('edited object');
-			$scope.cleanFormData();
+			$scope.clearFormData();
 			$scope.setGridData();
 			angular.element(createEditObjectModal).modal('hide');
 		});
@@ -204,21 +205,21 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	$scope.deleteTargetObject = function(){			
 		CRUDService.deleteOne(targetObjectUrl).success(function(data){
 			console.log('deleted object');
-			$scope.cleanFormData();
+			$scope.clearFormData();
 			$scope.setGridData();
 			angular.element(deleteObjectModal).modal('hide');
 		});
 	};
 
 	//Define the Clean form function
-	$scope.cleanFormData = function(){			
+	$scope.clearFormData = function(){			
 		$scope.formData = {};
 		$scope.objectForm.$setPristine();
 	};
+
 	
-	
-	
-	
+
+
 	
 	
 	

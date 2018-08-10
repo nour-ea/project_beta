@@ -40,21 +40,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		  
 		  //protect against Cross Site Request Forgery
 	      http.csrf().disable();
-	      /*
+	      
 	 
 	      // Requires login with role ROLE_CLIENT, ROLE_SELLER, or ROLE_ADMIN.
 	      // If not, it will redirect to /login.
-	      http.authorizeRequests().antMatchers("/")
+	      http.authorizeRequests().antMatchers("/portal")
 	      		.access("hasAnyRole('ROLE_CLIENT', 'ROLE_PARTNER', 'ROLE_ADMIN')");
 
-	      http.authorizeRequests().antMatchers("/accountInfo")//
+	      http.authorizeRequests().antMatchers("/portal/accountInfo")//
 	            .access("hasAnyRole('ROLE_CLIENT', 'ROLE_PARTNER', 'ROLE_ADMIN')");
 	 
 	      // Pages only for ADMIN
-	      http.authorizeRequests().antMatchers("/displays").access("hasAnyRole('ROLE_ADMIN')");
-	      http.authorizeRequests().antMatchers("/medias").access("hasAnyRole('ROLE_ADMIN')");
-	      http.authorizeRequests().antMatchers("/programs").access("hasAnyRole('ROLE_ADMIN')");
-	      http.authorizeRequests().antMatchers("/programs").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/portal/displays").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/portal/medias").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/portal/programs").access("hasAnyRole('ROLE_ADMIN')");
+	      http.authorizeRequests().antMatchers("/portal/reports").access("hasAnyRole('ROLE_ADMIN')");
 	 
 	      // When user login, role XX.
 	      // But access to the page requires the YY role,
@@ -67,15 +67,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	            //
 	            .loginProcessingUrl("/j_spring_security_check") // Submit URL
 	            .loginPage("/login")//
-	            .defaultSuccessUrl("/")//
+	            .defaultSuccessUrl("/portal")//
 	            .failureUrl("/login?error=true")//
 	            .usernameParameter("userName")//
 	            .passwordParameter("password")
 	 
 	            // Configuration for the Logout page.
 	            // (After logout, go to home page)
-	            .and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
-	 */
+	            .and().logout().logoutUrl("/logout").logoutSuccessUrl("/portal");
+	 
 	   }
 	
 }
