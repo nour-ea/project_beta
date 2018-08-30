@@ -1,4 +1,4 @@
-var app = angular.module('crudApp', ['ui.grid','ui.grid.pagination', 'ui.grid.selection', 'ui.grid.exporter']);
+var app = angular.module('portalApp', ['ui.grid','ui.grid.pagination', 'ui.grid.selection', 'ui.grid.exporter']);
 
 
 // CRUD CONTROLLER
@@ -397,6 +397,12 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		angular.element(createEditObjectModal).on('shown.bs.modal', function (e) {
 			$scope.setFormCollectionData('displaysGrid','displays', $scope.displaysPaginationOptions);
 			$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
+			
+			//refesh grids
+			$scope.displaysGridApi.core.handleWindowResize();
+			$scope.mediasGridApi.core.handleWindowResize();
+			$scope.selectedDisplaysGridApi.core.handleWindowResize();
+			$scope.selectedMediasGridApi.core.handleWindowResize();
 			});
 		
 		// Remove Form Grids Data from REST Api on modal hide

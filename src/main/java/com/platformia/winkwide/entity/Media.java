@@ -53,7 +53,7 @@ public class Media implements Serializable {
     @ManyToMany(mappedBy = "medias", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     private List<Program> programs;
     
-    @OneToMany(mappedBy="media", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE })
+    @OneToMany(mappedBy="media", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     private List<Report> reports;
     
     

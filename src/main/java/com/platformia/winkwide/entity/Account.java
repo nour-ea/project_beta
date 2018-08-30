@@ -22,6 +22,7 @@ public class Account implements Serializable {
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_SELLER = "ROLE_PARTNER";
 	public static final String ROLE_CLIENT = "ROLE_CLIENT";
+	public static final String ROLE_MACHINE = "ROLE_MACHINE";
 	
     @Id
     @Column(name = "user_name", length = 20, nullable = false)

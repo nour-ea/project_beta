@@ -14,14 +14,28 @@ public class MainController {
 	public String login(Model model) {
 		return "login";
 	}
-
+	
 	@RequestMapping("/403")
-	public String accessDenied() {
+	public String machineAccessDenied() {
 		return "403";
 	}
 
-	// Portal Pages
+	// Machine App Pages
 	//
+	@RequestMapping("/")
+	public String smartTV() {
+		return "smartTV/smartTV";
+	}	
+	
+	
+	// Portal App Pages
+	//
+	
+	@RequestMapping("/portal/403")
+	public String portalAccessDenied() {
+		return "portal/403";
+	}
+	
 	@RequestMapping("/portal")
 	public String welcome() {
 		return "portal/welcome";

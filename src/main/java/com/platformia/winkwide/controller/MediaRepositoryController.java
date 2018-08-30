@@ -98,10 +98,12 @@ public class MediaRepositoryController {
    @DeleteMapping("/medias/{mediaId}") 
     public @ResponseBody ResponseEntity<?> deleteMedia(@PathVariable Long mediaId) {
         	
-        Optional<Media> oldMedia = repository.findById(mediaId);    
-        if(oldMedia.isPresent()) {
-        	repository.delete(oldMedia.get());
-        	fileStorageService.deleteFile(oldMedia.get().getUrl());
+        Optional<Media> media = repository.findById(mediaId);    
+        if(media.isPresent()) {
+        	repository.deleteMediaProgramLinks(media.get().getId());
+        	repository.deleteMediaReportLinks(media.get().getId());
+        	repository.delete(media.get());
+        	fileStorageService.deleteFile(media.get().getUrl());
         }
         return ResponseEntity.ok().build();
             	    	        

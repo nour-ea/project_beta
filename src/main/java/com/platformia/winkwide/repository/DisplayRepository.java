@@ -5,9 +5,11 @@ import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.platformia.winkwide.entity.Display;
 
@@ -34,6 +36,18 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 			@Param("shopCoverageMin") BigDecimal shopCoverageMin,
 			@Param("shopCoverageMax") BigDecimal shopCoverageMax,
 			Pageable p);
+
+	@Modifying
+	@Transactional
+	@Query(value="update Programs set display_id = null where display_id = :displayId", nativeQuery = true)
+	public void deleteDisplayProgramLinks(
+			@Param("displayId") Long displayId);
+	
+	@Modifying
+	@Transactional
+	@Query(value="update Reports set display_id = null where display_id = :displayId", nativeQuery = true)
+	public void deleteDisplayReportLinks(
+			@Param("displayId") Long displayId);
 	
 	
 }
