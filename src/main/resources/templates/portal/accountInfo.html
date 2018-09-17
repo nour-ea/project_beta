@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <title>WinkWide</title>
-<th:block th:include="/includes/_include"></th:block>
+<th:block th:include="includes/_include"></th:block>
 <script th:src="@{/apps/crudApp.js}"></script>
 
 </head>
 
 <body  ng-app="crudApp" ng-controller="crudCtrl as vm">
-	<th:block th:include="/portal/_header"></th:block>
+	<th:block th:include="portal/_header"></th:block>
 		
 		<section class="row" id="mainContent">
-			<th:block th:include="/portal/_navigation"></th:block>
+			<th:block th:include="portal/_navigation"></th:block>
 			<div class="col m-4">
 			
 				<!-- CONTEXT INFORMATION -->
@@ -44,7 +44,7 @@
 			</div>
 		</section>
 
-	<th:block th:include="/portal/_footer"></th:block>
+	<th:block th:include="portal/_footer"></th:block>
 
 </body>
 </html>

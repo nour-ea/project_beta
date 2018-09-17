@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Create Account</title>
-<th:block th:include="/includes/_include"></th:block>
+<th:block th:include="includes/_include"></th:block>
 
 <!-- angular js app -->
-<script	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.js"></script>
 <script th:src="@{/apps/account.js}"></script>
 
 </head>
 
 <body ng-app="AccountManagement" ng-controller="CreateAccountController">
-	<th:block th:include="/portal/_header"></th:block>
+	<th:block th:include="portal/_header"></th:block>
 	
 	<section class="container-fluid p-3 bg-welcome">
 
@@ -79,7 +78,7 @@
 	     
 	</section>
 
-	<th:block th:include="/portal/_footer"></th:block>
+	<th:block th:include="portal/_footer"></th:block>
 
 </body>
 </html>

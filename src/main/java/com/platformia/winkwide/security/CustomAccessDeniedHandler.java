@@ -14,7 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
 	protected Log logger = LogFactory.getLog(this.getClass());
@@ -46,7 +48,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 		}
 
 		if (isMachine) {
-			return "/403";
+			return "/tv/403";
 		} else {
 			return "/portal/403";
 		}

@@ -3,7 +3,7 @@
 
 <!--main navigation bar-->
 <nav id="main_nav" class="navbar navbar-expand-lg bg-brand text-white">
-	<img src="/img/icons/logo.png" class="position-relative h-100" id="brand-logo" href="">
+	<img src="/img/icons/logo.png" class="position-relative h-100" id="brand-logo">
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 
@@ -29,7 +29,7 @@
 				<i class="p-1 fa fa-home" style="font-size: 28px" aria-hidden="true"></i>
 	          </a>
 	          <div class="dropdown-menu dropdown-menu-right align-self-center" aria-labelledby="navbarDropdownMenuLink">
-	            	<th:block sec:authorize="isAuthenticated()">
+	            <th:block sec:authorize="isAuthenticated()">
 						<a href="/portal/accountInfo" class="dropdown-item small font-weight-bold"><i class="fa fa-user fa-fw"></i>&nbsp; Profile</a>
 						<a href="#" class="dropdown-item small font-weight-bold"><i class="fa fa-gear fa-fw"></i>&nbsp; Settings</a> 
 	              		<div class="dropdown-divider"></div>

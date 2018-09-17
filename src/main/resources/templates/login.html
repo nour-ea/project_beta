@@ -3,23 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <title>Login</title>
-<th:block th:include="/includes/_include"></th:block>
+<th:block th:include="includes/_include"></th:block>
 </head>
 
 <body>
-	<!-- <th:block th:include="/portal/_header"></th:block> --> 
 	
-	<section class="container-fluid p-3 bg-welcome" >
+	<section id="loginSection" class="container-fluid p-3 bg-welcome" >
       
       <div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
 	     <div class="w-100 mb-3">
 	     
-	         <h4 class="float-left ml-2 mb-5">Welcome to WinkWide </h4>
+	         <h4 class="float-left ml-2 mb-5">Welcome to WinkWide&reg; </h4>
 	         <img class="float-right mb-5" src="/img/icons/logo.png"  height="100px">
 	     </div>
+
 	      
-         <form method="POST"
-            th:action="@{/j_spring_security_check}">
+         <form method="POST" th:action="@{/portal_login}">
                    
               <div class="form-group">
 			    <input type="text" name="userName" class="form-control" placeholder="Login or email address" required autofocus>
@@ -48,7 +47,7 @@
 
 	</section>
 
-	<!-- <th:block th:include="/portal/_footer"></th:block> -->
+
 
 </body>
 </html>

@@ -120,7 +120,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	//Function to show next program media
 	$scope.showNextMedia = function() {
 		console.log('showing next media');
-					
+		
 		//showMedia smoothly
 		//$scope.mediaChanging = true;
 		angular.element(mainMedia).attr('src',$scope.currentProgram.medias[$scope.loopCounter].localUrl);

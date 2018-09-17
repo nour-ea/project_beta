@@ -1,5 +1,7 @@
 package com.platformia.winkwide.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -9,24 +11,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class MainController {
 
+/*	//Error
+	@RequestMapping("/error")
+	public String oops() {
+		return "oops";
+	}*/
+	
+	
+	// Website Pages
+	//
+	@RequestMapping("/")
+	public String welcome() {
+		return "welcome";
+	}
+	
+	
 	// Login and Failure Page
 	@RequestMapping("/login")
-	public String login(Model model) {
+	public String login(HttpServletRequest request) {
 		return "login";
 	}
 	
-	@RequestMapping("/403")
-	public String machineAccessDenied() {
-		return "403";
+	@RequestMapping("/loginTV")
+	public String loginTV(HttpServletRequest request) {
+		return "loginTV";
 	}
-
+	
+	@RequestMapping("/tv/403")
+	public String machineAccessDenied() {
+		return "smartTV/403";
+	}	
+	
 	// Machine App Pages
 	//
-	@RequestMapping("/")
+	@RequestMapping("/tv")
 	public String smartTV() {
 		return "smartTV/smartTV";
 	}	
-	
 	
 	// Portal App Pages
 	//
@@ -37,8 +58,8 @@ public class MainController {
 	}
 	
 	@RequestMapping("/portal")
-	public String welcome() {
-		return "portal/welcome";
+	public String portal() {
+		return "portal/portal";
 	}
 
 	@RequestMapping("/portal/displays")

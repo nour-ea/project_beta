@@ -12,8 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import com.platformia.winkwide.security.CustomAccessDeniedHandler;
-import com.platformia.winkwide.security.CustomUrlAuthenticationSuccessHandler;
 import com.platformia.winkwide.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -21,74 +19,72 @@ import com.platformia.winkwide.service.UserDetailsServiceImpl;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	UserDetailsServiceImpl userDetailsService;
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-		return bCryptPasswordEncoder;
-	}
+				
+		@Autowired
+		public UserDetailsServiceImpl userDetailsService;
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		@Bean
+		public static BCryptPasswordEncoder passwordEncoder() {
+			BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+			return bCryptPasswordEncoder;
+		}
+		
+		@Autowired
+		private AuthenticationSuccessHandler authSuccessHandler;
 
-		// Setting Service to find User in the database.
-		// And Setting PassswordEncoder
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		@Autowired
+		private AccessDeniedHandler accessDeniedHandler;
 
-	}
+		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-	@Bean
-	public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
-		return new CustomUrlAuthenticationSuccessHandler();
-	}
-	
-	@Bean
-	public AccessDeniedHandler accessDeniedHandler(){
-	    return new CustomAccessDeniedHandler();
-	}
+			// Setting Service to find User in the database.
+			// And Setting PassswordEncoder
+			auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+		}
 
-		// Protect against Cross Site Request Forgery
-		http.csrf().disable();
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
 
-		// Requires login with role ROLE_CLIENT, ROLE_SELLER, or ROLE_ADMIN.
-		// If not, it will redirect to /login.
-		http.authorizeRequests().antMatchers("/")//
-				.access("hasAnyRole('ROLE_MACHINE')");
-
-		http.authorizeRequests().antMatchers("/portal", "/portal/accountInfo")//
+			//Protected Pages					
+			http.authorizeRequests().antMatchers("/portal*")//
 				.access("hasAnyRole('ROLE_CLIENT', 'ROLE_PARTNER', 'ROLE_ADMIN')");
 
-		// Pages only for ADMIN
-		http.authorizeRequests().antMatchers("/portal/displays").access("hasAnyRole('ROLE_ADMIN')");
-		http.authorizeRequests().antMatchers("/portal/medias").access("hasAnyRole('ROLE_ADMIN')");
-		http.authorizeRequests().antMatchers("/portal/programs").access("hasAnyRole('ROLE_ADMIN')");
-		http.authorizeRequests().antMatchers("/portal/reports").access("hasAnyRole('ROLE_ADMIN')");
+			// Pages only for ADMIN
+			http.authorizeRequests().antMatchers("/portal/displays").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/medias").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/programs").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/reports").access("hasAnyRole('ROLE_ADMIN')");
 
-		// When user login, role XX.
-		// But access to the page requires the YY role,
-		// An AccessDeniedException will be thrown.
-		http.authorizeRequests().and().exceptionHandling().accessDeniedHandler(accessDeniedHandler());
 
-		// Configuration for Login Form.
-		http.authorizeRequests().and().formLogin()//
+			// Configuration for Login.
+			http.authorizeRequests()
 
-				//
-				.loginProcessingUrl("/j_spring_security_check") // Submit URL
-				.loginPage("/login")//
-				.successHandler(myAuthenticationSuccessHandler())
-				.failureUrl("/login?error=true")//
-				.usernameParameter("userName")//
-				.passwordParameter("password")
+			.and()
+			.formLogin()
+			.loginPage("/login")
+			.loginProcessingUrl("/portal_login")
+			.usernameParameter("userName")//
+			.passwordParameter("password")
+			.successHandler(authSuccessHandler)
+			.failureUrl("/loginPortal?error=true")//
 
-				// Configuration for the Logout page.
-				// (After logout, go to home page)
-				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
+
+			.and()
+			.logout()
+			.logoutUrl("/logout")
+			.logoutSuccessUrl("/")
+			.deleteCookies("JSESSIONID")
+
+			.and()
+			.exceptionHandling()
+			.accessDeniedHandler(accessDeniedHandler)
+
+			.and()
+			.csrf().disable();				    
+
+		}
 
 	}
-
-}
