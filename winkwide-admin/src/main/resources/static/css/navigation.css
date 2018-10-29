@@ -1,0 +1,54 @@
+#navigation {
+	min-height: 80vh;
+}
+.sidenav > li {
+	 list-style-type: none;		
+}
+
+/* The sidebar menu */
+.sidenav {
+	position: relative;
+	height: 100%; /* Full-height: remove this if you want "auto" height */
+	width: 250px; /* Set the width of the sidebar */
+	top: 0;
+	left: 0;
+	background-color: #090c14;
+	padding: 20px 6px 6px 6px;
+}
+
+/* The navigation menu links */
+.sidenav a {
+	padding: 6px 8px 6px 16px;
+	text-decoration: none;
+	display: block;
+	color: #F1F1F1;
+	margin-left: 16px;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+	color: #090c14;
+	background-color: #F1F1F1;	
+	
+}
+
+.sidenav .disabled-link {
+	color: #5a5a5a;
+}
+
+
+/*When navigation link corresponds to open section*/
+.sidenav .currentNav {
+	color: #090c14;
+	background-color: #F1F1F1;	
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+	.sidenav {
+		padding-top: 15px;
+	}
+	.sidenav a {
+		font-size: 18px;
+	}
+}

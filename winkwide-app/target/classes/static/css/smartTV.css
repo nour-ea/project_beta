@@ -1,0 +1,95 @@
+html, body {
+	height: 100%;
+}
+
+/*change primary color*/
+.text-primary {
+  color: #0079bf !important;
+}
+
+.text-secondary {
+  color: #B8FEEF !important;
+}
+
+.btn-primary{
+  background-color: #0079bf !important;
+  border: #0079bf !important;
+  color: white !important;
+}
+
+.btn-primary:hover{
+  background-color: #393c45 !important;
+  border: #393c45 !important;
+}
+
+.bg-primary{
+  background-color: #0079bf !important;
+}
+
+.pagination .page-link {
+	 color : #0079bf;
+}
+.pagination .active .page-link {
+		background-color: #0079bf;
+		border-color: #0079bf;
+}
+
+/* special text styles*/
+
+.microtext {
+  font-size: 12px;
+  color: grey;
+  font-weight: lighter;
+  text-transform: lowercase !important;
+  vertical-align: middle;
+}
+
+.mini-icons {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.luxtext {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/*animation styles*/
+.no-js #loader { display: none;  }
+.js #loader { display: block; position: absolute; left: 100px; top: 0; }
+.se-pre-con {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background: url(/img/animations/logo.gif) center no-repeat #fff;
+}
+
+/*Welcome background*/
+.bg-welcome {
+	background-image: url(/img/backgrounds/welcome_background.jpg);
+	background-size: 100%;
+	height:100%;
+  	min-height: 80vh !important;
+}
+
+.centered-div {
+  position: absolute;
+ 	left: 50%;
+ 	top: 50%;
+ 	transform: translate(-50%,-50%);
+}
+
+#mainMedia{
+	position: absolute;
+	width:100%;
+	margin:auto;
+	z-index:9999;
+}
+
+#smoothDrop{
+	background-color: white;
+	transition:opacity 0.5s linear;	
+}

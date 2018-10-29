@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>WinkWide</title>
+<th:block th:include="includes/_include"></th:block>
+
+</head>
+
+<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+		
+		<section class="row" id="mainContent">
+			<div class="col m-4">
+			
+				<!-- CONTEXT INFORMATION -->
+				<div class="row m-2 rounded bg-light" id="contextRow">
+					<div class="col m-2 ml-auto">	
+					<p class="text-primary font-weight-bold text-center" href="">Breathe and Don't Panic ! </p>
+					</div>
+						
+				</div>
+				
+
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+						
+							<p class="text-danger text-center">Oops, something went wrong...</p>
+					</div>
+				</div>
+															
+			</div>
+		</section>
+
+</body>
+</html>

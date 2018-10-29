@@ -1,0 +1,22 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
+      "name": "file",
+      "type": "com.platformia.winkwide.core.utils.FileStorageProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
+      "name": "file.download-server",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
+      "name": "file.upload-dir",
+      "type": "java.lang.String"
+    }
+  ]
+}

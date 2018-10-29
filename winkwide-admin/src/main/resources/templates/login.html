@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<th:block th:include="includes/_include"></th:block>
+</head>
+
+<body>
+	
+	<section id="loginSection" class="container-fluid p-3 bg-welcome" >
+      
+      <div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
+	     <div class="w-100 mb-3">
+	     
+	         <h4 class="float-left ml-2 mb-5">Welcome to WinkWide&reg; </h4>
+	         <img class="float-right mb-5" src="/img/icons/logo.png"  height="100px">
+	     </div>
+
+	      
+         <form method="POST" th:action="@{/portal_login}">
+                   
+              <div class="form-group">
+			    <input type="text" name="userName" class="form-control" placeholder="Login or email address" required autofocus>
+			  </div>
+			  <div class="form-group">
+			    <input type="password" name="password" class="form-control" placeholder="Password" required>
+			  </div>
+
+			  <div class="form-group mt-2">
+			  <button type="submit" class="btn btn-primary w-25">Login</button>
+			</div>
+         </form>
+         <br>
+	     <!-- /login?error=true -->
+	     <th:block th:if="${#session != null && #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}">
+	          <div class="alert alert-danger text-danger" th:if= "${#request.getParameter('error') == 'true'}" >
+	             <small> <strong>Login Failed!</strong> Reason :</small> 
+	             <small th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}"></small>
+	          </div>
+	     </th:block>         
+         <hr>
+         
+         or, <a href="/portal/createAccount">Create a new account</a>
+         
+      </div>
+
+	</section>
+
+
+
+</body>
+</html>

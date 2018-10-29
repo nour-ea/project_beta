@@ -1,0 +1,47 @@
+<!--loading GIF-->
+<div class="se-pre-con"></div>
+
+<!--main navigation bar-->
+<nav id="main_nav" class="navbar navbar-expand-lg bg-brand text-white">
+	<img src="/img/icons/logo.png" class="position-relative h-100" id="brand-logo">
+
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+		<ul class="navbar-nav mr-auto">
+	            <li class="nav-item d-flex ml-4 mt-2">
+	            	<th:block sec:authorize="isAuthenticated()">
+	              <a class="nav-brand text-white font-weight-bold align-self-center" href="/portal">ADMINISTRATION DASHBOARD</a>
+	            </th:block>
+	            </li>
+		</ul>
+		
+		<ul class="navbar-nav ml-auto">
+			<th:block sec:authorize="isAuthenticated()">
+	            <li class="nav-item d-inline-flex mt-2">
+	              <a class="nav-link small align-self-baseline">Welcome</a>
+
+	              <a class="nav-link text-secondary font-weight-bold align-self-baseline" href="/portal/accountInfo" th:utext="${#request.userPrincipal.name}">..</a>
+	            </li>
+			</th:block>
+			
+			<li class="nav-item dropdown hidden-md-downd-flex">
+	          <a class="nav-link dropdown-toggle text-white align-self-center" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class="p-1 fa fa-home" style="font-size: 28px" aria-hidden="true"></i>
+	          </a>
+	          <div class="dropdown-menu dropdown-menu-right align-self-center" aria-labelledby="navbarDropdownMenuLink">
+	            <th:block sec:authorize="isAuthenticated()">
+						<a href="/portal/accountInfo" class="dropdown-item small font-weight-bold"><i class="fa fa-user fa-fw"></i>&nbsp; Profile</a>
+						<a href="#" class="dropdown-item small font-weight-bold"><i class="fa fa-gear fa-fw"></i>&nbsp; Settings</a> 
+	              		<div class="dropdown-divider"></div>
+						<a href="/logout"	class="dropdown-item small"><i class="fa fa-sign-out fa-fw"></i>&nbsp; Logout</a>
+				</th:block>
+				<th:block sec:authorize="!isAuthenticated()">
+						<a href="/login" class="dropdown-item small font-weight-bold"> <i class="fa fa-lock fa-fw"></i>&nbsp;Login</a> <a
+							href="/portal/createAccount" class="dropdown-item small font-weight-bold"> <i class="fa fa-plus fa-fw"></i>&nbsp; Create Account</a>
+				</th:block>
+	          </div>
+			</li>			
+		</ul>
+
+	</div>
+</nav>

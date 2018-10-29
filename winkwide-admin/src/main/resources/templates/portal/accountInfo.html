@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>WinkWide</title>
+<th:block th:include="includes/_include"></th:block>
+<script th:src="@{/apps/crudApp.js}"></script>
+
+</head>
+
+<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+	<th:block th:include="portal/_header"></th:block>
+		
+		<section class="row" id="mainContent">
+			<th:block th:include="portal/_navigation"></th:block>
+			<div class="col m-4">
+			
+				<!-- CONTEXT INFORMATION -->
+				<div class="row m-2 rounded bg-light" id="contextRow">
+					<div class="col m-2 ml-auto">	
+					<p class="text-primary font-weight-bold float-left" href="/portal/accountInfo">Administration / Account </p>
+					</div>
+						
+				</div>
+				
+
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+						
+					     <div class="account-container">
+					         <ul>
+					            <li>Welcome <span class="font-weight-bold" th:utext="${#request.userPrincipal.name}"></span></li>
+					            <li>
+					               You are connected with roles:
+					               <ul>
+					                  <li class="font-italic" th:each="auth : ${userDetails.authorities}" th:utext="${auth.authority}"></li>
+					               </ul>
+							          </li>
+					         </ul>
+					     </div>
+					</div>
+				</div>
+															
+			</div>
+		</section>
+
+	<th:block th:include="portal/_footer"></th:block>
+
+</body>
+</html>
