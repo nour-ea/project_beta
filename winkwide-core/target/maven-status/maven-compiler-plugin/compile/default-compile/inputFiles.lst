@@ -22,6 +22,7 @@
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/projection/ReportProjection.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/dao/GenericHibernateDao.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/validator/DisplayValidator.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/utils/MyRandomNumericGenerator.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Display.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/exception/MyFileNotFoundException.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/validator/AccountValidator.java

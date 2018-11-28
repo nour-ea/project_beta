@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			http.authorizeRequests().antMatchers("/tv*")//
 				.access("hasAnyRole('ROLE_MACHINE')");
 
-
+			
 			// Configuration for Login.
 			http.authorizeRequests()
 

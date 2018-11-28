@@ -39,13 +39,13 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 
 	@Modifying
 	@Transactional
-	@Query(value="update Programs set display_id = null where display_id = :displayId", nativeQuery = true)
+	@Query(value="update programs set display_id = null where display_id = :displayId", nativeQuery = true)
 	public void deleteDisplayProgramLinks(
 			@Param("displayId") Long displayId);
 	
 	@Modifying
 	@Transactional
-	@Query(value="update Reports set display_id = null where display_id = :displayId", nativeQuery = true)
+	@Query(value="update reports set display_id = null where display_id = :displayId", nativeQuery = true)
 	public void deleteDisplayReportLinks(
 			@Param("displayId") Long displayId);
 	

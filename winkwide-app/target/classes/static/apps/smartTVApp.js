@@ -12,9 +12,11 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		console.log('started init');
 		
 		//Static PERIOD parameters
+		//--------------------------------
 		$scope.showNextMediaPERIOD = 5000;
 		$scope.runPERIOD = 30000;
 		$scope.refreshPERIOD = 120000;
+		//--------------------------------
 		
 		//Application variables
 		$scope.display = {};

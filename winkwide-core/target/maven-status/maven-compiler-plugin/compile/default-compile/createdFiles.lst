@@ -1,6 +1,7 @@
 com/platformia/winkwide/core/dao/AbstractHibernateDao.class
 com/platformia/winkwide/core/projection/MediaProjection.class
 com/platformia/winkwide/core/entity/Media.class
+com/platformia/winkwide/core/utils/MyRandomNumericGenerator.class
 com/platformia/winkwide/core/utils/FileStorageProperties.class
 com/platformia/winkwide/core/projection/ProgramProjection.class
 com/platformia/winkwide/core/service/MediaFileStorageService.class

@@ -37,13 +37,13 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
 
 	@Modifying
 	@Transactional
-	@Query(value="delete from Programs_Medias where media_id = :mediaId", nativeQuery = true)
+	@Query(value="delete from programs_medias where media_id = :mediaId", nativeQuery = true)
 	public void deleteMediaProgramLinks(
 			@Param("mediaId") Long mediaId);
 	
 	@Modifying
 	@Transactional
-	@Query(value="update Reports set media_id = null where media_id = :mediaId", nativeQuery = true)
+	@Query(value="update reports set media_id = null where media_id = :mediaId", nativeQuery = true)
 	public void deleteMediaReportLinks(
 			@Param("mediaId") Long mediaId);
 	
