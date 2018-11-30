@@ -13,7 +13,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		
 		//Static PERIOD parameters
 		//--------------------------------
-		$scope.showNextMediaPERIOD = 5000;
+		$scope.showNextMediaPERIOD = 3000;
 		$scope.runPERIOD = 30000;
 		$scope.refreshPERIOD = 120000;
 		//--------------------------------
@@ -26,7 +26,6 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		
 		//Synchronization variables
 		$scope.remoteDataOk = false;
-		$scope.getMediasCounter = 0;
 		$scope.currentProgramOK = false;
 		
 		//Timers process IDs
@@ -42,6 +41,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		
 	};
 	
+	//Function to check if remote Data was fetched
 	$scope.isRemoteDataOK = function(){
 		return $scope.remoteDataOk;
 	};
@@ -64,7 +64,6 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 			console.log('doing a refresh');
 			//reset synchronization variables
 			$scope.remoteDataOk = false;
-			$scope.getMediasCounter = 0;
 		
 			//reset current program loop definition
 			$scope.stopCurrentProgramLoop();			
@@ -84,6 +83,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	
 	};
 	
+	//Function to manage the programs displaying
 	$scope.run = function(){
 		console.log('trying to run with remote data : ' + $scope.isRemoteDataOK());
 
@@ -141,6 +141,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 					
 		//report	
 		// ----
+		
 	};
 	
 	//Function to set the current Program 
@@ -163,12 +164,16 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	//The startup function
 	$scope.startup = function() {
 		console.log('launched startup');
-		//$scope.checkConnection();
-		$scope.getDisplayPrograms();
-		if($scope.programs.length > 0){
-			//$scope.buildLoops();
-		}
-
+		
+		//Check Connection
+		$scope.checkConnection();
+		
+		//Sync reports
+		//-----------
+		
+		//Sync Programs
+		$scope.getPrograms();
+		
 	};
 	
 	
@@ -178,57 +183,33 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		// à compléters
 	};
 	
-	//Function to get Display information
-	$scope.getDisplayPrograms = function() { 
-		console.log('trying to get displays');
+	//Function to get Programs and their Medias
+	$scope.getPrograms = function() { 
+		console.log('trying to get Programs and their Medias');
 		
-		CRUDService.getData('/api/displays/'+ angular.element(displayId).text())
+		CRUDService.getData('/sync/programs/'+ angular.element(displayId).text())
 		.success(function(data){
-		    $scope.display = data;
-			$scope.getPrograms();
-			console.log('got displays');
-			});
-	};
 	
-	//Function to get Display Programs
-	$scope.getPrograms = function() {
-		console.log('trying to get programs');
+		    $scope.programs = data;
 		
-		CRUDService.getData($scope.display._links.programs.href)
-			.success(function(data){
-			    $scope.programs = data._embedded.programs;
-				angular.forEach($scope.programs, function(value, key) {
-					$scope.getAndCacheMedias(value);
+			angular.forEach($scope.programs, function(prog, key) {
+				angular.forEach(prog.medias, function(med, key) {
+					med.localUrl = $scope.cacheMedia(med);
+					console.log('media cached');
 				});
-				console.log('got programs');
-		});
-	};
-	
-	//Function to get and locally cache Medias
-	$scope.getAndCacheMedias = function(program) {
-		console.log('trying to get medias for program: ' +($scope.programs.indexOf(program)+1)+'/'+$scope.programs.length);
-		
-		CRUDService.getData(program._links.medias.href)
-		.success(function(data){
-		    program.medias = data._embedded.medias;
-			angular.forEach(program.medias, function(value, key) {
-				value.localUrl = $scope.cacheMedia(value);
+				console.log('this program media cached');
 			});
-			console.log('got medias for for program: ' +($scope.programs.indexOf(program)+1)+'/'+$scope.programs.length);
-			$scope.getMediasCounter++;
 			
-			if($scope.getMediasCounter == $scope.programs.length){
-				console.log('got medias for all programs');
-				$scope.remoteDataOk = true;
-				//launch run loop
-				$scope.run();
-				$scope.runPID = setInterval($scope.run, $scope.runPERIOD);
-			}
-		});
-		
+			console.log('got programs and cached medias for all');
+			$scope.remoteDataOk = true;
+			
+			//launch run loop
+			$scope.run();
+			$scope.runPID = setInterval($scope.run, $scope.runPERIOD);
+			});
 	};
 	
-	//Function to locally cach medias 
+	//Function to locally cache medias 
 	$scope.cacheMedia = function(media) {
 		console.log('caching media');
 		
@@ -243,13 +224,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		return media.url;
 	};
 	
-	$scope.buildLoops = function() {
-		console.log('building loops');
-		
-		// à compléter
-		
-	};
-	
+
 
 	
 	//FullScreen Utils
