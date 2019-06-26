@@ -13,19 +13,21 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		
 		//Static PERIOD parameters
 		//--------------------------------
-		$scope.showNextMediaPERIOD = 3000;
-		$scope.runPERIOD = 30000;
-		$scope.refreshPERIOD = 120000;
+		$scope.showNextMediaPERIOD = 5000; //5000
+		$scope.runPERIOD = 300000; //30000
+		$scope.refreshPERIOD = 120000; //120000
 		//--------------------------------
 		
 		//Application variables
-		$scope.display = {};
+		$scope.displayId = angular.element(displayId).text();
 		$scope.programs = [];
 		$scope.loops = [];
 		$scope.reports = [];
+		//$scope.reportsToSend = [];
 		
 		//Synchronization variables
-		$scope.remoteDataOk = false;
+		$scope.programsSyncOK = false;
+		$scope.reportsSyncOK = false;
 		$scope.currentProgramOK = false;
 		
 		//Timers process IDs
@@ -42,8 +44,13 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	};
 	
 	//Function to check if remote Data was fetched
-	$scope.isRemoteDataOK = function(){
-		return $scope.remoteDataOk;
+	$scope.isprogramsSyncOK = function(){
+		return $scope.programsSyncOK;
+	};
+	
+	//Function to check if reports were pushed
+	$scope.isreportsSyncOK = function(){
+		return $scope.reportsSyncOK;
 	};
 	
 	//Main Function
@@ -59,11 +66,12 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	$scope.refresh = function() {
 		console.log('trying a refresh');
 		
-		//if last startup succeeded to get remoteData
-		if($scope.isRemoteDataOK()){
+		//if last startup succeeded to get remoteData and send reports
+		if($scope.isprogramsSyncOK() && $scope.isreportsSyncOK()){
 			console.log('doing a refresh');
 			//reset synchronization variables
-			$scope.remoteDataOk = false;
+			$scope.programsSyncOK = false;
+			$scope.reportsSyncOK = false;
 		
 			//reset current program loop definition
 			$scope.stopCurrentProgramLoop();			
@@ -85,9 +93,9 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	
 	//Function to manage the programs displaying
 	$scope.run = function(){
-		console.log('trying to run with remote data : ' + $scope.isRemoteDataOK());
+		console.log('trying to run with remote data : ' + $scope.isprogramsSyncOK());
 
-			if($scope.isRemoteDataOK()){
+			if($scope.isprogramsSyncOK()){
 				
 				//clearing run timers
 				console.log('clearing run timers');
@@ -139,8 +147,12 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		else
 			$scope.loopCounter = 0;
 					
-		//report	
-		// ----
+		//report
+		$scope.reports.push({ 
+			startTime: moment().format('YYYY-MM-DD HH:mm:ss a'), 
+			endTime: moment().add($scope.showNextMediaPERIOD).format('YYYY-MM-DD HH:mm:ss a'),
+			display: null ,
+			media: $scope.currentProgram.medias[$scope.loopCounter] });
 		
 	};
 	
@@ -169,8 +181,8 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 		$scope.checkConnection();
 		
 		//Sync reports
-		//-----------
-		
+		$scope.sendReports();
+	
 		//Sync Programs
 		$scope.getPrograms();
 		
@@ -187,7 +199,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 	$scope.getPrograms = function() { 
 		console.log('trying to get Programs and their Medias');
 		
-		CRUDService.getData('/sync/programs/'+ angular.element(displayId).text())
+		CRUDService.getData('/sync/programs/'+ $scope.displayId)
 		.success(function(data){
 	
 		    $scope.programs = data;
@@ -201,11 +213,27 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 			});
 			
 			console.log('got programs and cached medias for all');
-			$scope.remoteDataOk = true;
+			$scope.programsSyncOK = true;
 			
 			//launch run loop
 			$scope.run();
 			$scope.runPID = setInterval($scope.run, $scope.runPERIOD);
+			});
+	};
+	
+	//Function to send Reports to server
+	$scope.sendReports = function() { 
+		console.log('trying to send Reports to server');
+		
+		//free reports object into reportsToSend object
+		//$scope.reportsToSend.push.apply($scope.reportsToSend, $scope.reports);
+		//$scope.reports = [];
+		
+		CRUDService.setData('/sync/reports/'+ $scope.displayId, $scope.reports)
+		.success(function(data){
+			console.log('sent Reports successfully');
+			$scope.reportsSyncOK = true;
+			$scope.reports = [];
 			});
 	};
 	
@@ -275,7 +303,6 @@ app.controller('smartCtrl', ['$scope', 'CRUDService',
 // --------------------------------------------------------
 //list of CRUD calls
 app.service('CRUDService',['$http', function ($http) {
-
 	    
 	    function getData(url) {
 	        return $http({
@@ -284,17 +311,17 @@ app.service('CRUDService',['$http', function ($http) {
 	        });
 	    };
 	    
-	    function createOne(target, data) {
+	    function setData(url, data) {
 	        return $http({
 	          method: 'POST',
-	          	url: '/api/'+target,
+	          	url: url,
 	            data: data
 	        });
 	    };
 	    
 	    return {
 	    		getData: 						getData,
-	    		createOne: 						createOne,
+	    		setData: 						setData,
 	    };
     
 }]);

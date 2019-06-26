@@ -8,3 +8,4 @@ com/platformia/winkwide/admin/controller/RestResponseEntityExceptionHandler.clas
 com/platformia/winkwide/admin/controller/DisplayRepositoryController.class
 com/platformia/winkwide/admin/config/ValidatorEventRegister.class
 com/platformia/winkwide/admin/config/WebConfiguration.class
+com/platformia/winkwide/admin/config/RepositoryConfig.class

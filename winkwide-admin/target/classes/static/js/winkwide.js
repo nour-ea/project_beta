@@ -18,3 +18,4 @@ $(window).on('load', function(){
 	$(".glyphicon-arrow-left").addClass("fa fa-arrow-left").removeClass(".glyphicon",".glyphicon-arrow-left");
 
 });
+

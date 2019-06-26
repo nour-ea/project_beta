@@ -75,6 +75,10 @@ html, body {
   	min-height: 80vh !important;
 }
 
+.bg-black {
+  	background-color: #000000;
+}
+
 .centered-div {
   position: absolute;
  	left: 50%;

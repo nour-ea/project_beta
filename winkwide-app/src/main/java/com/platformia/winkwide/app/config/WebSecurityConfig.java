@@ -43,6 +43,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			//Protected Pages					
 			http.authorizeRequests().antMatchers("/tv*")//
 				.access("hasAnyRole('ROLE_MACHINE')");
+			
+			http.authorizeRequests().antMatchers("/sync*")//
+			.access("hasAnyRole('ROLE_MACHINE')");
 
 			
 			// Configuration for Login.

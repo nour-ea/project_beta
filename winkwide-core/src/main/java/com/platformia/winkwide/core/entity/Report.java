@@ -39,13 +39,13 @@ public class Report implements Serializable {
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
 	private Date startTime;
 	
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "end_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
 	private Date endTime;
 
     @ManyToOne

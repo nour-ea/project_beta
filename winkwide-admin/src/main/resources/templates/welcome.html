@@ -2,33 +2,124 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Bienvenue sur WinkWide</title>
 <th:block th:include="includes/_include"></th:block>
+
+<script type="text/javascript">
+
+//Load video background
+$(window).bind("load", function() {  
+	myVar = setTimeout(function() {
+		//$('.bg-welcome').css('background-image', 'url(img/backgrounds/etoiles.mp4)');
+		$(backgroundVideo).attr('src', 'img/backgrounds/etoiles.mp4');
+	}, 1000);
+
+}); 
+
+</script>
+
 </head>
 
 <body>
-	
-	<section id="loginSection" class="container-fluid p-3 bg-welcome" >
-      
-      <div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
-	     <div class="w-100 mb-3">
-	     
-	         <h4 class="float-left ml-2 mb-5">Welcome to WinkWide TV APP </h4>
-	         <img class="float-right mb-5" src="/img/icons/logo.png"  height="100px">
-	     </div>
-	  </div>
-	  
-	  <div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
-	   
-	     <hr>
-         Go to <a href="/portal">Portal App</a>
-		 <hr>
-         Go to <a href="/tv">Smart TV App</a>	         
-         
-      </div>
+	<!-- The video -->
+	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4">
+	</video>
 
-	</section>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+		<div class="container-fluid text-white">
+			<a class="navbar-brand" href="#"><img class="float-right"
+				src="/img/icons/logo.png" height="65" width="65"></a>
 
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
+				aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+				<ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+					<li class="nav-item"><a class="nav-link" href="#">Notre Réseau d'Ecrans</a></li>
+					<li class="nav-item"><a class="nav-link" href="localhost:40001/tv">Devenez Partenaire</a></li>
+					<li class="nav-item"><a class="nav-link" href="#">Aide</a></li>
+					<li class="nav-item"><a class="nav-link" href="#">Inscription</a></li>
+					<li class="nav-item"><a class="nav-link" href="/login">Connexion</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+	<header class="masthead text-center text-white d-flex bg-welcome small">
+
+		<div class="container-fluid my-auto">
+			<div class="row h-100" style="margin-top:100px">
+				
+				<div class="col-lg-3 col-6 mx-auto mt-auto bg-light rounded p-3">
+
+				     <div class="w-100 mb-3">
+				     
+				         <h6 class="text-dark float-center"> Lancez votre Campagne Pub <br>sur le réseau d'écrans WinkWide&reg </h6>
+				     </div>
+			
+				      
+			         <form method="POST" th:action="@{/}">
+							                   
+					         <div class="form-group form-row">
+					          <div class="col-md-8" >
+					            <input type="text" name="firstName" class="form-control form-control-sm" placeholder="Raison Sociale" required>
+				   	          </div>
+				
+					          <div class="col-md-4" >
+					            <input type="text" name="lastName" class="form-control form-control-sm" placeholder="ICE" required>
+				   	          </div>
+							</div>
+					      
+					        <div class="form-group" >
+					            <input type="email" name="userName" class="form-control form-control-sm" placeholder="Adresse email" required>
+					        </div>
+				
+					        <div class="form-group" >
+					            <input type="password" name="password" class="form-control form-control-sm" placeholder="Mot de passe" ng-model="accountForm.password" required>
+					        </div>
+					        
+					        <div class="form-group" >
+					            <input type="password" name="confirmPassword" class="form-control form-control-sm" placeholder="Confirmer mot de passe" required>
+					        </div>
+
+					        <div class="form-group" >
+					            <textarea type="text" name="" class="form-control form-control-sm" placeholder="Objet de la Campagne Pub, 			Durée, Impressions cibles..."  required></textarea>
+					        </div>
+
+					        <div class="form-group" >
+					            <label class="text-dark"> <text class="font-weight-bold">Uploadez votre Media de pub</text> <br> (jpeg, jpg, gif, mp4) </label>
+					            <input type="file" name="" class="form-control form-control-sm" placeholder="Média (jpeg, jpg, gif, mp4)" required>
+					        </div>
+					        
+				
+							<div class="form-group">
+							    <div class="form-check">
+							      <input type="checkbox" name="conditionsAccepted" class="form-check-input" required>
+							      <label class="form-check-label text-dark"> J'accepte les <a href="#"> termes et conditions </a> </label>
+							      <br>
+							    </div>
+							</div>
+					        
+							<div class="form-group mt-2">
+								<button type="submit" class="btn btn-primary w-100" ng-disabled="userForm.$invalid" >Lancer ma Campagne</button>				
+							</div>
+			         </form>
+
+				</div>
+				
+				<div class="col-lg-8 mx-auto" style="margin-top:150px">
+					<h2 class="">
+						<strong>Première Plateforme Ouverte <br> d’Affichage Digital Indoor </strong>
+					</h2>
+					<br>
+				</div>
+			</div>
+		</div>
+	</header>
 
 
 </body>

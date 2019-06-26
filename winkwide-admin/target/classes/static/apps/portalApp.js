@@ -14,6 +14,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		$scope.targetObject = objectModel;
 		$scope.targetCollection = $scope.targetObject + 's';
 		
+		// Define columnList object (for the table column titles)
+		$scope.columnList = {};
+		
 		// Define Pagination options & Specific filters for GetAll Request to fill the UI Grid  
 		$scope.paginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
 		$scope.specificFilters = {};
@@ -56,7 +59,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		
 
 		// Define HTML template for edition buttons
-		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary ml-1" ><i class="fa fa-eye fa-fw"></i></button>';
+		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary ml-1" disabled><i class="fa fa-eye fa-fw"></i></button>';
 		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary ml-1" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil fa-fw"></i></button>';
 		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger ml-1" data-toggle="modal" data-target="#deleteObjectModal" > <i class="fa fa-remove fa-fw"></i></button>';
 		var actionButtonsHTML = '<div class="m-1">' + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
@@ -92,9 +95,13 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 						this.push({ field: value.name , name: value.title, enableFiltering:false });
 
 					}, columnList);
+				
 				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130 });
+				
 			});
-			return columnList;
+			
+			$scope.columnList = columnList;
+			//return columnList;
 		};
 		
 		$scope.getDisplayName = function(target){
@@ -106,9 +113,27 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			
 		     CRUDService.getAll(target, page, size, sortCols, filterCols, specificFilters)
 				.success(function(data){
+										
 		          	$scope[options].data = data._embedded[target];
+		
 					angular.forEach($scope[options].data, function(value, key) {
 						value.actionLink =  value._links.self.href;
+						
+						//Specific to programs and reports (getting display.id and media.id)
+						if(target=='programs' || target=='reports'){					
+							CRUDService.getLinkedObjects(value._links.display.href)
+								.success(function(display){
+									value.display = display.id;
+							});
+						}
+						if(target=='reports'){					
+							CRUDService.getLinkedObjects(value._links.media.href)
+								.success(function(media){
+									value.media = media.id;
+							});
+						}
+						//------
+						
 						});
 		            $scope[options].totalItems = data.page.totalElements;
 		         });                            
@@ -127,6 +152,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				$scope.specificFilters);                            
 		 };
 		
+		// Build columnList (titles of the table columns)
+		$scope.getColumnList();
+		
 		// Get Grid Data from REST Api
 		$scope.setGridData();
 	 	
@@ -137,14 +165,14 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		    enableSelectAll: true,
 		    exporterExcelFilename: 'export.xlsx',
 		    exporterExcelSheetName: 'Sheet1',
-	        paginationPageSizes: [5, 10, 20, 50],
+	        paginationPageSizes: [5, 10, 20, 50, 100, 1000],
 	        paginationPageSize: $scope.paginationOptions.pageSize,
 	        enableColumnMenus:false,
 	    	useExternalPagination: true,
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: $scope.getColumnList(),
+	        columnDefs: $scope.columnList,
 	        onRegisterApi: function(gridApi) {
 	           	$scope.gridApi = gridApi;
 	           	$scope.gridApi.pagination.on.paginationChanged(

@@ -6,7 +6,7 @@
 <th:block th:include="includes/_include"></th:block>
 </head>
 
-<body class="bg-dark">
+<body class="bg-black">
 	
 	<section id="loginSection" class="container-fluid p-3 " >
       
@@ -16,13 +16,12 @@
 	         <h4 class="float-left ml-2 mb-5">WinkWide&reg; Smart TV app</h4>
 	         <img class="float-right mb-5" src="/img/icons/logo.png"  height="100px">
 	     </div>
-		<div class="row ml-1">
-	    		<p>Please enter your Display ID and Partner Code</p>
-	    </div>
+	     <br>
 	      
         <form method="POST" th:action="@{/tv_login}">
 	                
               <div class="form-group">
+				<p class="float-left ml-1">Please enter your Display ID and Partner Code</p>
 			    <input type="text" name="userName" class="form-control" placeholder="Display ID" required autofocus>
 			  </div>
 			  <div class="form-group">

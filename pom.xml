@@ -11,6 +11,21 @@
 
 	<name>winkwide</name>
 	<description>winkwide</description>
+	<url>https://projects.spring.io/spring-boot/#/spring-boot-starter-parent/winkwide</url>
+	<licenses>
+		<license>
+			<name>Platformia License, Version 1.0</name>
+			<url>http://www.platformia.net</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Platformia</name>
+			<email>info@platformia.net</email>
+			<organization>Platformia SARL</organization>
+			<organizationUrl>http://www.platformia.net</organizationUrl>
+		</developer>
+	</developers>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
