@@ -7,7 +7,7 @@ var app = angular.module('portalApp', ['ui.grid','ui.grid.pagination', 'ui.grid.
 app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 
 	    function ($scope, objectModel, CRUDService) {
 		
-		//current path
+		// Get current path
 		$scope.currentPath = window.location.pathname;
 		
 		// Define the Object Target for the CRUD App (Display, Media...)
@@ -18,7 +18,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		$scope.columnList = {};
 		
 		// Define Pagination options & Specific filters for GetAll Request to fill the UI Grid  
-		$scope.paginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
+		$scope.paginationOptions = {pageNumber: 1, pageSize: 20, sortColumns: [], filterColumns: []};
 		$scope.specificFilters = {};
 				
 		// Define Edit / Delete target object url link and fill $scope.formData
@@ -73,7 +73,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			CRUDService.getScheme($scope.targetObject).success(function(data){
 				$scope.schema = data;
 				
-				//SPECIFIC for programs and reports list
+				//SPECIFIC for programs and reports list (as they have related objects : display and media)
 				angular.forEach(data, function(value, key) {
 					if(value.type=='Display')
 						this.push({ field: 'display' , name: 'Display', enableFiltering:false });
@@ -88,7 +88,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					if(value.name=='url' && $scope.targetObject == 'media')
 						this.push({ field: value.name , name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering:false });
 					// ---------------------------------------
-					
+					//enabling filtering only for string fields
 					else if(value.type=='String')
 						this.push({ field: value.name , name: value.title, enableFiltering:true });
 					else if( ['boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(value.type) !== -1)
@@ -96,12 +96,12 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 
 					}, columnList);
 				
+				// create an Actions column (view, edit, delete)
 				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130 });
 				
 			});
 			
 			$scope.columnList = columnList;
-			//return columnList;
 		};
 		
 		$scope.getDisplayName = function(target){

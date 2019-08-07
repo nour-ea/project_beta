@@ -103,7 +103,7 @@ public class SmartTVSyncController {
 			// ----------
 
 			// return success message
-			return ResponseEntity.ok(reports);
+			return new ResponseEntity<>(HttpStatus.OK);
 
 		} catch (Exception e) {
 			e.printStackTrace();
