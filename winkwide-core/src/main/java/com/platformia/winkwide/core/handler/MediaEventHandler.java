@@ -13,5 +13,6 @@ public class MediaEventHandler{
 	  @HandleBeforeCreate
 	  public void handleMediaSave(Media m) {
 	    //System.out.println("My Handler says : we are trying to save media with name : " + m.getName());
+		// use this to limit data storage for a Client ?
 	  }
 }

@@ -11,21 +11,22 @@
 
 <body ng-app="smartTVApp" ng-controller="smartCtrl as vm" ng-init="init()" class="bg-black">
 
-	<img id="mainImage" src="" >
-	<video id="mainVideo" src="" autoplay></video>
-	<div id="mainHTML" src=""></div>
 
-	<div class="centered-div">
+	<div id="startupdiv" class="centered-div">
 		<div style="text-align:center">
 		<img src="/img/icons/logo.png" class=" w-75" >
 		</div>
 
 		<div class="pt-4" style="text-align:center">
-		<button id="controlButton" class="btn btn-lg btn-primary" ng-click="winkwide()" >Launch WinkWide</button>
+		<button id="controlButton" class="btn btn-lg btn-primary" ng-click="winkwide()" >Click here to start WinkWide</button>
 		</div>
 		
 
 	</div>
+	
+	<img id="mainImage" src="" >
+	<video id="mainVideo" src="" autoplay muted></video>
+	<div id="mainHTML" src=""></div>
 	
 	<th:block sec:authorize="isAuthenticated()">
 	          <p id="displayId" style="opacity:0"th:utext="${#request.userPrincipal.name}">..</p>

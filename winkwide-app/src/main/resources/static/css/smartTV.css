@@ -80,13 +80,13 @@ html, body {
 }
 
 .centered-div {
-  position: absolute;
- 	left: 50%;
+	position: absolute;
+	left: 50%;
  	top: 50%;
  	transform: translate(-50%,-50%);
 }
 
-#mainImage{
+#mainImage {
 	position: absolute;
 	width:100%;
 	max-width: 100%;
@@ -98,7 +98,7 @@ html, body {
 }
 
 #mainVideo{
-	position: relative;
+	position: absolute;
 	width:100%;
 	max-width: 100%;
 	max-height: 100%;
@@ -107,6 +107,11 @@ html, body {
 	margin:auto;
 	z-index:9000;
 }
+
+#startupdiv{
+	z-index:10000;
+}
+
 
 #smoothDrop{
 	background-color: white;

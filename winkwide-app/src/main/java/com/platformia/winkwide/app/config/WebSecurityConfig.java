@@ -41,12 +41,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		protected void configure(HttpSecurity http) throws Exception {
 
 			//Protected Pages					
-			http.authorizeRequests().antMatchers("/tv*")//
-				.access("hasAnyRole('ROLE_MACHINE')");
+			http.authorizeRequests().antMatchers("/login*", "/tv_login*", "/logout*")
+			.permitAll();
 			
-			http.authorizeRequests().antMatchers("/sync*")//
-			.access("hasAnyRole('ROLE_MACHINE')");
-
+			http.authorizeRequests().antMatchers("/")
+				.access("hasAnyRole('ROLE_MACHINE')");
 			
 			// Configuration for Login.
 			http.authorizeRequests()
@@ -57,22 +56,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.loginProcessingUrl("/tv_login")
 			.usernameParameter("userName")//
 			.passwordParameter("password")
-			.defaultSuccessUrl("/tv")
+			.defaultSuccessUrl("/")
 			.failureUrl("/login?error=true")//
 
 
 			.and()
 			.logout()
 			.logoutUrl("/logout")
-			.logoutSuccessUrl("/tv")
+			.logoutSuccessUrl("/")
 			.deleteCookies("JSESSIONID")
 
 			.and()
 			.exceptionHandling()
-			.accessDeniedPage("/tv/403")
+			.accessDeniedPage("/403")
 
 			.and()
 			.csrf().disable();				    
+
 
 		}
 

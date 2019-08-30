@@ -25,12 +25,12 @@ import com.platformia.winkwide.core.utils.FileStorageProperties;
 public class MediaFileStorageService {
 
 	private final Path fileStorageLocation;
-	private final String fileDownloadServer;
+	//private final String fileDownloadServer;
 
 	@Autowired
 	public MediaFileStorageService(FileStorageProperties fileStorageProperties) {
 		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
-		this.fileDownloadServer = fileStorageProperties.getDownloadServer();
+		//this.fileDownloadServer = fileStorageProperties.getDownloadServer();
 
 		try {
 			Files.createDirectories(this.fileStorageLocation);
@@ -69,7 +69,7 @@ public class MediaFileStorageService {
             // Create File
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
             
-            String url = this.fileDownloadServer + relativeTargetLocation.toString();
+            String url = /*this.fileDownloadServer +*/ relativeTargetLocation.toString();
 
             //Create Media object
             Media media = new Media();
@@ -91,7 +91,8 @@ public class MediaFileStorageService {
 
         try {
             // Build Target Location (absolute)
-            Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url.replaceFirst(this.fileDownloadServer.toString(), ""));
+            //Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url.replaceFirst(this.fileDownloadServer.toString(), ""));
+        	Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url);
             
             // Delete File
             Files.delete(targetLocation);

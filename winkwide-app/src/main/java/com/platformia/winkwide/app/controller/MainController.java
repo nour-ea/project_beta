@@ -23,14 +23,14 @@ public class MainController {
 		return "login";
 	}
 	
-	@RequestMapping("/tv/403")
+	@RequestMapping("/403")
 	public String machineAccessDenied() {
 		return "tv/403";
 	}	
 	
 	// Machine App Pages
 	//
-	@RequestMapping("/tv")
+	@RequestMapping("/")
 	public String smartTV() {
 		return "tv/smartTV";
 	}	

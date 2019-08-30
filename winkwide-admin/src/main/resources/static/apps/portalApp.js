@@ -117,7 +117,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		          	$scope[options].data = data._embedded[target];
 		
 					angular.forEach($scope[options].data, function(value, key) {
-						value.actionLink =  value._links.self.href;
+						value.actionLink =  CRUDService.getRelativePath(value._links.self.href);
 						
 						//Specific to programs and reports (getting display.id and media.id)
 						if(target=='programs' || target=='reports'){					
@@ -647,14 +647,14 @@ app.service('CRUDService',['$http', function ($http) {
 	    function getLinkedObjects(fullTarget) {
 	        return $http({
 	          method: 'GET',
-	            url: fullTarget
+	            url: getRelativePath(fullTarget)
 	        });
 	    };
 	    
 	    function setLinkedObjects(fullTarget, links) {
 	        return $http({
 	          method: 'PUT',
-	            url: fullTarget,
+	            url: getRelativePath(fullTarget),
 	            data: links,
 	            headers: {'Content-type' : 'text/uri-list'}
 	        });
@@ -663,10 +663,18 @@ app.service('CRUDService',['$http', function ($http) {
 	    function deleteLinkedObjects(fullTarget) {
 	        return $http({
 	          method: 'DELETE',
-	            url: fullTarget
+	            url: getRelativePath(fullTarget)
 	        });
 	    };
 	    
+	    //tool to go from URL to URI
+	    function getRelativePath(absolutePath){
+	    	    var l = document.createElement("a");
+	    	    l.href = absolutePath;
+	    	    var relativePath = l.pathname;
+	    	    delete l;
+	    	    return relativePath;
+	    };
 	    
 	    return {
 	    		getScheme: 						getScheme,
@@ -678,6 +686,7 @@ app.service('CRUDService',['$http', function ($http) {
 	    		getLinkedObjects:				getLinkedObjects,
 	    		setLinkedObjects:				setLinkedObjects,
 	    		deleteLinkedObjects:			deleteLinkedObjects,
+	    		getRelativePath:				getRelativePath,
 
 	    };
     

@@ -1,7 +1,7 @@
-com/platformia/winkwide/app/WinkWideApp.class
 com/platformia/winkwide/app/controller/SmartTVSyncController.class
 com/platformia/winkwide/app/config/ValidatorEventRegister.class
-com/platformia/winkwide/app/controller/MainController.class
-com/platformia/winkwide/app/config/WebSecurityConfig.class
-com/platformia/winkwide/app/controller/RestResponseEntityExceptionHandler.class
 com/platformia/winkwide/app/config/WebConfiguration.class
+com/platformia/winkwide/app/controller/RestResponseEntityExceptionHandler.class
+com/platformia/winkwide/app/WinkWideApp.class
+com/platformia/winkwide/app/config/WebSecurityConfig.class
+com/platformia/winkwide/app/controller/MainController.class

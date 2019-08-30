@@ -14,7 +14,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		//Static PERIOD parameters
 		//--------------------------------
 		$scope.refreshPERIOD = 120000; //120000
-		$scope.runPERIOD = 300000; //30000
+		$scope.runPERIOD = 30000; //30000
 		$scope.showNextMediaPERIOD = 5000; //5000
 		//--------------------------------
 		
@@ -25,7 +25,12 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		$scope.displayId = angular.element(displayId).text();
 		$scope.programs = [];
 		$scope.reports = [];
-		$scope.reportsToSend = [];
+		
+		//Local Storage variables
+		if(localStorage.getItem('storedPrograms') === null)
+			STOREService.storeJSONinLS('storedPrograms', []);
+		if(localStorage.getItem('storedReports') === null)
+			STOREService.storeJSONinLS('storedReports', []);
 		
 		//Synchronization variables
 		$scope.programsSyncOK = false;
@@ -58,7 +63,9 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 	$scope.winkwide = function() {
 		console.log('started winkwide');
 		$scope.openFullscreen();
-		$scope.startup();
+		if(window.navigator.onLine)
+				$scope.remoteStartup();
+		else	$scope.localStartup();
 		setInterval( $scope.refresh, $scope.refreshPERIOD);		
 	};
 	
@@ -66,28 +73,37 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 	$scope.refresh = function() {
 		console.log('trying a refresh');
 		
-		//if last startup succeeded to get remoteData and send reports
-		if($scope.isprogramsSyncOK() && $scope.isreportsSyncOK()){
-			console.log('doing a refresh');
+		//stop Running programs
+		$scope.stopCurrentProgram();			
+		clearInterval($scope.runPID);
+		
+		//reinitialize Current Program and Loop variables
+		$scope.currentProgram = {};
+		$scope.currentMedia = {};
+		$scope.loopCounter = 0;
+		
+		//REFRESH WITH INTERNET CONNECTION
+		//&& last startup succeeded to get remoteData and send reports
+		if(window.navigator.onLine &&
+		($scope.isprogramsSyncOK() && $scope.isreportsSyncOK())){
+			console.log('doing a remote refresh');
 			
 			//reset synchronization variables
 			$scope.programsSyncOK = false;
 			$scope.reportsSyncOK = false;
-		
-			//reset current program loop definition
-			$scope.stopCurrentProgramLoop();			
 			
-			//clear run timer
-			clearInterval($scope.runPID);
+			//remote update & run
+			$scope.remoteStartup();
+			console.log('done with the remote refresh');
+		}
+		 
+		//REFRESH WITHOUT INTERNET CONNECTION
+		else {
+			console.log('doing a local refresh');
 			
-			//reinitialize run variables
-			$scope.currentProgram = {};
-			$scope.loopCounter = 0;
-			
-			//update & run
-			$scope.startup();
-			console.log('done with the refresh');
-
+			//local update & run
+			$scope.localStartup();
+			console.log('done with the local refresh');
 		}
 	
 	};
@@ -108,7 +124,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 
 					//define timeout for the current program
 					console.log('setting current program timeout : '+  moment($scope.currentProgram.endTime, 'YYYY-MM-DD HH:mm a').diff(moment()));
-					$scope.setCurrentProgramPID = setTimeout( $scope.stopCurrentProgramLoop, moment($scope.currentProgram.endTime, 'YYYY-MM-DD HH:mm a').diff(moment()) );
+					$scope.setCurrentProgramPID = setTimeout( $scope.stopCurrentProgram, moment($scope.currentProgram.endTime, 'YYYY-MM-DD HH:mm a').diff(moment()) );
 
 					//display the current program media
 					$scope.showNextMedia();
@@ -140,7 +156,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 	};
 	
 	//Function to Stop current program loop
-	$scope.stopCurrentProgramLoop = function(){
+	$scope.stopCurrentProgram = function(){
 		console.log('stopping current program loop');
 
 		//clear run timers
@@ -161,13 +177,18 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		//Show Media from IDB if available
 		STOREService.getFileIDB($scope.currentMedia.url, function(data){
 		
-			//Hide all 3 types of tags (img, video, html)
+			//Hide and empty all 3 types of tags (img, video, html)
 			angular.element(mainImage).attr('style','display:none');
 			angular.element(mainVideo).attr('style','display:none');
 			angular.element(mainHTML).attr('style','display:none');
+
+			angular.element(mainImage).attr('src','');
+			angular.element(mainVideo).attr('src','');
+			angular.element(mainHTML).attr('src','');
+
 			
 			if (data === undefined){				
-				//Use the Tag that corresponds to the media format (img, video, html)
+				//Use the Element/Tag that corresponds to the media format (img, video, html)
 				switch($scope.currentMedia.format){		
 					case 'video/mp4':
 						angular.element(mainVideo).attr('src',$scope.currentMedia.url);
@@ -220,13 +241,10 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 	};
 	
 
-	//The startup function
-	$scope.startup = function() {
-		console.log('launched startup');
-		
-		//Check Connection
-		$scope.checkConnection();
-		
+	//The startup function / WITH INTERNET CONNECTION 
+	$scope.remoteStartup = function() {
+		console.log('launched a remote Startup');
+				
 		//Sync reports
 		$scope.sendReports();
 	
@@ -235,53 +253,80 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 			
 	};
 	
+	//The startup function / NO INTERNET CONNECTION
+	$scope.localStartup = function()	{
+		console.log('launched a local Startup');
+
+		//store reports in LS
+		$scope.storeReports();
+		
+		//run with locally stored programs
+		$scope.programs = STOREService.getJSONfromLS('storedPrograms');
+		console.log('running with programs stored in Local Storage');
+		
+		//launch Run loop : start displaying programs medias
+		$scope.run();
+		$scope.runPID = setInterval($scope.run, $scope.runPERIOD);			
+	}
 	
-	// Function to check the internet connection
-	$scope.checkConnection = function(){		
-		
-		// à compléters
-		
-	};
 	
 	//Function to send Reports to server
 	$scope.sendReports = function() { 
 		console.log('trying to send Reports to server');
 		
-		//Empty reports object into reportsToSend object
-		$scope.reportsToSend.push.apply($scope.reportsToSend, $scope.reports);
-		$scope.reports = [];
+		//store Reports in LS and empty reports object
+		$scope.storeReports();
+		var storedReports = STOREService.getJSONfromLS('storedReports');
+
+		// try to send reports and empty stored reports in LS
+		CRUDService.setData('/sync/reports/'+ $scope.displayId, storedReports)
+			.success(function(data){
+				console.log('sent Reports successfully');
+				$scope.reportsSyncOK = true;
+				STOREService.storeJSONinLS('storedReports', [])
+		});
 		
-		CRUDService.setData('/sync/reports/'+ $scope.displayId, $scope.reportsToSend)
-		.success(function(data){
-			console.log('sent Reports successfully');
-			$scope.reportsSyncOK = true;
-			$scope.reportsToSend = [];
-			});
 	};
 	
-	//Function to get Programs and their Medias
+	//Function to store Reports in LS and empty reports object
+	$scope.storeReports = function() { 
+		console.log('storing reports in LS');
+		
+		var storedReports = STOREService.getJSONfromLS('storedReports');
+		storedReports.push.apply(storedReports, $scope.reports);		
+		STOREService.storeJSONinLS('storedReports', storedReports)
+		
+		$scope.reports = [];
+		};
+	
+	//Function to get Programs and their Medias from server
 	$scope.getPrograms = function() { 
 		console.log('trying to get Programs and their Medias');
 		
+		// try to get programs and update stored programs in LS
+
 		CRUDService.getData('/sync/programs/'+ $scope.displayId)
-		.success(function(data){
-	
-		    $scope.programs = data;
+			.success(function(data){
 		
-			//caching all programs medias
-			angular.forEach($scope.programs, function(prog, key) {
-				angular.forEach(prog.medias, function(med, key) {
-					$scope.cacheMedia(med);
+			    $scope.programs = data;
+				STOREService.storeJSONinLS('storedPrograms', data);
+			
+				//caching all programs medias
+				angular.forEach($scope.programs, function(prog, key) {
+					angular.forEach(prog.medias, function(med, key) {
+						$scope.cacheMedia(med);
+					});
 				});
-			});
-			
-			console.log('got programs and cached medias for all');
-			$scope.programsSyncOK = true;
-			
-			//launch Run loop : start displaying programs medias
-			$scope.run();
-			$scope.runPID = setInterval($scope.run, $scope.runPERIOD);	
-		});	
+				
+				console.log('got programs and cached medias for all');
+				$scope.programsSyncOK = true;
+				
+				//launch Run loop : start displaying programs medias
+				$scope.run();
+				$scope.runPID = setInterval($scope.run, $scope.runPERIOD);	
+		});
+
+				
 	};
 	
 	//Function to locally cache medias 
@@ -307,6 +352,8 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		  } else if (elem.msRequestFullscreen) {  //IE/Edge 
 		    elem.msRequestFullscreen();
 		  }
+		  
+		  angular.element(startupdiv).attr('style','display:none');
 		  
 	};
 	
@@ -365,7 +412,7 @@ app.service('CRUDService',['$http', function ($http) {
 }]);
 
 
-//Local Storage Caching service
+//Local Storage / Database Caching service
 app.service('STOREService',['$http', function($http){
 	
 	
@@ -373,52 +420,12 @@ app.service('STOREService',['$http', function($http){
 		// Stores the JavaScript object as a string
 		localStorage.setItem(objectName, JSON.stringify(object));
 	};
-	
-	function storeFileLS(fileUrl, fileType){
-	
-			//Check if the file is already stored
-			if(localStorage.getItem(fileUrl) !== null){
-				console.log("File :"+ fileUrl +" already stored ");
-				return;
-			}
-				
-		
-		    // Create XHR, Blob and FileReader objects
-		    var xhr = new XMLHttpRequest(),
-		        blob,
-		        fileReader = new FileReader();
 
-		    xhr.open("GET", fileUrl, true);
-		    // Set the responseType to arraybuffer. "blob" is an option too, rendering manual Blob creation unnecessary, but the support for "blob" is not widespread enough yet
-		    xhr.responseType = "arraybuffer";
-
-		    xhr.addEventListener("load", function () {
-		        if (xhr.status === 200) {
-		            // Create a blob from the response
-		            blob = new Blob([xhr.response], {type: fileType});
-
-		            // onload needed since Google Chrome doesn't support addEventListener for FileReader
-		            fileReader.onload = function (evt) {
-		                // Read out file contents as a Data URL
-		                var result = evt.target.result;
-
-		                // Store Data URL in localStorage
-		                try {
-		                    localStorage.setItem(fileUrl, result);
-		                    console.log("Storage of file :"+ fileUrl +" succeeded ");
-		                }
-		                catch (e) {
-		                    console.log("Storage failed: " + e);
-		                }
-		            };
-		            // Load blob as Data URL
-		            fileReader.readAsDataURL(blob);
-		        }
-		    }, false);
-		    // Send XHR
-		    xhr.send();
-		
+	function getJSONfromLS(objectName){
+		// Get the string as a JavaScript object
+		return JSON.parse(localStorage.getItem(objectName));
 	};
+	
 
 	function setupIDB(){
 		let db;
@@ -541,10 +548,10 @@ app.service('STOREService',['$http', function($http){
 	
     return {
     	storeJSONinLS: 					storeJSONinLS,
-    	storeFileLS: 					storeFileLS,
+    	getJSONfromLS:					getJSONfromLS,
+    	setupIDB: 						setupIDB,
     	storeFileIDB: 					storeFileIDB,
     	getFileIDB:						getFileIDB,
-    	setupIDB: 						setupIDB,
-};
+    };
 	
 }]);
