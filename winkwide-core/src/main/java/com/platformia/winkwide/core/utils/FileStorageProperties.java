@@ -7,8 +7,6 @@ public class FileStorageProperties {
 
 	private String uploadDir;
     
-//    private String downloadServer;
-
     public String getUploadDir() {
         return uploadDir;
     }
@@ -17,13 +15,5 @@ public class FileStorageProperties {
         this.uploadDir = uploadDir;
     }
 
-/*	public String getDownloadServer() {
-		return downloadServer;
-	}
-
-	public void setDownloadServer(String downloadServer) {
-		this.downloadServer = downloadServer;
-	}
-*/    
     
 }

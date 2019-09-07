@@ -13,24 +13,29 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		
 		//Static PERIOD parameters
 		//--------------------------------
-		$scope.refreshPERIOD = 120000; //120000
-		$scope.runPERIOD = 30000; //30000
-		$scope.showNextMediaPERIOD = 5000; //5000
+		$scope.refreshPERIOD = 20000; //120000
+		$scope.runPERIOD = 6000; //30000
+		$scope.showNextMediaPERIOD = 2000; //5000
 		//--------------------------------
 		
 		//Setting up the local Database
 		STOREService.setupIDB();
 		
 		//Application variables
-		$scope.displayId = angular.element(displayId).text();
+		$scope.displayId = 0;
 		$scope.programs = [];
 		$scope.reports = [];
 		
 		//Local Storage variables
+		if(localStorage.getItem('displayId') === null)
+			localStorage.setItem('displayId', '0');
 		if(localStorage.getItem('storedPrograms') === null)
 			STOREService.storeJSONinLS('storedPrograms', []);
 		if(localStorage.getItem('storedReports') === null)
 			STOREService.storeJSONinLS('storedReports', []);
+		
+		//Set this Display ID
+		$scope.setDisplayId();
 		
 		//Synchronization variables
 		$scope.programsSyncOK = false;
@@ -39,7 +44,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		
 		//Timers process IDs
 		$scope.runPID = -1;
-		$scope.setCurrentProgramPID = -1;
+		$scope.stopCurrentProgramPID = -1;
 		$scope.showNextMediaPID = -1;
 		
 		//Current Program and Loop variables
@@ -49,6 +54,22 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		
 		console.log('ended init');
 		
+		//Click to Fullscreen
+		
+	};
+	
+	//Function to get current Display Id
+	$scope.setDisplayId = function(){
+		//set it default from LS
+		$scope.displayId = localStorage.getItem('displayId');
+		console.log('Display Id set from LS to : ' + $scope.displayId);
+		
+		//set it from server
+		CRUDService.getData('/sync/displayId').success(function(data){
+			$scope.displayId = data;
+			console.log('Display Id set from server to : ' + $scope.displayId);
+		});
+
 	};
 	
 	//Functions to check if remoteData was fetched/ reports were pushed
@@ -110,25 +131,28 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 	
 	//Function to manage the programs displaying
 	$scope.run = function(){
-		console.log('trying to run with remote data : ' + $scope.isprogramsSyncOK());
+		console.log('trying to run with available data : ' + $scope.isprogramsSyncOK());
 
 			if($scope.isprogramsSyncOK()){
 				
 				//clearing run timers
 				console.log('clearing showNextMedia and setCurrentProgram timers');
 				clearInterval($scope.showNextMediaPID);
-				clearTimeout($scope.setCurrentProgramPID);
+				clearTimeout($scope.stopCurrentProgramPID);
 				
 				if($scope.setCurrentProgramOK){
 					console.log('setting setCurrentProgram and showNextMedia timers');
 
-					//define timeout for the current program
-					console.log('setting current program timeout : '+  moment($scope.currentProgram.endTime, 'YYYY-MM-DD HH:mm a').diff(moment()));
-					$scope.setCurrentProgramPID = setTimeout( $scope.stopCurrentProgram, moment($scope.currentProgram.endTime, 'YYYY-MM-DD HH:mm a').diff(moment()) );
+					//define timeout for the current program (never more than 20 days / largest integer in milliseconds)
+					let programTimeout = Math.min(20*24*3600*1000, moment($scope.currentProgram.endTime, 'YYYY-MM-DD HH:mm a').diff(moment())) 
+					console.log('setting current program timeout : '+  programTimeout);
+					$scope.stopCurrentProgramPID = setTimeout( $scope.stopCurrentProgram, programTimeout);
 
 					//display the current program media
-					$scope.showNextMedia();
-					$scope.showNextMediaPID = setInterval( $scope.showNextMedia, $scope.showNextMediaPERIOD);
+					$scope.showNextMediaPID = setTimeout( function(){
+							$scope.showNextMedia();
+							$scope.showNextMediaPID = setInterval( $scope.showNextMedia, $scope.showNextMediaPERIOD);
+						}, 1000); // petit décalage pour éviter les chevauchements
 						
 				}else{
 					//set current program
@@ -161,7 +185,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 
 		//clear run timers
 		clearInterval($scope.showNextMediaPID);
-		clearTimeout($scope.setCurrentProgramPID);
+		clearTimeout($scope.stopCurrentProgramPID);
 		
 		//ask for reset program definition
 		$scope.setCurrentProgramOK = false;
@@ -279,12 +303,17 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		var storedReports = STOREService.getJSONfromLS('storedReports');
 
 		// try to send reports and empty stored reports in LS
-		CRUDService.setData('/sync/reports/'+ $scope.displayId, storedReports)
+		CRUDService.setData('/sync/reports', storedReports)
 			.success(function(data){
 				console.log('sent Reports successfully');
 				$scope.reportsSyncOK = true;
+				console.log('clearing LS Reports');
 				STOREService.storeJSONinLS('storedReports', [])
-		});
+				})
+			.error(function(errors){
+				console.log('sending Reports to server failed for reason: ' + errors);
+				$scope.reportsSyncOK = true;
+				});
 		
 	};
 	
@@ -305,7 +334,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		
 		// try to get programs and update stored programs in LS
 
-		CRUDService.getData('/sync/programs/'+ $scope.displayId)
+		CRUDService.getData('/sync/programs')
 			.success(function(data){
 		
 			    $scope.programs = data;
@@ -324,7 +353,11 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 				//launch Run loop : start displaying programs medias
 				$scope.run();
 				$scope.runPID = setInterval($scope.run, $scope.runPERIOD);	
-		});
+				})
+			.error(function(errors){
+				console.log('getting Reports from server failed for reason: ' + errors);
+				$scope.programsSyncOK = true;
+				});
 
 				
 	};

@@ -20,7 +20,7 @@
 	            <li class="nav-item d-inline-flex mt-2">
 	              <a class="nav-link small align-self-baseline">Welcome</a>
 
-	              <a class="nav-link text-secondary font-weight-bold align-self-baseline" href="/portal/accountInfo" th:utext="${#request.userPrincipal.name}">..</a>
+	              <a class="nav-link text-secondary font-weight-bold align-self-baseline" href="/portal/accountInfo" th:utext="${session.accountName}" th:unless="${session == null}">..</a>
 	            </li>
 			</th:block>
 			
@@ -36,8 +36,9 @@
 						<a href="/logout"	class="dropdown-item small"><i class="fa fa-sign-out fa-fw"></i>&nbsp; Logout</a>
 				</th:block>
 				<th:block sec:authorize="!isAuthenticated()">
-						<a href="/login" class="dropdown-item small font-weight-bold"> <i class="fa fa-lock fa-fw"></i>&nbsp;Login</a> <a
-							href="/portal/createAccount" class="dropdown-item small font-weight-bold"> <i class="fa fa-plus fa-fw"></i>&nbsp; Create Account</a>
+						<a href="/" class="dropdown-item small font-weight-bold"> <i class="fa fa-home fa-fw"></i>&nbsp; Home Website</a>
+						<a href="/login" class="dropdown-item small font-weight-bold"> <i class="fa fa-lock fa-fw"></i>&nbsp; Login</a> 
+						<a href="/portal/createAccount" class="dropdown-item small font-weight-bold"> <i class="fa fa-plus fa-fw"></i>&nbsp; Create Account</a>
 				</th:block>
 	          </div>
 			</li>			
@@ -45,3 +46,8 @@
 
 	</div>
 </nav>
+
+
+<div id="mainAlert" style="display:none" role="alert"> </div>
+
+

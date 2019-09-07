@@ -24,13 +24,9 @@
 
 	</div>
 	
-	<img id="mainImage" src="" >
-	<video id="mainVideo" src="" autoplay muted></video>
-	<div id="mainHTML" src=""></div>
-	
-	<th:block sec:authorize="isAuthenticated()">
-	          <p id="displayId" style="opacity:0"th:utext="${#request.userPrincipal.name}">..</p>
-	</th:block>
+	<img id="mainImage" src="" style="display:none" >
+	<video id="mainVideo" src="" autoplay muted style="display:none"></video>
+	<iframe id="mainHTML" src="" style="display:none"></iframe>
 	
 
 </body>

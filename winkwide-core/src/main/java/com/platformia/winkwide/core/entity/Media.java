@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platformia.winkwide.core.model.Auditable;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,7 @@ import lombok.Setter;
 @Getter @Setter @NoArgsConstructor  
 @Entity
 @Table(name = "Medias")
-public class Media implements Serializable {
+public class Media extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = -5558760606017435981L;
 

@@ -5,12 +5,22 @@
       "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
       "name": "file",
       "type": "com.platformia.winkwide.core.utils.FileStorageProperties"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.MachineAccountProperties",
+      "name": "machine",
+      "type": "com.platformia.winkwide.core.utils.MachineAccountProperties"
     }
   ],
   "properties": [
     {
       "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
       "name": "file.upload-dir",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.MachineAccountProperties",
+      "name": "machine.default-password",
       "type": "java.lang.String"
     }
   ]

@@ -9,7 +9,6 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		
 		// Get current path
 		$scope.currentPath = window.location.pathname;
-		
 		// Define the Object Target for the CRUD App (Display, Media...)
 		$scope.targetObject = objectModel;
 		$scope.targetCollection = $scope.targetObject + 's';

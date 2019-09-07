@@ -9,28 +9,37 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.platformia.winkwide.core.entity.Account;
 import com.platformia.winkwide.core.entity.Display;
+import com.platformia.winkwide.core.repository.AccountRepository;
 import com.platformia.winkwide.core.repository.DisplayRepository;
 
 @RepositoryRestController
 public class DisplayRepositoryController {
 
-    private final DisplayRepository repository;
+    private final DisplayRepository displayRepo;
+    private final AccountRepository accountRepo; 
 
     @Autowired
-    public DisplayRepositoryController(DisplayRepository repo) { 
-        repository = repo;
+    public DisplayRepositoryController(DisplayRepository dispRepo, AccountRepository accRepo) { 
+        displayRepo = dispRepo;
+        accountRepo = accRepo;
     }
     
 
    @DeleteMapping("/displays/{displayId}") 
     public @ResponseBody ResponseEntity<?> deleteDisplay(@PathVariable Long displayId) {
         	
-        Optional<Display> display = repository.findById(displayId);    
+        Optional<Display> display = displayRepo.findById(displayId);    
         if(display.isPresent()) {
-        	repository.deleteDisplayProgramLinks(display.get().getId());
-        	repository.deleteDisplayReportLinks(display.get().getId());
-        	repository.delete(display.get());
+        	//delete associated Machine Account
+    		Optional<Account> machineAccount = Optional.of(accountRepo.findByUserName(displayId.toString()));
+			accountRepo.delete(machineAccount.get());
+        	
+        	//delete linked objects
+        	displayRepo.deleteDisplayProgramLinks(display.get().getId());
+        	displayRepo.deleteDisplayReportLinks(display.get().getId());
+        	displayRepo.delete(display.get());
         }
         return ResponseEntity.ok().build();
             	    	        

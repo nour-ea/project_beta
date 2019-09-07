@@ -29,7 +29,8 @@
 						
 					     <div class="account-container">
 					         <ul>
-					            <li>Welcome <span class="font-weight-bold" th:utext="${#request.userPrincipal.name}"></span></li>
+					            <li>Welcome <span class="font-weight-bold" th:utext="${session.accountName}" th:unless="${session == null}"></span></li>
+								
 					            <li>
 					               You are connected with roles:
 					               <ul>

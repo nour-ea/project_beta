@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,15 +40,15 @@ public class SmartTVSyncController {
 		programRepo = pRepo;
 		reportRepo = rRepo;
 	}
-
-	@GetMapping("sync/programs/{displayId}")
-	public @ResponseBody ResponseEntity<?> getPrograms(@PathVariable("displayId") String displayId) {
+	
+	@GetMapping("sync/programs")
+	public @ResponseBody ResponseEntity<?> getPrograms() {
 
 		try {
 
 			// identify display
-			Long dispId = new Long(displayId);
-			// Display display = displayRepo.getOne(dispId);
+			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+			Display display = displayRepo.getOne(dispId);
 
 			// get programs & their media url lists (ONLY Current and Futur Programs)
 			@SuppressWarnings("deprecation")
@@ -66,7 +66,7 @@ public class SmartTVSyncController {
 			}
 
 			// set display lastProgramsSync time and status (SUCCESS CASE)
-			// --------------
+			display.setLastSyncTime(new Date());
 
 			// return programs
 			return ResponseEntity.ok(programs);
@@ -79,19 +79,18 @@ public class SmartTVSyncController {
 
 	}
 
-	@PostMapping("sync/reports/{displayId}")
-	public @ResponseBody ResponseEntity<?> updateReports(@PathVariable("displayId") String displayId,
+	@PostMapping("sync/reports")
+	public @ResponseBody ResponseEntity<?> updateReports(
 			@RequestBody ArrayList<Report> reports) {
 
 		try {
 
 			// identify display
-			Long dispId = new Long(displayId);
-			Display display = displayRepo.getOne(dispId);
-
+			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+			
 			// set reports
 			for (Report report : reports) {
-				report.setDisplay(display);
+				report.setDisplay(displayRepo.getOne((dispId)));
 				try {
 					reportRepo.save(report);
 				} catch (Exception e) {
@@ -100,7 +99,10 @@ public class SmartTVSyncController {
 			}
 
 			// set display lastReportSync time and status (SUCCESS CASE)
-			// ----------
+			Display display = displayRepo.getOne((dispId));
+			display.setLastSyncTime(new Date());
+			displayRepo.save(display);
+			
 
 			// return success message
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -109,6 +111,30 @@ public class SmartTVSyncController {
 			e.printStackTrace();
 
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+		}
+
+	}
+	
+	@GetMapping("sync/displayId")
+	public @ResponseBody ResponseEntity<?> getDisplayId() {
+
+		try {
+
+			// identify display
+			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+			//Display display = displayRepo.getOne(dispId);
+
+			// check if the mac adress is correct
+			//----
+			//----
+			
+			// return programs
+			return ResponseEntity.ok(dispId);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 
 	}

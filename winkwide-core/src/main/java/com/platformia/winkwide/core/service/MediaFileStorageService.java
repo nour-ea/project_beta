@@ -30,7 +30,6 @@ public class MediaFileStorageService {
 	@Autowired
 	public MediaFileStorageService(FileStorageProperties fileStorageProperties) {
 		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
-		//this.fileDownloadServer = fileStorageProperties.getDownloadServer();
 
 		try {
 			Files.createDirectories(this.fileStorageLocation);
@@ -69,7 +68,7 @@ public class MediaFileStorageService {
             // Create File
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
             
-            String url = /*this.fileDownloadServer +*/ relativeTargetLocation.toString();
+            String url = relativeTargetLocation.toString();
 
             //Create Media object
             Media media = new Media();
@@ -90,8 +89,7 @@ public class MediaFileStorageService {
 
 
         try {
-            // Build Target Location (absolute)
-            //Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url.replaceFirst(this.fileDownloadServer.toString(), ""));
+            // Build Target Location
         	Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url);
             
             // Delete File

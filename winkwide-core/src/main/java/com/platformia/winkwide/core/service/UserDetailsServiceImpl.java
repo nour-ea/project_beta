@@ -4,6 +4,8 @@ package com.platformia.winkwide.core.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,19 +15,22 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.platformia.winkwide.core.dao.GenericHibernateDao;
 import com.platformia.winkwide.core.entity.Account;
- 
+import com.platformia.winkwide.core.repository.AccountRepository;
+
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
  
 	@Autowired
-	private GenericHibernateDao<Account> accountDAO;
- 
+	private AccountRepository repository;
+
+	@Autowired 
+	HttpSession session;
+	
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		accountDAO.setEntityClass(Account.class);
-        Account account = accountDAO.findOne(username);
+        Account account = repository.findByUserName(username);
         System.out.println("Account= " + account);
  
         if (account == null) {
@@ -48,9 +53,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
  
-        UserDetails userDetails = (UserDetails) new User( account.getFirstName(), //
+        UserDetails userDetails = (UserDetails) new User( account.getUserName(), //
                 account.getEncrytedPassword(), enabled, accountNonExpired, //
                 credentialsNonExpired, accountNonLocked, grantList);
+        
+        //put account name in session
+        session.setAttribute("accountName", account.getFirstName());
          
         return userDetails;
     }

@@ -8,7 +8,7 @@
 
 </head>
 
-<body  ng-app="portalApp" ng-controller="crudCtrl as vm">
+<body  ng-cloak ng-app="portalApp" ng-controller="crudCtrl as vm">
 	<th:block th:include="portal/_header"></th:block>
 		
 		<section class="row" id="mainContent">
@@ -35,7 +35,7 @@
 							<!-- add specific filters here -->
 							<div class="form-row pt-2" ng-form name="specificForm">
 			
-								<div class="col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0 float-left">
+								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
 									<small>Filter by size</small>
 									<div>
 										<input type="text" name="sizeMin" class="form-control form-control-sm mt-1" placeholder="min size" 
@@ -48,18 +48,45 @@
 											<small ng-show="specificForm.sizeMax.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
 									</div>
 								</div>
-								<div class="col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0 float-left">
-									<small>Filter by shop coverage</small>
+								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+									<small>Filter by average audience</small>
 									<div>
-										<input type="text" name="shopCoverageMin" class="form-control form-control-sm mt-1" placeholder="min coverage" 
-											ng-model="specificFilters.shopCoverageMin" ng-change="setGridData()"
+										<input type="text" name="averageAudienceMin" class="form-control form-control-sm mt-1" placeholder="min average audience" 
+											ng-model="specificFilters.averageAudienceMin" ng-change="setGridData()"
 											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
-											<small ng-show="specificForm.shopCoverageMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
-										<input type="text" name="shopCoverageMax" class="form-control form-control-sm mt-1" placeholder="max coverage"
-											ng-model="specificFilters.shopCoverageMax" ng-change="setGridData()"
+											<small ng-show="specificForm.averageAudienceMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
+										<input type="text" name="averageAudienceMax" class="form-control form-control-sm mt-1" placeholder="max average audience"
+											ng-model="specificFilters.averageAudienceMax" ng-change="setGridData()"
 											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
-											<small ng-show="specificForm.shopCoverageMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
+											<small ng-show="specificForm.averageAudienceMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
 											
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+									<small>Filter by last sync time</small>
+									<div class="input-append date form_datetime row">
+										<div class="col-sm-10 pr-0">
+										<input type="text" name="lastSyncTimeMin" class="form-control form-control-sm small mt-1 " readonly  placeholder="min start time" 
+											ng-model="specificFilters.lastSyncTimeMin" ng-change="setGridData()">
+										</div>
+										<div class="col-sm-2 p-1">
+											<div class="mt-1">
+												<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
+    												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
+											</div>
+    										</div>																											
+									</div>
+									<div class="input-append date form_datetime row">
+										<div class="col-sm-10 pr-0">
+										<input type="text" name="lastSyncTimeMax" class="form-control form-control-sm small mt-1 " readonly  placeholder="max start time" 
+											ng-model="specificFilters.lastSyncTimeMax" ng-change="setGridData()">
+										</div>
+										<div class="col-sm-2 p-1">
+											<div class="mt-1">
+												<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
+    												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
+											</div>
+    										</div>																											
 									</div>
 								</div>
 								
