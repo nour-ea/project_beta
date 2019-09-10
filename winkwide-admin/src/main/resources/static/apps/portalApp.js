@@ -54,6 +54,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				angular.element(deleteObjectModal).on('hidden.bs.modal', function (e) {
 					$scope.clearFormData();
 				});
+			
+			//initiate DateTime Pickers in Modal 
+			initiateDateTimePickers();
 		};
 		
 
@@ -64,7 +67,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		var actionButtonsHTML = '<div class="m-1">' + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
 		
 		// Define HTML template for media thumbnails
-		var thumbnailHTML = '<img src="{{row.entity.url}}" alt="No Image Found" class="m-1" height="80%" >'
+		var thumbnailHTML = '<img ng-src="{{row.entity.url}}" alt="No Image Found" class="m-1" height="80%" >'
 		
 		// Define a function to Get Data Scheme from REST Api
 		$scope.getColumnList = function(){
@@ -75,9 +78,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				//SPECIFIC for programs and reports list (as they have related objects : display and media)
 				angular.forEach(data, function(value, key) {
 					if(value.type=='Display')
-						this.push({ field: 'display' , name: 'Display', enableFiltering:false });
+						this.push({ field: 'display' , name: 'Display', enableFiltering:false, width: '*', minWidth:100 });
 					if(value.type=='Media')
-						this.push({ field: 'media' , name: 'Media', enableFiltering:false });
+						this.push({ field: 'media' , name: 'Media', enableFiltering:false, width: '*', minWidth:100 });
 				}, columnList);
 				// ---------------------------------------
 				
@@ -85,18 +88,20 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					
 					//SPECIFIC for media thumbnail
 					if(value.name=='url' && $scope.targetObject == 'media')
-						this.push({ field: value.name , name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering:false });
+						this.unshift({ field: value.name , name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering:false, width: '*', minWidth:100 });
 					// ---------------------------------------
 					//enabling filtering only for string fields
-					else if(value.type=='String')
-						this.push({ field: value.name , name: value.title, enableFiltering:true });
-					else if( ['boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(value.type) !== -1)
-						this.push({ field: value.name , name: value.title, enableFiltering:false });
+					else if(value.type=='String' && value.name!=='mac')
+						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100 });
+					else if(value.type=='Date' || value.name=='mac')
+						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:170 });
+					else if( ['boolean', 'int', 'Long', 'BigDecimal'].indexOf(value.type) !== -1)
+						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:100 });
 
 					}, columnList);
 				
 				// create an Actions column (view, edit, delete)
-				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130 });
+				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130});
 				
 			});
 			
@@ -161,10 +166,16 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	    $scope.mainGrid = {
 			rowHeight: 40,
 		    enableGridMenu: true,
+		    gridMenuCustomItems: [{ title: 'Delete Selection',
+		          				action: function ($event) {
+		          					angular.element(deleteSelectionModal).modal('show');
+		          				}, order: 1}],
 		    enableSelectAll: true,
+		    exporterMenuCsv: false,
+		    exporterMenuPdf: false,
 		    exporterExcelFilename: 'export.xlsx',
 		    exporterExcelSheetName: 'Sheet1',
-	        paginationPageSizes: [5, 10, 20, 50, 100, 1000],
+	        paginationPageSizes: [5, 10, 20, 50, 100, 500, 1000, 10000],
 	        paginationPageSize: $scope.paginationOptions.pageSize,
 	        enableColumnMenus:false,
 	    	useExternalPagination: true,
@@ -199,12 +210,27 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			
 			//SPECIFIC for program creation
 			if($scope.targetObject == 'program'){
-				$scope.addLinkedObjects(data._links.display.href, $scope.selectedDisplaysGrid.data);
-				$scope.addLinkedObjects(data._links.medias.href, $scope.selectedMediasGrid.data);
+				$scope.addLinkedObjects(data._links.display.href, $scope.selectedDisplaysGrid.data, function(){
+					$scope.addLinkedObjects(data._links.medias.href, $scope.selectedMediasGrid.data, function(){
+						console.log('created object');
+						createAlert('success', 'successfully created '+ $scope.targetObject, 5000);
+						$scope.setGridData();
+						angular.element(createEditObjectModal).modal('hide');						
+					});					
+				});
+
 			}
 			//------------------------------
-			
-			console.log('created object');
+			else{
+				console.log('created object');
+				createAlert('success', 'successfully created '+ $scope.targetObject, 5000);
+				$scope.setGridData();
+				angular.element(createEditObjectModal).modal('hide');				
+			}
+		})
+		.error(function(data){
+			console.log('Did not create object correctly');
+			createAlert('danger', 'an issue occured creating '+ $scope.targetObject +'\n reason: '+data.toString(), null);
 			$scope.setGridData();
 			angular.element(createEditObjectModal).modal('hide');
 		});
@@ -216,15 +242,31 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			
 			//SPECIFIC for program update
 			if($scope.targetObject == 'program'){
-				$scope.updateLinkedObjects($scope.formData._links.display.href, $scope.selectedDisplaysGrid.data);
-				$scope.updateLinkedObjects($scope.formData._links.medias.href, $scope.selectedMediasGrid.data);
+				$scope.updateLinkedObjects($scope.formData._links.display.href, $scope.selectedDisplaysGrid.data, function(){
+					$scope.updateLinkedObjects($scope.formData._links.medias.href, $scope.selectedMediasGrid.data, function(){
+						console.log('updated object');
+						createAlert('success', 'successfully updated '+ $scope.targetObject, 5000);
+						$scope.clearFormData();
+						$scope.setGridData();
+						angular.element(createEditObjectModal).modal('hide');						
+					});
+				});
 			}
 			//----------------------------
-			
-			console.log('edited object');
+			else{
+				console.log('updated object');
+				createAlert('success', 'successfully updated '+ $scope.targetObject, 5000);
+				$scope.clearFormData();
+				$scope.setGridData();
+				angular.element(createEditObjectModal).modal('hide');				
+			}
+		})
+		.error(function(data){
+			console.log('Did not update object correctly');
+			createAlert('danger', 'an issue occured updating '+ $scope.targetObject +'\n reason: '+data.toString(), null);
 			$scope.clearFormData();
 			$scope.setGridData();
-			angular.element(createEditObjectModal).modal('hide');
+			angular.element(createEditObjectModal).modal('hide');	
 		});
 	};
 	
@@ -232,6 +274,14 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	$scope.deleteTargetObject = function(){			
 		CRUDService.deleteOne(targetObjectUrl).success(function(data){
 			console.log('deleted object');
+			createAlert('success', 'successfully deleted '+ $scope.targetObject, 5000);
+			$scope.clearFormData();
+			$scope.setGridData();
+			angular.element(deleteObjectModal).modal('hide');
+		})
+		.error(function(data){
+			console.log('Did not delete object correctly');
+			createAlert('danger', 'an issue occured deleting '+ $scope.targetObject +'\n reason: '+data.toString(), null);
 			$scope.clearFormData();
 			$scope.setGridData();
 			angular.element(deleteObjectModal).modal('hide');
@@ -243,8 +293,22 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		$scope.formData = {};
 		$scope.objectForm.$setPristine();
 	};
-
 	
+	//Define function to Delete a whole selection of objects (selected rows)
+	$scope.deleteSelection = function(){
+		$scope.gridApi.selection.getSelectedRows().forEach(function(obj){
+			CRUDService.deleteOne(CRUDService.getRelativePath(obj._links.self.href))
+			.success(function(data){
+				console.log('deleted object: ' + obj._links.self.href);
+				createAlert('success', 'successfully deleted '+ $scope.targetObject+'s', 5000);
+				$scope.setGridData();		
+			})
+			.error(function(data){
+				createAlert('danger', 'an issue occured deleting '+ $scope.targetObject +'s \n reason: '+data.toString(), null);
+			});
+		});
+		angular.element(deleteSelectionModal).modal('hide');
+	};
 
 
 	
@@ -272,8 +336,6 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			    reader.readAsDataURL(input.files[0]);
 
 	};
-	
-	
 	
 	
 	// Specific UI tables and data for programs displays and media management
@@ -325,9 +387,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: [	{ field: 'name', name: 'Name'},
-							{ field: 'mediaType', name: 'Media type'},
-							{ field: 'url', name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering: false }] ,
+	        columnDefs: [	{ field: 'url', name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering: false },
+							{ field: 'name', name: 'Name'},
+							{ field: 'mediaType', name: 'Media type'}] ,
 	        onRegisterApi: function(gridApi) {
 	           	$scope.mediasGridApi = gridApi;
 	           	$scope.mediasGridApi.pagination.on.paginationChanged(
@@ -497,24 +559,38 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	
 	
 	// Define a function to create or update or delete program display or medias (via links)
-	$scope.addLinkedObjects = function(target, selected){
+	$scope.addLinkedObjects = function(target, selected, callback){
 
 		if(selected.length > 0){
 				CRUDService.setLinkedObjects(target, $scope.selectedToLinks(selected)).success(function(data){
 					console.log("set linked objects: " + $scope.selectedToLinks(selected) + "\n" + "on link: " + target);
+					createAlert('success', 'successfully set '+ $scope.targetObject +' linked objects', 5000);
+					callback();
+				})
+				.error(function(data){
+					createAlert('danger', 'an issue occured setting '+ $scope.targetObject +' linked objects \n reason: '+data.toString(), null);
 				});
 			}								
 	};
 	
-	$scope.updateLinkedObjects = function(target, selected){
+	$scope.updateLinkedObjects = function(target, selected, callback){
 			
 			if(selected.length > 0){
 				CRUDService.setLinkedObjects(target, $scope.selectedToLinks(selected)).success(function(data){
 					console.log("set linked objects: " + $scope.selectedToLinks(selected) + "\n" + "on link: " + target);
+					callback();
+				})
+				.error(function(data){
+					createAlert('danger', 'an issue occured setting '+ $scope.targetObject +' linked objects \n reason: '+data.toString(), null);
 				});
+				
 			}else{
 				CRUDService.deleteLinkedObjects(target).success(function(data){
 					console.log("deleted linked objects on link: " + target);
+					callback();
+				})
+				.error(function(data){
+					createAlert('danger', 'an issue occured deleting '+ $scope.targetObject +' linked objects \n reason: '+data.toString(), null);
 				});
 			}
 					
@@ -655,7 +731,7 @@ app.service('CRUDService',['$http', function ($http) {
 	          method: 'PUT',
 	            url: getRelativePath(fullTarget),
 	            data: links,
-	            headers: {'Content-type' : 'text/uri-list'}
+	            headers: {'Content-Type' : 'text/uri-list'}
 	        });
 	    };
 	    

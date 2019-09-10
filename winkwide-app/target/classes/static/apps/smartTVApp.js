@@ -13,9 +13,9 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 		
 		//Static PERIOD parameters
 		//--------------------------------
-		$scope.refreshPERIOD = 20000; //120000
-		$scope.runPERIOD = 6000; //30000
-		$scope.showNextMediaPERIOD = 2000; //5000
+		$scope.refreshPERIOD = 120000; //120000
+		$scope.runPERIOD = 30000; //30000
+		$scope.showNextMediaPERIOD = 20000; //5000
 		//--------------------------------
 		
 		//Setting up the local Database
@@ -204,10 +204,12 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 			//Hide and empty all 3 types of tags (img, video, html)
 			angular.element(mainImage).attr('style','display:none');
 			angular.element(mainVideo).attr('style','display:none');
+			angular.element(mainAudio).attr('style','display:none');
 			angular.element(mainHTML).attr('style','display:none');
 
 			angular.element(mainImage).attr('src','');
 			angular.element(mainVideo).attr('src','');
+			angular.element(mainAudio).attr('src','');
 			angular.element(mainHTML).attr('src','');
 
 			
@@ -215,15 +217,21 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 				//Use the Element/Tag that corresponds to the media format (img, video, html)
 				switch($scope.currentMedia.format){		
 					case 'video/mp4':
-						angular.element(mainVideo).attr('src',$scope.currentMedia.url);
+						angular.element(mainVideo).attr('src', $scope.currentMedia.url);
 						angular.element(mainVideo).attr('style','display:block');
 						break;
+					case 'audio/mp3':
+						angular.element(mainAudio).attr('src', $scope.currentMedia.url);
+						angular.element(mainAudio).attr('style','display:block');
+						angular.element(mainImage).attr('src','/misc/audioCover.gif');
+						angular.element(mainImage).attr('style','display:block');
+						break;
 					case 'app/html':
-						angular.element(mainHTML).attr('src',$scope.currentMedia.url);
+						angular.element(mainHTML).attr('src', $scope.currentMedia.url);
 						angular.element(mainHTML).attr('style','display:block');
 						break;
 					default :
-						angular.element(mainImage).attr('src',$scope.currentMedia.url);
+						angular.element(mainImage).attr('src', $scope.currentMedia.url);
 						angular.element(mainImage).attr('style','display:block');
 					}
 				
@@ -233,15 +241,21 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 				//Use the Element/Tag that corresponds to the media format (img, video, html)
 				switch($scope.currentMedia.format){		
 					case 'video/mp4':
-						angular.element(mainVideo).attr('src',data);
+						angular.element(mainVideo).attr('src', data);
 						angular.element(mainVideo).attr('style','display:block');
 						break;
+					case 'audio/mp3':
+						angular.element(mainAudio).attr('src', data);
+						angular.element(mainAudio).attr('style','display:block');
+						angular.element(mainImage).attr('src','/img/misc/audioCover.gif');
+						angular.element(mainImage).attr('style','display:block');
+						break;
 					case 'app/html':
-						angular.element(mainHTML).attr('src',data);
+						angular.element(mainHTML).attr('src', data);
 						angular.element(mainHTML).attr('style','display:block');
 						break;
 					default :
-						angular.element(mainImage).attr('src',data);
+						angular.element(mainImage).attr('src', data);
 						angular.element(mainImage).attr('style','display:block');
 					}
 	
@@ -355,7 +369,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService',
 				$scope.runPID = setInterval($scope.run, $scope.runPERIOD);	
 				})
 			.error(function(errors){
-				console.log('getting Reports from server failed for reason: ' + errors);
+				console.log('getting Programs from server failed for reason: ' + errors);
 				$scope.programsSyncOK = true;
 				});
 
