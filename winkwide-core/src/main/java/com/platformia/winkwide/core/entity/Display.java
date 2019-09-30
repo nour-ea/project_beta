@@ -6,10 +6,12 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -24,6 +26,7 @@ import com.platformia.winkwide.core.utils.MyRandomNumericGenerator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 
 @Getter @Setter @NoArgsConstructor
 @Entity
@@ -43,6 +46,15 @@ public class Display extends Auditable implements Serializable {
     
     @Column(name = "areas", length = 128, nullable = false)
     private String area;
+    
+    @Column(name = "average_audience", nullable = false)
+    private int averageAudience;
+    
+	@Basic
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_sync_time")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
+	private Date lastSyncTime;
     
     @Column(name = "address", length = 128, nullable = false)
     private String address;
@@ -64,17 +76,8 @@ public class Display extends Auditable implements Serializable {
 	
     @Column(name = "smart", length = 1, nullable = false, columnDefinition = "TINYINT(1)")
     private boolean smart;
-    
-    @Column(name = "average_audience", nullable = false)
-    private int averageAudience;
-    
-	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "last_sync_time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
-	private Date lastSyncTime;
-    
-    @OneToMany(mappedBy="display")
+ 
+    @ManyToMany(mappedBy = "displays", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     private List<Program> programs;
     
     @OneToMany(mappedBy="display")

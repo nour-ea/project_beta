@@ -46,7 +46,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 			// Pages only for ADMIN
 			http.authorizeRequests().antMatchers("/portal/displays").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/playlists").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/medias").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/playlists").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/programs").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/reports").access("hasAnyRole('ROLE_ADMIN')");
 

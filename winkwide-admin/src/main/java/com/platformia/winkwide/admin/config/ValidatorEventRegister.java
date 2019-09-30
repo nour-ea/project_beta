@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.validation.Validator;
 
+//somehow makes Validation great again
 @Configuration
 public class ValidatorEventRegister implements InitializingBean {
 

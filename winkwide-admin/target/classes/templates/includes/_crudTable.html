@@ -3,7 +3,7 @@
 	<div class="row m-2  rounded bg-light" id="tableRow">
 		<div class="m-4 w-100" style="font-size: 12px">
 			<div id="crudTable">
-				<div ui-grid="mainGrid" class="grid" ui-grid-pagination ui-grid-selection ui-grid-exporter></div>
+				<div ui-grid="mainGrid" class="grid" ui-grid-pagination ui-grid-selection ui-grid-exporter ui-grid-pinning></div>
 			</div>
 
 		</div>
@@ -22,21 +22,30 @@
 				</div>
 				
 				<form id="objectForm" name="objectForm" class="m-2">
-				<div class="modal-body m-1 p-1">		
+				<div id="createEditObjectModalBody" class="modal-body m-1 p-1">		
 										
 						<!-- AUTOMATIC form fields for each object -->
 						<!-- ------------------------------------- -->
 						
-						<div ng-repeat="field in schema" ng-if="targetObject!='media' && field.name!='id'" class="form-group row">
+						<div ng-repeat="field in schema" 
+							 ng-if="targetObject!='media' 
+							 		&& field.name!='id'
+									&& !(targetObject=='display' && field.name=='lastSyncTime')
+									&& !(targetObject=='playlist' && field.name=='duration')"
+							 class="form-group row">
 						 
-						    <label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
+						    <label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].includes(field.type)"
 						    		class="col-sm-2 col-form-label">{{field.title}}</label>
 						    
-						    <!-- case of a Textfield -->
+						    <!-- case of a Textfield-->
 						    <div ng-if="field.type=='String'" class="col-sm-10">
 								<input type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" required>
-								<small ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
+								<small ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine  && objectForm[field.name].$viewValue==''" class="text-danger"> &nbsp field {{field.title}} is required </small>
+								<small id="nameInvalidMessage" ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine && objectForm[field.name].$error.nameInvalid" class="text-danger"></small>
+								<small id="macInvalidMessage" ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine && objectForm[field.name].$error.macInvalid" class="text-danger"></small>
+																
 							</div>
+							
 							
 							<!-- case of a Boolean -->
 						    <div ng-if="field.type=='boolean'" class="col-sm-10">
@@ -48,7 +57,7 @@
 							</div> 
 							
 							<!-- case of a Number -->
-						    <div ng-if="field.type=='int' || field.type=='Long' " class="col-sm-10">
+						    <div ng-if="field.type=='int' || field.type=='Long'" class="col-sm-10">
 								<input type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" ng-pattern="/^[0-9]*$/" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" required>
 								<small ng-show="objectForm[field.name].$error.required && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
 								<small ng-show="!objectForm[field.name].$error.required  && objectForm[field.name].$error.pattern && !objectForm[field.name].$pristine" class="text-danger">&nbsp field {{field.title}} must be a number </small>				
@@ -79,34 +88,72 @@
 						<!-- add SCHEMA RELATED specific form fields here -->
 						<!-- -------------------------------------------- -->
 						
+						<!-- case of a Playlist -->
+						<div ng-repeat="field in schema" ng-if="targetObject=='playlist'">
+							<div  ng-if="field.name=='spots'" >
+								<div  class="form-group row" >
+									 <label  class="col-sm-2 col-form-label">Available Medias</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="mediasGrid" class="grid small" ui-grid-pagination ui-grid-selection  ></div>						 		
+									 </div>
+								</div>
+								<div  class="form-group row " >
+									 <div class="w-100 d-flex justify-content-center">
+									 	<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias', selectedSpotsGridApi, selectedSpotsGrid)" class="btn btn-sm btn-primary m-1" ><i class="fa fa-arrow-up fa-fw"></i></button>
+									 	<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias', mediasGridApi, selectedSpotsGrid)" class="btn btn-sm btn-primary m-1" ><i class="fa fa-arrow-down fa-fw"></i></button>
+									 </div>
+								</div>
+								<div  class="form-group row" >
+									 <label  class="col-sm-2 col-form-label">Selected Spots</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="selectedSpotsGrid" class="grid small" ui-grid-pagination ui-grid-selection ui-grid-edit ></div>						 		
+									 </div>
+								</div>
+							</div>						
+						</div>
+						
 						<!-- case of a Program -->
 						<div ng-repeat="field in schema" ng-if="targetObject=='program'">
-							<div  class="form-group row">
-								 <label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
-								 <div ng-if="field.type=='Display'" class="col-sm-4">
-								 	<div ui-grid="displaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-								 </div>
-								 <div ng-if="field.type=='Display'" class="col-sm-1">
-								 	<button id="displaysGridAddButton" ng-click="addSelectedObjects('display')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
-								 	<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('display')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
-								 </div>
-								 <div ng-if="field.type=='Display'" class="col-sm-4">
-								 	<div ui-grid="selectedDisplaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-								 </div>
+							<div  ng-if="field.name=='displays'">
+								<div  class="form-group row" >
+									 <label class="col-sm-2 col-form-label">Available Displays</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="displaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+									 </div>
+							 	</div>
+							 	<div  class="form-group row" >
+									 <div class="w-100 d-flex justify-content-center">
+									 	<button id="displaysGridRemoveButton" ng-click="removeSelectedObjects('displays', selectedDisplaysGridApi, selectedDisplaysGrid)" class="btn btn-sm btn-primary m-1" ><i class="fa fa-arrow-up fa-fw"></i></button>
+									 	<button id="displaysGridAddButton" ng-click="addSelectedObjects('displays', displaysGridApi, selectedDisplaysGrid)" class="btn btn-sm btn-primary m-1" ><i class="fa fa-arrow-down fa-fw"></i></button>
+									 </div>
+								</div>
+								<div  class="form-group row" >
+									 <label class="col-sm-2 col-form-label">Selected Displays</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="selectedDisplaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+									 </div>
+								</div>
 							</div>						
 							
-							<div  class="form-group row">		 	
-								 <label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
-								 <div ng-if="field.type=='List'" class="col-sm-4">
-								 	<div ui-grid="mediasGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-								 </div>
-								 <div ng-if="field.type=='List'" class="col-sm-1">
-								 	<button id="mediasGridAddButton" ng-click="addSelectedObjects('medias')" class="btn btn-sm btn-primary mt-5" ><i class="fa fa-arrow-right fa-fw"></i></button>
-								 	<button id="mediasGridRemoveButton" ng-click="removeSelectedObjects('medias')" class="btn btn-sm btn-primary mt-2" ><i class="fa fa-arrow-left fa-fw"></i></button>						 									 		
-								 </div>
-								 <div ng-if="field.type=='List'" class="col-sm-4">
-								 	<div ui-grid="selectedMediasGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-								 </div>				 	
+							<div  ng-if="field.name=='playlists'">
+								<div  class="form-group row" >		 	
+									 <label class="col-sm-2 col-form-label">Available Playlists</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="playlistsGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+									 </div>
+								</div>
+								<div  class="form-group row" >
+									 <div class="w-100 d-flex justify-content-center">
+									 	<button id="playlistsGridRemoveButton" ng-click="removeSelectedObjects('playlists', selectedPlaylistsGridApi, selectedPlaylistsGrid)" class="btn btn-sm btn-primary m-1" ><i class="fa fa-arrow-up fa-fw"></i></button>
+										<button id="playlistsGridAddButton" ng-click="addSelectedObjects('playlists', playlistsGridApi, selectedPlaylistsGrid)" class="btn btn-sm btn-primary m-1" ><i class="fa fa-arrow-down fa-fw"></i></button>						 									 		
+									 </div>
+								</div>
+								<div  class="form-group row" >
+									 <label class="col-sm-2 col-form-label">Selected Playlists</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="selectedPlaylistsGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+									 </div>				 	
+								</div>
 							</div>
 						</div>
 						
@@ -115,45 +162,76 @@
 						
 						<!-- case of a Media -->
 						<div ng-if="targetObject=='media'">
+						
 							<div class="form-group row">						
-								<label class="col-sm-2 col-form-label">Name</label>
-							    <div class="col-sm-10">
-									<input type="text" class="form-control" name="name" ng-model="formData.name" ng-class="{ 'is-invalid' : objectForm.name.$invalid && !objectForm.name.$pristine }" required>
-									<small ng-show="objectForm.name.$invalid && !objectForm.name.$pristine" class="text-danger"> &nbsp field Name is required </small>
-								</div>
-							</div>
-							<div class="form-group row">						
-								<label class="col-sm-2 col-form-label">Media Type</label>
-							    <div class="col-sm-10">
-									<select type="text" class="form-control" name="mediaType" ng-model="formData.mediaType" ng-class="{ 'is-invalid' : objectForm.mediaType.$invalid && !objectForm.mediaType.$pristine }" required>
-										<option ng-selected="formData.mediaType=='ads'">ads</option>
-										<option ng-selected="formData.mediaType=='info'">info</option>
-										<option ng-selected="formData.mediaType=='private'">private</option>
-										<option ng-selected="formData.mediaType=='other'">other</option>
-									</select>
-									<small ng-show="objectForm.mediaType.$invalid && !objectForm.mediaType.$pristine" class="text-danger"> &nbsp field Media Type is required </small>
-								</div>
-							</div>
-							<div class="form-group row">						
-								<label class="col-sm-2 col-form-label">Media File</label>
+								<label class="col-sm-2 col-form-label">File</label>
 							    <div class="col-sm-10">
 									<input type="file" class="form-control" name="file" id="file" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.file.$invalid && !objectForm.file.$pristine }">
 									<small ng-show="objectForm.file.$invalid && !objectForm.file.$pristine" class="text-danger"> &nbsp field Media File is required </small>
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-sm-2 col-form-label">Preview</label>
+								<label class="col-sm-2 col-form-label"></label>
 							    <div class="col-sm-10">
-									<img id="mediaPreview" ng-src="{{formData.url}}" alt="Media Preview" class="form-control w-50">
+									<img id="imagePreview" ng-src="{{formData.type=='Image' ? formData.url :''}}" onload="angular.element(this).scope().generateThumbFile(this)" alt="Image Preview" class="w-100 d-none">
+									<video id="videoPreview" ng-src="{{formData.type=='Video' ? formData.url :''}}" ontimeupdate="angular.element(this).scope().generateThumbFile(this)" alt="Video Preview" class="w-100 d-none" controls></video>
+									<audio id="audioPreview" ng-src="{{formData.type=='Audio' ? formData.url :''}}" alt="Audio Preview" class="w-100 d-none" controls></audio>
+									<div id="htmlPreview" class="w-100 d-none" style="height:400px">Preview HTML File</div>
 								</div>
 							</div>
+							<canvas id="thumbnailCanvas" class="d-none"></canvas>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Thumbnail</label>
+							    <div class="col-sm-10">
+									<input type="file" class="form-control" name="thumbFile" id="thumbFile" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine }">
+									<small ng-show="objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine" class="text-danger"> &nbsp field Thumbnail is required </small>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-2 col-form-label"></label>
+							    <div class="col-sm-10">
+									<img id="thumbPreview" ng-src="{{formData.thumbUrl}}" alt="Thumbnail Preview" class="w-50 d-none">
+								</div>
+							</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Name</label>
+							    <div class="col-sm-10">
+									<input type="text" class="form-control" name="name" ng-model="formData.name" ng-class="{ 'is-invalid' : objectForm.name.$invalid && !objectForm.name.$pristine }" required>
+									<small ng-show="objectForm.name.$invalid && !objectForm.name.$pristine  && objectForm.name.$viewValue==''" class="text-danger"> &nbsp field Name is required </small>
+									<small id="nameInvalidMessage" ng-show="objectForm.name.$invalid && !objectForm.name.$pristine && objectForm.name.$error.nameInvalid" class="text-danger"></small>									
+								</div>
+							</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Verified</label>
+								<div class="col-sm-10">
+									<select type="text" class="form-control" name="verified" ng-model="formData.verified" ng-class="{ 'is-invalid' : objectForm.verified.$invalid && !objectForm.verified.$pristine }" required>
+										<option ng-selected="formData.verified == true">true</option>
+										<option ng-selected="formData.verified == false">false</option>
+									</select>
+									<small ng-show="objectForm.verified.$invalid && !objectForm.verified.$pristine" class="text-danger"> &nbsp field Verified is required </small>
+								</div> 
+							</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Category</label>
+							    <div class="col-sm-10">
+									<select type="text" class="form-control" name="category" ng-model="formData.category" ng-class="{ 'is-invalid' : objectForm.category.$invalid && !objectForm.category.$pristine }" required>
+										<option ng-selected="formData.category=='ad'">ad</option>
+										<option ng-selected="formData.category=='entertain'">entertain</option>
+										<option ng-selected="formData.category=='private'">private</option>
+										<option ng-selected="formData.category=='other'">other</option>
+									</select>
+									<small ng-show="objectForm.category.$invalid && !objectForm.category.$pristine" class="text-danger"> &nbsp field Category is required </small>
+								</div>
+							</div>							
+							
+							
 						</div>	
 							
 				</div>
 												
 				<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button id="createEditObjectModalAction" ng-click="isCreateModalType ? createTargetObject() : updateTargetObject()" type="button" class="btn btn-primary" ng-disabled="objectForm.$invalid">{{isCreateModalType ? 'Create' : 'Update'}}</button>
+						<button id="createEditObjectModalAction" ng-click="isCreateModalType ? createTargetObject() : updateTargetObject()" type="button" class="btn btn-primary" ng-disabled="objectForm.$invalid ">{{isCreateModalType ? 'Create' : 'Update'}}</button>
 				</div>
 				</form>	
 																									
@@ -162,27 +240,27 @@
 	</div>
 
 
-	<!-- DELETE an object modal -->
-	<div class="modal fade" id="deleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteObjectModal" aria-hidden="true">
+	<!-- VIEW/DELETE an object modal -->
+	<div class="modal fade" id="viewDeleteObjectModal" tabindex="-1" role="dialog" aria-labelledby="viewDeleteObjectModal" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="deleteObjectModalLabel">Delete {{targetObject}}</h5>
+					<h5 class="modal-title" id="viewDeleteObjectModalLabel">{{isDeleteModalType ? 'Delete' : 'View'}} {{targetObject}}</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<div class="modal-body">
-					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete that {{targetObject}}?</p>
+				<div id="viewDeleteObjectModalBody" class="modal-body">
+					<p ng-if="isDeleteModalType" class="modal-title" id="exampleModalLabel">Are your sure you want to delete that {{targetObject}}?</p>
 					<br>
 
 					<!-- AUTOMATIC form fields for each object -->
 					<!-- ------------------------------------- -->
 						
 					<div ng-repeat="field in schema" ng-if="targetObject!='media'" class="form-group row">
-						<label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
+						<label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].includes(field.type)" 
 							class="col-sm-2 col-form-label">{{field.title}}</label>
-						<div ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].indexOf(field.type) !== -1" 
+						<div ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].includes(field.type)" 
 							class="col-sm-10">
 							<div class="form-control">{{formData[field.name]}}</div>
 						</div>
@@ -190,19 +268,39 @@
 					
 					<!-- add SCHEMA RELATED specific form fields here -->
 					<!-- -------------------------------------------- -->
-						
-					<!-- case of a Program -->
-					<div ng-repeat="field in schema" ng-if="targetObject=='program'" class="form-group row">
-					<!-- <label ng-if="field.type=='Display'" class="col-sm-2 col-form-label">Display</label>
-						<div ng-if="field.type=='Display'" class="col-sm-10">
-						 		<div ui-grid="selectedDisplaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+						<!-- case of a Playlist -->
+						<div ng-repeat="field in schema" ng-if="targetObject=='playlist'">
+							<div  ng-if="field.name=='spots'" >
+								<div  class="form-group row" >
+									 <label  class="col-sm-2 col-form-label">Selected Spots</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="viewSelectedSpotsGrid" class="grid small" ui-grid-pagination ui-grid-selection ui-grid-edit ></div>						 		
+									 </div>
+								</div>
+							</div>						
 						</div>
-						 	
-						<label ng-if="field.type=='List'" class="col-sm-2 col-form-label">Medias</label>
-						<div ng-if="field.type=='List'" class="col-sm-10">
-								<div ui-grid="selectedMediasGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
-						</div> -->
-					</div>		
+						
+						<!-- case of a Program -->
+						<div ng-repeat="field in schema" ng-if="targetObject=='program'">
+							<div  ng-if="field.name=='displays'">
+								<div  class="form-group row" >
+									 <label class="col-sm-2 col-form-label">Selected Displays</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="viewSelectedDisplaysGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+									 </div>
+								</div>
+							</div>						
+							
+							<div  ng-if="field.name=='playlists'">
+								<div  class="form-group row" >
+									 <label class="col-sm-2 col-form-label">Selected Playlists</label>
+									 <div class="col-sm-10">
+									 	<div ui-grid="viewSelectedPlaylistsGrid" class="grid small" ui-grid-pagination ui-grid-selection ></div>						 		
+									 </div>				 	
+								</div>
+							</div>
+						</div>						
+
 
 					<!-- add MANUALLY SET specific form fields here -->
 					<!-- ------------------------------------------ -->
@@ -210,36 +308,51 @@
 					<!-- case of a Media -->
 					<div ng-if="targetObject=='media'">
 						<div class="form-group row">						
-							<label class="col-sm-2 col-form-label">Name</label>
-						    <div class="col-sm-10">
-								<div class="form-control">{{formData.name}}</div>
+								<label class="col-sm-2 col-form-label">File</label>
+							    <div class="col-sm-10">
+									<img id="imagePreview" ng-src="{{formData.type=='Image' ? formData.url :''}}" onload="angular.element(this).scope().generateThumbFile(this)" alt="Image Preview" class="w-100 d-none">
+									<video id="videoPreview" ng-src="{{formData.type=='Video' ? formData.url :''}}" ontimeupdate="angular.element(this).scope().generateThumbFile(this)" alt="Video Preview" class="w-100 d-none" controls></video>
+									<audio id="audioPreview" ng-src="{{formData.type=='Audio' ? formData.url :''}}" alt="Audio Preview" class="w-100 d-none" controls></audio>
+									<div id="htmlPreview" class="w-100 d-none" style="height:400px">Preview HTML File</div>
+								</div>
 							</div>
-						</div>
-						<div class="form-group row">						
-							<label class="col-sm-2 col-form-label">Media Type</label>
-						    <div class="col-sm-10">
-								<div class="form-control">{{formData.mediaType}}</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Thumbnail</label>
+							    <div class="col-sm-10">
+									<img id="thumbPreview" ng-src="{{formData.thumbUrl}}" alt="Thumbnail Preview" class="w-50 d-none">
+								</div>
 							</div>
-						</div>
-						<div class="form-group row">
-							<label class="col-sm-2 col-form-label">Preview</label>
-						    <div class="col-sm-10">
-								<img ng-src="{{formData.url}}" alt="Media Preview" class="form-control w-50">
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Name</label>
+							    <div class="col-sm-10">
+									<div class="form-control">{{formData.name}}</div>
+								</div>
 							</div>
-						</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Verified</label>
+								<div class="col-sm-10">
+									<div class="form-control">{{formData.verified}}</div>
+								</div> 
+							</div>
+							<div class="form-group row">						
+								<label class="col-sm-2 col-form-label">Category</label>
+							    <div class="col-sm-10">
+									<div class="form-control">{{formData.category}}</div>
+								</div>
+							</div>
 					</div>						
 					
 						
 				</div>
 				<div class="modal-footer">
-					<button ng-click="clearFormData()" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button ng-click="deleteTargetObject()" type="button" class="btn btn-primary">Delete</button>
+					<button ng-click="clearFormData()" type="button" class="btn btn-secondary" data-dismiss="modal">{{isDeleteModalType ? 'Cancel' : 'Close'}}</button>
+					<button ng-if="isDeleteModalType" ng-click="deleteTargetObject()" type="button" class="btn btn-danger">Delete</button>
 				</div>
 			</div>
 		</div>
 	</div>
 	
-		<!-- Delete selection modal -->
+	<!-- Delete selection modal -->
 	<div class="modal fade" id="deleteSelectionModal" tabindex="-1">
 		<div class="modal-dialog modal-sm" >
 			<div class="modal-content">
@@ -249,13 +362,13 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<div class="modal-body">
+				<div id="deleteSelectionModalBody" class="modal-body">
 					<p class="modal-title" id="exampleModalLabel">Are your sure you want to delete the selected {{targetObject}}s?</p>
 				</div>
 				<div class="modal-footer">
 					<button ng-click="" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button ng-click="deleteSelection()" type="button" class="btn btn-primary">Delete</button>
+					<button ng-click="deleteSelection()" type="button" class="btn btn-danger">Delete Selection</button>
 				</div>
 			</div>
 		</div>
-	</div>-->
+	</div>

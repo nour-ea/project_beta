@@ -54,6 +54,11 @@ public class MainController {
 	public String medias() {
 		return "portal/medias";
 	}
+	
+	@RequestMapping("/portal/playlists")
+	public String playlists() {
+		return "portal/playlists";
+	}
 
 	@RequestMapping("/portal/programs")
 	public String programs() {

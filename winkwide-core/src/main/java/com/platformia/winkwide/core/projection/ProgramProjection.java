@@ -11,6 +11,8 @@ import com.platformia.winkwide.core.entity.Program;
 public interface ProgramProjection {
 
 	   	Long getDisplayId();
+	   	
+	   	String getName();
 	    
 	   	Date getStartTime();
 	   	

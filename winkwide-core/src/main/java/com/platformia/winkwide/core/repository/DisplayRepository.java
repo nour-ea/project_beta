@@ -24,7 +24,7 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 			+ "and ( :address is null or c.address like %:address% )"
 			+ "and ( :brand is null or c.brand like %:brand% )"
 			+ "and ( :mac is null or c.mac like %:mac% )"
-			+ "and ( :smart is null or c.smart like %:smart% )"
+			+ "and ( :smart is null or c.smart = :smart )"
 			+ "and ( :sizeMin is null or :sizeMax is null or (c.size between :sizeMin and :sizeMax) )"
 			+ "and ( :longitudeMin is null or :longitudeMax is null or (c.longitude between :longitudeMin and :longitudeMax) )"
 			+ "and ( :latitudeMin is null or :latitudeMax is null or (c.latitude between :latitudeMin and :latitudeMax) )"
@@ -37,7 +37,7 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 			@Param("address") String address,
 			@Param("brand") String brand,
 			@Param("mac") String mac,
-			@Param("smart") String smart,
+			@Param("smart") Boolean smart,
 			@Param("sizeMin") Integer sizeMin,
 			@Param("sizeMax") Integer sizeMax,
 			@Param("longitudeMin") BigDecimal longitudeMin,
@@ -52,7 +52,7 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 
 	@Modifying
 	@Transactional
-	@Query(value="update programs set display_id = null where display_id = :displayId", nativeQuery = true)
+	@Query(value="delete from programs_displays where display_id = :displayId", nativeQuery = true)
 	public void deleteDisplayProgramLinks(
 			@Param("displayId") Long displayId);
 	

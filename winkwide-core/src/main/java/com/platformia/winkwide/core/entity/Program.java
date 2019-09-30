@@ -14,11 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.platformia.winkwide.core.model.Auditable;
@@ -29,7 +27,7 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
 @Entity
-@Table(name = "Programs", uniqueConstraints={@UniqueConstraint(columnNames={"start_time","end_time","display_id"})})
+@Table(name = "Programs")
 public class Program extends Auditable implements Serializable {
 
 
@@ -39,6 +37,9 @@ public class Program extends Auditable implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+    
+	@Column(name = "name", length = 128, nullable = false, unique=true)
+    private String name;
     
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
@@ -51,16 +52,19 @@ public class Program extends Auditable implements Serializable {
 	@Column(name = "end_time", nullable = false)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
 	private Date endTime;
-	
-    @ManyToOne
-    @JoinColumn(name="display_id")
-    private Display display;
+        
+    @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+    @JoinTable(
+        name = "Programs_Displays", 
+        joinColumns = { @JoinColumn(name = "program_id") }, 
+        inverseJoinColumns = { @JoinColumn(name = "display_id") })
+    private List<Display> displays;
     
     @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinTable(
-        name = "Programs_Medias", 
+        name = "Programs_Playlists", 
         joinColumns = { @JoinColumn(name = "program_id") }, 
-        inverseJoinColumns = { @JoinColumn(name = "media_id") })
-    private List<Media> medias;
+        inverseJoinColumns = { @JoinColumn(name = "playlist_id") })
+    private List<Playlist> playlists;
  
 }

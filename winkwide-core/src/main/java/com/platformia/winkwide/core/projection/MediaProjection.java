@@ -9,11 +9,17 @@ public interface MediaProjection {
 
 	   	String getName();
 	    
-	    String getMediaType();
+	    String getCategory();
+	    
+	    String getType();
 	    
 	    String getFormat();
 	    
 	    String getUrl();
+	    
+	    String getThumbUrl();
 	 
 	    int getSize();
+	    
+	    boolean getVerified();
 }

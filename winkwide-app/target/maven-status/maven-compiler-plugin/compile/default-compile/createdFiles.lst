@@ -1,3 +1,4 @@
+com/platformia/winkwide/app/config/PersistenceConfig.class
 com/platformia/winkwide/app/controller/SmartTVSyncController.class
 com/platformia/winkwide/app/config/ValidatorEventRegister.class
 com/platformia/winkwide/app/config/WebConfiguration.class

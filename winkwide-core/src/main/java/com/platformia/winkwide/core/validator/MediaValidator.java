@@ -21,9 +21,11 @@ public class MediaValidator implements Validator {
 
 		// Check the fields of media.
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty.media.name");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mediaType", "NotEmpty.media.mediaType");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "category", "NotEmpty.media.category");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "type", "NotEmpty.media.type");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "format", "NotEmpty.media.format");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "url", "NotEmpty.media.url");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "thumbUrl", "NotEmpty.media.thumUrl");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "size", "NotEmpty.media.size");
 	}
 

@@ -33,7 +33,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 		List<String> errors = new ArrayList<String>();
 		
 		for (FieldError error : nevEx.getErrors().getFieldErrors()) {
-	        errors.add(error.getField() + ": " + error.getCode());
+	        errors.add("\""+ error.getField() + "\": \"" + error.getCode() + "\"");
 	    }
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);

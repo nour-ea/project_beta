@@ -16,19 +16,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platformia.winkwide.core.entity.Media;
 import com.platformia.winkwide.core.exception.FileStorageException;
+import com.platformia.winkwide.core.model.FileProperties;
 import com.platformia.winkwide.core.utils.FileStorageProperties;
 
 @Service
 @EnableConfigurationProperties({FileStorageProperties.class})
-public class MediaFileStorageService {
+public class FileStorageService {
 
 	private final Path fileStorageLocation;
-	//private final String fileDownloadServer;
 
 	@Autowired
-	public MediaFileStorageService(FileStorageProperties fileStorageProperties) {
+	public FileStorageService(FileStorageProperties fileStorageProperties) {
 		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
 
 		try {
@@ -39,13 +38,15 @@ public class MediaFileStorageService {
 		}
 	}
 
-	public Media storeFile(String name, String mediaType, MultipartFile file) {
+	public FileProperties storeFile(String name, String location, MultipartFile file) {
 
+		FileProperties fileProperties = new FileProperties();
+		
     	// Normalize file name
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if(!name.isEmpty()) fileName = name;
         String format = file.getContentType();
         long size = file.getSize()/1000;
-        boolean verified = false;
 
         try {
             // Check if the file's name contains invalid characters
@@ -59,7 +60,7 @@ public class MediaFileStorageService {
             String month = new SimpleDateFormat("MMM").format(Calendar.getInstance().getTime());
 
             // Build Target Location (relative and absolute)
-            Path relativeTargetLocation = Paths.get("/uploads/medias", mediaType, year, month, random +"_"+ fileName);
+            Path relativeTargetLocation = Paths.get("/uploads", location, year, month, random +"_"+ fileName);
             Path targetLocation = Paths.get(this.fileStorageLocation.toString(), relativeTargetLocation.toString());
             
             // Create target Folder
@@ -67,21 +68,18 @@ public class MediaFileStorageService {
             
             // Create File
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            
+            System.out.println("stored file :" + relativeTargetLocation);
             String url = relativeTargetLocation.toString();
-
-            //Create Media object
-            Media media = new Media();
-            media.setName(name);
-            media.setMediaType(mediaType);
-            media.setFormat(format);
-            media.setUrl(url);
-            media.setSize(size);
-            media.setVerified(verified);
             
-            return media;
+            //Populate fileProperties
+            fileProperties.setName(fileName);
+            fileProperties.setFormat(format);
+            fileProperties.setSize(size);
+            fileProperties.setUrl(url);
+            
+            return fileProperties;
         } catch (Exception ex) {
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+            throw new FileStorageException("Could not store file " + fileName + ". Please try again or contact your Admin!", ex);
         }
     }
 
@@ -93,10 +91,13 @@ public class MediaFileStorageService {
         	Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url);
             
             // Delete File
-            Files.delete(targetLocation);
+        	if(Files.exists(targetLocation)) {
+        		Files.delete(targetLocation);
+            	System.out.println("deleted file :" + url);        		
+        	}
             
         } catch (Exception ex) {
-            throw new FileStorageException("Could not delete file at " + url + ". Please try again!", ex);
+            throw new FileStorageException("Could not delete file at " + url + ". Please try again or contact your Admin!", ex);
         }
     }
 

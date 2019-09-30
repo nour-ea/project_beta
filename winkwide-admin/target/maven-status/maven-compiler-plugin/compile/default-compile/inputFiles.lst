@@ -1,11 +1,13 @@
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/WinkWideAdmin.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/RepositoryConfig.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/PlaylistRepositoryController.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/RestResponseEntityExceptionHandler.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/ValidatorEventRegister.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/PersistenceConfig.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/DisplayRepositoryController.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/SchemaRestController.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/WebConfiguration.java
-/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/AccountRESTController.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/WebSecurityConfig.java
-/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/RepositoryConfig.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/MainController.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/MediaRepositoryController.java
-/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/RestResponseEntityExceptionHandler.java
-/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/config/ValidatorEventRegister.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-admin/src/main/java/com/platformia/winkwide/admin/controller/ProgramRepositoryController.java

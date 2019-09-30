@@ -59,8 +59,7 @@ app.controller("CreateAccountController", function($scope, $http) {
 				}, 10000);
 
 		}
-		
-
+	
 		
 	}
 

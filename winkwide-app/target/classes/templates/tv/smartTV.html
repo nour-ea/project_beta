@@ -11,6 +11,8 @@
 
 <body ng-app="smartTVApp" ng-controller="smartCtrl as vm" ng-init="init()" class="bg-black">
 
+	<!--loading GIF-->
+	<div class="se-pre-con"></div>
 
 	<div id="startupdiv" class="centered-div">
 		<div style="text-align:center">
@@ -21,13 +23,12 @@
 		<button id="controlButton" class="btn btn-lg btn-primary" ng-click="winkwide()" >Click here to start WinkWide</button>
 		</div>
 		
-
 	</div>
 	
 	<img id="mainImage" src="" style="display:none" >
 	<video id="mainVideo" src="" autoplay style="display:none"></video>
 	<audio id="mainAudio" src="" autoplay style="display:none"></audio>
-	<iframe id="mainHTML" src="" style="display:none"></iframe>
+	<div id="mainHTML" style="display:none"></div>
 
 
 	

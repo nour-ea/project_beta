@@ -1,11 +1,11 @@
-var app = angular.module('portalApp', ['ui.grid','ui.grid.pagination', 'ui.grid.selection', 'ui.grid.exporter']);
+var app = angular.module('portalApp', ['ui.grid','ui.grid.pagination', 'ui.grid.selection', 'ui.grid.edit', 'ui.grid.exporter', 'ui.grid.pinning']);
 
 
 // CRUD CONTROLLER
 // -------------------------------------------------------------------------
 // All mighty controller
-app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 
-	    function ($scope, objectModel, CRUDService) {
+app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConstants',
+	    function ($scope, objectModel, CRUDService, uiGridConstants) {
 		
 		// Get current path
 		$scope.currentPath = window.location.pathname;
@@ -16,7 +16,8 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		// Define columnList object (for the table column titles)
 		$scope.columnList = {};
 		
-		// Define Pagination options & Specific filters for GetAll Request to fill the UI Grid  
+		// Define Pagination options & Specific filters for GetAll Request to
+		// fill the UI Grid  
 		$scope.paginationOptions = {pageNumber: 1, pageSize: 20, sortColumns: [], filterColumns: []};
 		$scope.specificFilters = {};
 				
@@ -24,50 +25,78 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		var targetObjectUrl = '/api/'+$scope.targetCollection;
 		$scope.schema = {};
 		$scope.formData = {};
-		$scope.isCreateModalType = true; //to differentiate create and edit modal
+		$scope.isCreateModalType = true; // to differentiate create and edit modal
+		$scope.isDeleteModalType = true; // to differentiate delete and view modal
 
 		$scope.setFormData = function(url, operation){
-			if(operation == 'edit' || operation == 'delete') {
+			if(operation == 'edit' || operation == 'delete' || operation =='view') {
 				targetObjectUrl = url;
 				console.log('setting target object url');
 				CRUDService.getOne(url).success(function(data){
 					$scope.formData = data;
 					console.log('setting form data');
 					
-					//SPECIFIC for program creation and edition
-					if($scope.targetObject == 'program'){
-						$scope.setFormSelectionData('selectedDisplaysGrid',$scope.formData._links.display.href, 'display');
-						$scope.setFormSelectionData('selectedMediasGrid',$scope.formData._links.medias.href, 'medias');
+					// SPECIFIC for media edition and deletion
+					if($scope.targetObject == 'media'){	
+			    		$scope.resetPreview();
+			    		angular.element(thumbPreview).attr("class", "w-50 d-block");
+			    		if($scope.formData.type == 'App')
+			    			$scope.generateHTMLPreview();
 					}
-					//------------------------------------------
+					
+					// ------------------------------------------
+					// SPECIFIC for playlist edition and deletion
+					if($scope.targetObject == 'playlist'){
+						$scope.setFormSelectionData('selectedSpotsGrid',$scope.formData._links.spots.href, 'spots');
+						$scope.setFormSelectionData('viewSelectedSpotsGrid',$scope.formData._links.spots.href, 'spots');
+					}
+					// ------------------------------------------
+					
+					// SPECIFIC for program edition and deletion
+					if($scope.targetObject == 'program'){
+						$scope.setFormSelectionData('selectedDisplaysGrid',$scope.formData._links.displays.href, 'displays');
+						$scope.setFormSelectionData('selectedPlaylistsGrid',$scope.formData._links.playlists.href, 'playlists');
+						
+						$scope.setFormSelectionData('viewSelectedDisplaysGrid',$scope.formData._links.displays.href, 'displays');
+						$scope.setFormSelectionData('viewSelectedPlaylistsGrid',$scope.formData._links.playlists.href, 'playlists');
+					}
+					// ------------------------------------------
 				});
 			}
 			
-			//check if createEditModal is of type Create
-			$scope.isCreateModalType = (operation == 'create'); 
-			//set clear-formData-on-hide if the modal is of type edit or delete
-			if(operation == 'edit')
+			// check if createEditModal is of type Create
+			$scope.isCreateModalType = (operation == 'create');
+			
+			// check if viewDeleteModal is of type Delete
+			$scope.isDeleteModalType = (operation == 'delete');
+			
+			// set clear-formData-on-hide if the modal is of type edit or delete
+			if(operation == 'create' || operation == 'edit')
 				angular.element(createEditObjectModal).on('hidden.bs.modal', function (e) {
 					$scope.clearFormData();
+					$scope.clearObjectFormValidation();
 				});
-			if(operation == 'delete')
-				angular.element(deleteObjectModal).on('hidden.bs.modal', function (e) {
+			if(operation == 'delete' || operation =='view')
+				angular.element(viewDeleteObjectModal).on('hidden.bs.modal', function (e) {
 					$scope.clearFormData();
 				});
 			
-			//initiate DateTime Pickers in Modal 
-			initiateDateTimePickers();
+			
+			// initiate DateTime Pickers in Modal
+			
+			if (angular.element(".form_datetime")[0])
+				initiateDateTimePickers();
 		};
 		
 
 		// Define HTML template for edition buttons
-		var viewButtonHTML = '<button type="button" class="btn btn-sm btn-primary ml-1" disabled><i class="fa fa-eye fa-fw"></i></button>';
-		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary ml-1" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil fa-fw"></i></button>';
-		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger ml-1" data-toggle="modal" data-target="#deleteObjectModal" > <i class="fa fa-remove fa-fw"></i></button>';
+		var viewButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'view\')" type="button" class="btn btn-sm btn-primary ml-1" data-toggle="modal" data-target="#viewDeleteObjectModal" ><i class="fa fa-eye fa-fw"></i></button>';
+		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary ml-1" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil-alt fa-fw"></i></button>';
+		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger ml-1" data-toggle="modal" data-target="#viewDeleteObjectModal" > <i class="fa fa-trash-alt fa-fw"></i></button>';
 		var actionButtonsHTML = '<div class="m-1">' + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
 		
 		// Define HTML template for media thumbnails
-		var thumbnailHTML = '<img ng-src="{{row.entity.url}}" alt="No Image Found" class="m-1" height="80%" >'
+		var thumbnailHTML = '<img ng-src="{{row.entity.thumbUrl}}" alt="No Image Found" class="m-1" height="80%" >'
 		
 		// Define a function to Get Data Scheme from REST Api
 		$scope.getColumnList = function(){
@@ -75,7 +104,8 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			CRUDService.getScheme($scope.targetObject).success(function(data){
 				$scope.schema = data;
 				
-				//SPECIFIC for programs and reports list (as they have related objects : display and media)
+				// SPECIFIC for programs and reports list (as they have related
+				// objects : display and media)
 				angular.forEach(data, function(value, key) {
 					if(value.type=='Display')
 						this.push({ field: 'display' , name: 'Display', enableFiltering:false, width: '*', minWidth:100 });
@@ -86,19 +116,37 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				
 				angular.forEach(data, function(value, key) {
 					
-					//SPECIFIC for media thumbnail
-					if(value.name=='url' && $scope.targetObject == 'media')
-						this.unshift({ field: value.name , name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering:false, width: '*', minWidth:100 });
+					// SPECIFIC for media thumbnail
+					if(value.name=='thumbUrl' && $scope.targetObject == 'media')
+						this.unshift({ field: value.name , name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering:false, pinnedLeft:true, width: '*', minWidth:100 });
 					// ---------------------------------------
-					//enabling filtering only for string fields
-					else if(value.type=='String' && value.name!=='mac')
-						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100 });
+					// enabling filtering only for string fields
 					else if(value.type=='Date' || value.name=='mac')
-						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:170 });
-					else if( ['boolean', 'int', 'Long', 'BigDecimal'].indexOf(value.type) !== -1)
+						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:150 });
+					else if(value.name=='name')
+						this.push({ field: value.name , name: value.title, enableFiltering:true, pinnedLeft:true, width: '*', minWidth:150 });
+					else if(value.type=='String' && value.name!=='url')
+						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100 });
+
+					else if(value.name!=='id' && [ 'int', 'Long', 'BigDecimal'].includes(value.type))
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:100 });
+					else if(value.type=='boolean')
+						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100,
+							filter: {
+						          term: '1',
+						          type: uiGridConstants.filter.SELECT,
+						          selectOptions: [ { value: true, label: 'true' }, { value: false, label: 'false' }]}
+						          });
+					
+					}, columnList);
+				
+				//put Ids at the end of the table
+				angular.forEach(data, function(value, key) {
+					if(value.name=='id')
+						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', width:100 });
 
 					}, columnList);
+
 				
 				// create an Actions column (view, edit, delete)
 				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130});
@@ -112,7 +160,8 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			return CRUDService.getLinkedObjects(target).name
 		};
 
-		// Define a function to Get Data Collection from REST Api and put it in some grid options
+		// Define a function to Get Data Collection from REST Api and put it in
+		// some grid options
 		$scope.getCollectionData = function(options, target, page, size, sortCols, filterCols, specificFilters) {
 			
 		     CRUDService.getAll(target, page, size, sortCols, filterCols, specificFilters)
@@ -123,20 +172,19 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					angular.forEach($scope[options].data, function(value, key) {
 						value.actionLink =  CRUDService.getRelativePath(value._links.self.href);
 						
-						//Specific to programs and reports (getting display.id and media.id)
-						if(target=='programs' || target=='reports'){					
+						// Specific to reports (getting display.id and media.id)
+						if(target=='reports'){					
 							CRUDService.getLinkedObjects(value._links.display.href)
 								.success(function(display){
 									value.display = display.id;
 							});
-						}
-						if(target=='reports'){					
+					
 							CRUDService.getLinkedObjects(value._links.media.href)
 								.success(function(media){
 									value.media = media.id;
 							});
 						}
-						//------
+						// ------
 						
 						});
 		            $scope[options].totalItems = data.page.totalElements;
@@ -204,115 +252,184 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			}
 	    };
 	
-	//Define the Create function
-	$scope.createTargetObject = function(){			
-		CRUDService.createOne($scope.targetCollection, $scope.formData).success(function(data){
-			
-			//SPECIFIC for program creation
-			if($scope.targetObject == 'program'){
-				$scope.addLinkedObjects(data._links.display.href, $scope.selectedDisplaysGrid.data, function(){
-					$scope.addLinkedObjects(data._links.medias.href, $scope.selectedMediasGrid.data, function(){
-						console.log('created object');
-						createAlert('success', 'successfully created '+ $scope.targetObject, 5000);
-						$scope.setGridData();
-						angular.element(createEditObjectModal).modal('hide');						
-					});					
-				});
+	// Define the Create function
+	$scope.createTargetObject = function(){
 
-			}
-			//------------------------------
-			else{
-				console.log('created object');
-				createAlert('success', 'successfully created '+ $scope.targetObject, 5000);
-				$scope.setGridData();
-				angular.element(createEditObjectModal).modal('hide');				
-			}
+		// Animate loader in screen
+		$(".se-pre-con").show();
+		
+		// SPECIFIC for playlist and program creation
+		if($scope.targetObject == 'playlist')
+			$scope.formData.spots = $scope.selectedSpotsGrid.data;
+		if($scope.targetObject == 'program'){
+			$scope.formData.displays = $scope.selectedDisplaysGrid.data;
+			$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
+		}
+	
+		CRUDService.createOne($scope.targetCollection, $scope.formData).success(function(data){
+			console.log('created object');
+			createAlert(main_nav, 'success', 'successfully created '+ $scope.targetObject, 5000);
+			$scope.setGridData();
+			angular.element(createEditObjectModal).modal('hide');
+			// Animate loader off screen
+			$(".se-pre-con").fadeOut("slow");
+
 		})
 		.error(function(data){
 			console.log('Did not create object correctly');
-			createAlert('danger', 'an issue occured creating '+ $scope.targetObject +'\n reason: '+data.toString(), null);
+			
+			//Validate Form with remote answer errors & Alert 
+			$scope.validateObjectForm(data);
+			
 			$scope.setGridData();
-			angular.element(createEditObjectModal).modal('hide');
+			//angular.element(createEditObjectModal).modal('hide');
+			// Animate loader off screen
+			$(".se-pre-con").fadeOut("slow");
 		});
+
 	};
 	
-	//Define the Edit function
-	$scope.updateTargetObject = function(){			
+	// Define the Edit function
+	$scope.updateTargetObject = function(){	
+		
+		// Animate loader in screen
+		$(".se-pre-con").show();
+		
+		// SPECIFIC for playlist update
+		if($scope.targetObject == 'playlist')
+			$scope.formData.spots = $scope.selectedSpotsGrid.data;	
+		if($scope.targetObject == 'program'){
+			$scope.formData.displays = $scope.selectedDisplaysGrid.data;
+			$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
+		}
+		
 		CRUDService.updateOne(targetObjectUrl, $scope.formData).success(function(data){
-			
-			//SPECIFIC for program update
-			if($scope.targetObject == 'program'){
-				$scope.updateLinkedObjects($scope.formData._links.display.href, $scope.selectedDisplaysGrid.data, function(){
-					$scope.updateLinkedObjects($scope.formData._links.medias.href, $scope.selectedMediasGrid.data, function(){
-						console.log('updated object');
-						createAlert('success', 'successfully updated '+ $scope.targetObject, 5000);
-						$scope.clearFormData();
-						$scope.setGridData();
-						angular.element(createEditObjectModal).modal('hide');						
-					});
-				});
-			}
-			//----------------------------
-			else{
-				console.log('updated object');
-				createAlert('success', 'successfully updated '+ $scope.targetObject, 5000);
-				$scope.clearFormData();
-				$scope.setGridData();
-				angular.element(createEditObjectModal).modal('hide');				
-			}
+			console.log('updated object');
+			createAlert(main_nav, 'success', 'successfully updated '+ $scope.targetObject, 5000);
+			$scope.clearFormData();
+			$scope.setGridData();
+			angular.element(createEditObjectModal).modal('hide');
+			// Animate loader off screen
+			$(".se-pre-con").fadeOut("slow");
 		})
 		.error(function(data){
 			console.log('Did not update object correctly');
-			createAlert('danger', 'an issue occured updating '+ $scope.targetObject +'\n reason: '+data.toString(), null);
-			$scope.clearFormData();
+			
+			//Validate Form with remote answer errors & Alert 
+			$scope.validateObjectForm(data);
+			
 			$scope.setGridData();
-			angular.element(createEditObjectModal).modal('hide');	
+			//angular.element(createEditObjectModal).modal('hide');
+			// Animate loader off screen
+			$(".se-pre-con").fadeOut("slow");
 		});
 	};
 	
-	//Define the Delete function
-	$scope.deleteTargetObject = function(){			
+	// Define the Delete function
+	$scope.deleteTargetObject = function(){		
+		
+		// Animate loader in screen
+		$(".se-pre-con").show();
+		
 		CRUDService.deleteOne(targetObjectUrl).success(function(data){
 			console.log('deleted object');
-			createAlert('success', 'successfully deleted '+ $scope.targetObject, 5000);
+			createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject, 5000);
 			$scope.clearFormData();
 			$scope.setGridData();
-			angular.element(deleteObjectModal).modal('hide');
+			angular.element(viewDeleteObjectModal).modal('hide');
+			// Animate loader off screen
+			$(".se-pre-con").fadeOut("slow");
 		})
 		.error(function(data){
 			console.log('Did not delete object correctly');
-			createAlert('danger', 'an issue occured deleting '+ $scope.targetObject +'\n reason: '+data.toString(), null);
-			$scope.clearFormData();
+			createAlert(viewDeleteObjectModalBody, 'danger', 'an issue occured deleting '+ $scope.targetObject +'<br> reason: '
+					+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
+			//$scope.clearFormData();
 			$scope.setGridData();
-			angular.element(deleteObjectModal).modal('hide');
+			// angular.element(viewDeleteObjectModal).modal('hide');
+			// Animate loader off screen
+			$(".se-pre-con").fadeOut("slow");
 		});
 	};
 
-	//Define the Clean form function
+	// Define the Clean form function
 	$scope.clearFormData = function(){			
 		$scope.formData = {};
 		$scope.objectForm.$setPristine();
+		
+		if($scope.targetObject == 'media'){
+
+    		angular.element(file)[0].value = '';
+			angular.element(thumbFile)[0].value = '';
+
+			angular.element(imagePreview).attr('src', '');
+			angular.element(videoPreview).attr('src', '');
+			angular.element(audioPreview).attr('src', '');
+			angular.element(htmlPreview).html('');
+			$('.modal-backdrop').remove();
+			angular.element(thumbPreview).attr('src', '');
+						
+			$scope.resetPreview();
+		}
 	};
 	
-	//Define function to Delete a whole selection of objects (selected rows)
+	// Define function to Delete a whole selection of objects (selected rows)
 	$scope.deleteSelection = function(){
 		$scope.gridApi.selection.getSelectedRows().forEach(function(obj){
 			CRUDService.deleteOne(CRUDService.getRelativePath(obj._links.self.href))
 			.success(function(data){
 				console.log('deleted object: ' + obj._links.self.href);
-				createAlert('success', 'successfully deleted '+ $scope.targetObject+'s', 5000);
+				createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject+'s', 5000);
 				$scope.setGridData();		
 			})
 			.error(function(data){
-				createAlert('danger', 'an issue occured deleting '+ $scope.targetObject +'s \n reason: '+data.toString(), null);
+				createAlert(main_nav, 'danger', 'an issue occured deleting '+ $scope.targetObject +'s <br> reason: '
+						+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
 			});
 		});
 		angular.element(deleteSelectionModal).modal('hide');
 	};
 
-
+	//Function to Validate Form with remote answer errors
+	$scope.validateObjectForm = function(data){		
+		
+		if (typeof(data.errors) !== 'undefined'){
+			if(data.errors[0].includes('\"name\"')){
+				$scope.objectForm.name.$invalid = true;
+				$scope.objectForm.name.$error.nameInvalid = true;
+				angular.element(nameInvalidMessage).html('&nbsp' + data.message);
+			}else if(data.errors[0].includes('\"mac\"')){
+				$scope.objectForm.mac.$invalid = true;
+				$scope.objectForm.mac.$error.macInvalid = true;
+				angular.element(macInvalidMessage).html('&nbsp' + data.message);
+			}else{
+				$scope.clearObjectFormValidation();
+				createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
+						+ data.message, null);
+			}
+		}
+		else {
+			
+			$scope.clearObjectFormValidation();
+			createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
+					+ data.toString(), null);
+		}
+	};
 	
-	
+	//Function to Clear validateObjectForm(data) messages
+	$scope.clearObjectFormValidation = function(){
+		if(typeof($scope.objectForm.name) !== 'undefined'){
+			angular.element(nameInvalidMessage).html('');
+			$scope.objectForm.name.$invalid = false;
+			$scope.objectForm.name.$error = {};
+		} 
+		if(typeof($scope.objectForm.mac) !== 'undefined'){
+			angular.element(macInvalidMessage).html('');
+			$scope.objectForm.mac.$invalid = false;
+			$scope.objectForm.mac.$error = {};
+		}
+		clearModalAlert();
+	};
 	
 	
 	
@@ -325,20 +442,213 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	// ----------------------------------------------------------------------
 	// ----------------------------------------------------------------------
 	
-	//Specific to Media File Upload
+	// Specific to Media File Upload
+	// START OF MEDIA MANAGEMENT STUFF
 	$scope.previewFile = function (input) { 
-				$scope.formData.file    = input.files[0];
-				
+
 			    var reader = new FileReader();
 			    reader.onload = function(e) {
-			    	angular.element(mediaPreview).attr("src", e.target.result);
+			    	
+			    	if(input.name == 'file'){
+			    		
+			    		//auto-fill form file and name
+						$scope.formData.file = input.files[0];
+						$scope.formData.name = input.files[0].name;
+						
+						//reset media form
+						$scope.objectForm.name.$pristine = false;
+						$scope.formData.verified = false;
+			    		
+			    		//set Media type
+				    	if($scope.formData.file.type.includes('image')){
+				    		$scope.formData.type = 'Image';
+				    		$scope.formData.url = null;
+				    		angular.element(imagePreview).attr("src", e.target.result);
+				    	}else
+				    	if($scope.formData.file.type.includes('video')){
+				    		$scope.formData.type = 'Video';
+				    		$scope.formData.url = null;
+				    		angular.element(videoPreview).attr("src", e.target.result);
+				    		angular.element(thumbPreview).attr("src", "/img/misc/defaultVideoThumb.png"); //default video thumb in image to generate thumb
+				    		$scope.urltoFile("/img/misc/defaultVideoThumb.png", "image/png", "defaultVideoThumb.png", 
+				    				function(file){$scope.formData.thumbFile = file});
+				    	}else
+				    	if( $scope.formData.file.type.includes('audio')){
+				    		$scope.formData.type = 'Audio';
+				    		$scope.formData.url = null;
+				    		angular.element(audioPreview).attr("src", e.target.result);
+				    		angular.element(thumbPreview).attr("src", "/img/misc/defaultAudioCover.gif"); //default audio cover in image to generate thumb
+				    		$scope.urltoFile("/img/misc/defaultAudioCover.gif", "image/gif", "defaultAudioCover.gif", 
+				    				function(file){$scope.formData.thumbFile = file});
+				    	}else
+				    	if($scope.formData.file.type.includes('html')){
+				    		$scope.formData.type = 'App';
+				    		$scope.formData.url = null;
+				    		//read html file into preview
+				    		$scope.generateHTMLPreview();
+				    		
+				    		angular.element(thumbPreview).attr("src", "/img/misc/defaultAppThumb.png"); //default app cover in image to generate thumb
+				    		$scope.formData.thumbFile = $scope.urltoFile("/img/misc/defaultAppThumb.png", "image/png", "defaultAppThumb.png", 
+				    				function(file){$scope.formData.thumbFile = file});
+				    	}
+				    	
+				    	//reset Preview area
+				    	$scope.resetPreview();
+					    $scope.$apply();
+			    	}
+			    	if(input.name == 'thumbFile'){
+			    		//auto-fill form file
+						$scope.formData.thumbFile = input.files[0];
+
+				    	if($scope.formData.thumbFile.type.includes('image')){
+				    		angular.element(thumbPreview).attr("src", e.target.result);
+				    		angular.element(thumbPreview).attr("class", "w-50 d-block");
+				    	}
+			    	}
+			    	angular.element(thumbPreview).attr("class", "w-50 d-block");
+				    $scope.$apply();
 				}
+			    
 			    reader.readAsDataURL(input.files[0]);
 
 	};
 	
+	$scope.resetPreview = function () {
+		//hide all previews
+		angular.element(thumbPreview).attr("class", "w-50 d-none");
+		angular.element(imagePreview).attr("class", "w-100 d-none");
+		angular.element(videoPreview).attr("class", "w-100 d-none");
+		angular.element(audioPreview).attr("class", "w-100 d-none");
+		angular.element(htmlPreview).attr("class", "w-100 d-none");
+		
+		//show relevant preview
+		if(typeof($scope.formData.type) !== 'undefined'){
+			switch ($scope.formData.type) {
+			case 'Image':
+				angular.element(imagePreview).attr("class", "w-100 d-block");
+				break;
+			case 'Video':
+				angular.element(videoPreview).attr("class", "w-100 d-block");
+				break;
+			case 'Audio':
+				angular.element(audioPreview).attr("class", "w-100 d-block");
+				break;
+			case 'App':
+				angular.element(htmlPreview).attr("class", "w-100 d-block");
+				break;
+			}	
+		}
+	}
 	
-	// Specific UI tables and data for programs displays and media management
+	$scope.generateThumbFile = function (element) {
+
+		//stop if element is hidden or no file selected and video not played
+		if(//element.getAttribute('class') !== 'w-100 d-block'
+			element.getAttribute('src') == ''
+			|| (element.tagName == 'IMG' && typeof(angular.element(file)[0].files[0]) == 'undefined' )
+			|| (element.tagName == 'VIDEO' && element.currentTime == 0 ) )
+			return;
+		
+    	var canvas = document.getElementById('thumbnailCanvas'),
+		context = canvas.getContext("2d");
+
+		if( element.tagName == 'IMG'){
+			canvas.width = 500;
+			canvas.height = 500*element.naturalHeight/element.naturalWidth;
+			context.drawImage(element, 0, 0, 500, 500*element.naturalHeight/element.naturalWidth);			
+		}
+			
+		if( element.tagName == 'VIDEO'){
+			canvas.width = 500;
+			canvas.height = 500*element.videoHeight/element.videoWidth;
+			context.drawImage(element, 0, 0, 500, 500*element.videoHeight/element.videoWidth);
+		}
+
+		// Setting thumbnail file in formData
+		canvas.toBlob(function(blob) {
+			$scope.formData.thumbFile = new File([blob], 'thumbnail.jpeg', {type: "image/jpeg"});
+			});
+		
+		angular.element(thumbFile)[0].value = '';
+		angular.element(thumbPreview).attr("src", canvas.toDataURL());
+		$scope.$apply();
+	};
+	
+	$scope.urltoFile = function(fileUrl, fileType, fileName, callback){
+	
+	    // Create XHR, Blob and FileReader objects
+	    var xhr = new XMLHttpRequest(),
+	        blob,
+	        fileReader = new FileReader();
+	
+	    xhr.open("GET", fileUrl, true);
+	    // Set the responseType to arraybuffer. "blob" is an option too, rendering manual Blob creation unnecessary, but the support for "blob" is not widespread enough yet
+	    xhr.responseType = "arraybuffer";
+	
+	    xhr.addEventListener("load", function () {
+	        if (xhr.status === 200) {
+	            // Create a blob from the response
+	            blob = new Blob([xhr.response], {type: fileType});
+	
+	            // onload needed since Google Chrome doesn't support addEventListener for FileReader
+	            fileReader.onload = function (evt) {
+	                // Read out file contents as a Data URL
+	                var result = evt.target.result;
+	                if(callback !== null)
+	                	callback(new File([blob], fileName, {type: fileType}));
+
+	                console.log('done url to file')
+	            };
+	            // Load blob as Data URL
+	            fileReader.readAsDataURL(blob);
+	          
+	        } else return null;
+	    }, false);
+	    // Send XHR
+	    xhr.send();
+	}
+	
+	$scope.generateHTMLPreview = function(){
+		var file;
+		var reader = new FileReader();
+		if($scope.formData.url != null)
+			$scope.urltoFile($scope.formData.url, 'text/html', 'preview.html',
+				function(file){
+				    //read file text into htmlPreview
+				    reader.readAsText(file, "UTF-8");
+				    reader.onload = function (evt) {
+				    	angular.element(htmlPreview).html(evt.target.result);
+						setTimeout(startAppPreview, 1000);
+				    }
+				    reader.onerror = function (evt) {
+				        createLog("error reading HTML file");
+				    }
+			});
+			
+		else {
+		    //read file text into htmlPreview
+		    reader.readAsText($scope.formData.file, "UTF-8");
+		    reader.onload = function (evt) {
+		    	angular.element(htmlPreview).html(evt.target.result);
+				setTimeout(startAppPreview, 1000);
+		    }
+		    reader.onerror = function (evt) {
+		        createLog("error reading HTML file");
+		    }
+		}
+	}	
+	
+	// END OF MEDIA MANAGEMENT STUFF
+	
+	
+	
+	
+	
+	
+	
+	
+	// Specific UI tables and data for programs (displays and playlists) and
+	// playlists (medias and spots) management
 	
 	// Define All Displays table
 	$scope.displaysPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
@@ -352,8 +662,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: [	{ field: 'name', name: 'Name'},
-							{ field: 'smart', name: 'smart', enableFiltering: false}] ,
+	        columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100 },
+							{ field: 'area', name: 'area', minWidth:100}],
 	        onRegisterApi: function(gridApi) {
 	           	$scope.displaysGridApi = gridApi;
 	           	$scope.displaysGridApi.pagination.on.paginationChanged(
@@ -374,7 +685,45 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 	        		});
 			}
 	    };
-		
+	
+	// Define All Playlists table
+	$scope.playlistsPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
+	$scope.playlistsGrid = {
+			rowHeight:40,
+		    enableSelectAll: true,
+	        paginationPageSizes: [5, 10, 20, 50],
+	        paginationPageSize: $scope.playlistsPaginationOptions.pageSize,
+	        enableColumnMenus:false,
+	    	useExternalPagination: true,
+			useExternalSorting: true,
+			enableFiltering: true,
+			useExternalFiltering: true,
+	        columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100},
+							{ field: 'duration', name: 'Duration', minWidth:100}] ,
+	        onRegisterApi: function(gridApi) {
+	           	$scope.playlistsGridApi = gridApi;
+	           	$scope.playlistsGridApi.pagination.on.paginationChanged(
+	             	$scope, function (newPage, pageSize) {
+				     	$scope.playlistsPaginationOptions.pageNumber = newPage;
+		     		 	$scope.playlistsPaginationOptions.pageSize = pageSize;
+						$scope.setFormCollectionData('playlistsGrid','playlists', $scope.playlistsPaginationOptions);
+				 	});
+				$scope.playlistsGridApi.core.on.sortChanged(
+					$scope, function (grid, sortColumns) {
+						$scope.playlistsPaginationOptions.sortColumns = sortColumns;
+						$scope.setFormCollectionData('playlistsGrid','playlists', $scope.playlistsPaginationOptions);
+				 	});
+		        $scope.playlistsGridApi.core.on.filterChanged(
+		        	$scope, function() {
+		        		$scope.playlistsPaginationOptions.filterColumns = this.grid.columns;
+						$scope.setFormCollectionData('playlistsGrid','playlists', $scope.playlistsPaginationOptions);
+	        		});
+			}
+	    };
+
+	
+	
 	// Define All Medias table
 	$scope.mediasPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
 	$scope.mediasGrid = {
@@ -387,9 +736,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: [	{ field: 'url', name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering: false },
-							{ field: 'name', name: 'Name'},
-							{ field: 'mediaType', name: 'Media type'}] ,
+	        columnDefs: [	{ field: 'thumbUrl', name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering: false, minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100},
+							{ field: 'category', name: 'Category', minWidth:100},
+							{ field: 'type', name: 'Type', minWidth:100}] ,
 	        onRegisterApi: function(gridApi) {
 	           	$scope.mediasGridApi = gridApi;
 	           	$scope.mediasGridApi.pagination.on.paginationChanged(
@@ -424,7 +774,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 				[]);                            
 		 };
 		
-	// Define Selected Displays table
+	// Define Selected Displays table  (for create/edit and view/delete)
 	$scope.selectedDisplaysPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
 	$scope.selectedDisplaysGrid = {
 			rowHeight:40,
@@ -436,139 +786,308 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-		    columnDefs: [	{ field: 'name', name: 'Name'},
-							{ field: 'smart', name: 'smart', enableFiltering: false}],
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100 },
+							{ field: 'area', name: 'area', minWidth:100}],
 			onRegisterApi: function(gridApi) {
 								$scope.selectedDisplaysGridApi = gridApi;
 							}
 								
 		};
-		
-	// Define Selected Medias table
-	$scope.selectedMediasPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
-	$scope.selectedMediasGrid = {
+	
+	$scope.viewSelectedDisplaysGrid = {
 			rowHeight:40,
 		    enableSelectAll: true,
 	        paginationPageSizes: [5, 10, 20, 50],
-	        paginationPageSize: $scope.selectedMediasPaginationOptions.pageSize,
+	        paginationPageSize: $scope.selectedDisplaysPaginationOptions.pageSize,
+		    enableColumnMenus:false,
+		    useExternalPagination: true,
+			useExternalSorting: true,
+			enableFiltering: true,
+			useExternalFiltering: false,
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100 },
+							{ field: 'area', name: 'area', minWidth:100}],
+			onRegisterApi: function(gridApi) {
+								$scope.viewSelectedDisplaysGridApi = gridApi;
+							}
+								
+		};
+	
+
+	// Define Selected Playlists table (for create/edit and view/delete)
+	$scope.selectedPlaylistsPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
+	$scope.selectedPlaylistsGrid = {
+			rowHeight:40,
+		    enableSelectAll: true,
+	        paginationPageSizes: [5, 10, 20, 50],
+	        paginationPageSize: $scope.selectedPlaylistsPaginationOptions.pageSize,
+		    enableColumnMenus:false,
+		    useExternalPagination: true,
+			useExternalSorting: true,
+			enableFiltering: true,
+			useExternalFiltering: false,
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100},
+							{ field: 'duration', name: 'Duration', minWidth:100}] ,
+			onRegisterApi: function(gridApi) {
+								$scope.selectedPlaylistsGridApi = gridApi;
+							}
+								
+		};
+	
+	$scope.viewSelectedPlaylistsGrid = {
+			rowHeight:40,
+		    enableSelectAll: true,
+	        paginationPageSizes: [5, 10, 20, 50],
+	        paginationPageSize: $scope.selectedPlaylistsPaginationOptions.pageSize,
+		    enableColumnMenus:false,
+		    useExternalPagination: true,
+			useExternalSorting: true,
+			enableFiltering: true,
+			useExternalFiltering: false,
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:100},
+							{ field: 'duration', name: 'Duration', minWidth:100}] ,
+			onRegisterApi: function(gridApi) {
+								$scope.viewSelectedPlaylistsGridApi = gridApi;
+							}
+								
+		};
+	
+	// Define reorder buttons and functions for Playlist Spots
+	var moveUpButtonHTML = '<button ng-click="grid.appScope.moveUpRow(row)" type="button" class="btn btn-sm btn-primary ml-1"> <i class="fa fa-arrow-up fa-fw"></i></button>';
+	var moveDownButtonHTML = '<button ng-click="grid.appScope.moveDownRow(row)" type="button" class="btn btn-sm btn-primary ml-1"> <i class="fa fa-arrow-down fa-fw"></i></button>';
+	var reorderButtonsHTML = '<div class="m-1">' + moveUpButtonHTML + moveDownButtonHTML + '</div' ; 
+	
+	$scope.moveUpRow = function(row){
+		if(row.grid.rows.length > 1){
+			let index = row.grid.rows.indexOf(row);
+			if( index >0){
+				let obj = $scope.selectedSpotsGrid.data[index];
+				$scope.selectedSpotsGrid.data[index] = $scope.selectedSpotsGrid.data[index-1];
+				$scope.selectedSpotsGrid.data[index-1] = obj;
+				
+				$scope.recalculateOrder();
+				$scope.selectedSpotsGridApi.core.handleWindowResize();
+			}			
+		}
+	};
+	
+	$scope.moveDownRow = function(row){
+		if(row.grid.rows.length > 1){
+			let index = row.grid.rows.indexOf(row);
+			if( index < row.grid.rows.length -1){
+				let obj = $scope.selectedSpotsGrid.data[index];
+				$scope.selectedSpotsGrid.data[index] = $scope.selectedSpotsGrid.data[index+1];
+				$scope.selectedSpotsGrid.data[index+1] = obj;
+				
+				$scope.recalculateOrder();
+				$scope.selectedSpotsGridApi.core.handleWindowResize();
+			}			
+		}
+	};
+	
+	$scope.recalculateOrder = function(){
+		$scope.selectedSpotsGrid.data.forEach(function(entity){
+			entity.playOrder = $scope.selectedSpotsGrid.data.indexOf(entity);
+		});
+	};
+	
+	// Define HTML template for spots thumbnails
+	var spotThumbnailHTML = '<img ng-src="{{row.entity.media.thumbUrl}}" alt="No Image Found" class="m-1" height="80%" >'
+
+	// Define Selected Spots table (for create/edit and view/delete)
+	$scope.selectedSpotsPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
+	$scope.selectedSpotsGrid = {
+			rowHeight:40,
+		    enableSelectAll: true,
+	        paginationPageSizes: [5, 10, 20, 50],
+	        paginationPageSize: $scope.selectedSpotsPaginationOptions.pageSize,
 	        enableColumnMenus:false,
 	    	useExternalPagination: true,
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-			columnDefs: [	{ field: 'name', name: 'Name'},
-							{ field: 'mediaType', name: 'Media type'},
-							{ field: 'url', name: 'Preview', cellTemplate: thumbnailHTML, enableFiltering: false }],
+			columnDefs: [	{ field: 'media.thumbUrl', name: 'Thumbnail', cellTemplate: spotThumbnailHTML, enableFiltering: false, enableCellEdit: false, minWidth:100},
+							{ field: 'media.name', name: 'Name', enableCellEdit: false, minWidth:100},
+							{ field: 'media.category', name: 'Category', enableCellEdit: false, minWidth:100},
+							{ field: 'media.type', name: 'Type', enableCellEdit: false, minWidth:100},
+							{ field: 'duration', name: 'Duration', enableCellEdit: true, type: 'number', minWidth:100},
+							{ field: 'playOrder', name: 'Play Order', cellTemplate: reorderButtonsHTML, enableFiltering: false, minWidth:100}],
 			onRegisterApi: function(gridApi) {
-								$scope.selectedMediasGridApi = gridApi;
+								$scope.selectedSpotsGridApi = gridApi;
+							}
+	    };	
+	
+	$scope.viewSelectedSpotsGrid = {
+			rowHeight:40,
+		    enableSelectAll: true,
+	        paginationPageSizes: [5, 10, 20, 50],
+	        paginationPageSize: $scope.selectedSpotsPaginationOptions.pageSize,
+	        enableColumnMenus:false,
+	    	useExternalPagination: true,
+			useExternalSorting: true,
+			enableFiltering: true,
+			useExternalFiltering: false,
+			columnDefs: [	{ field: 'media.thumbUrl', name: 'Thumbnail', cellTemplate: spotThumbnailHTML, enableFiltering: false, enableCellEdit: false, minWidth:100},
+							{ field: 'media.name', name: 'Name', enableCellEdit: false, minWidth:100},
+							{ field: 'media.category', name: 'Category', enableCellEdit: false, minWidth:100},
+							{ field: 'media.type', name: 'Type', enableCellEdit: false, minWidth:100},
+							{ field: 'duration', name: 'Duration', enableCellEdit: true, type: 'number', minWidth:100}],
+			onRegisterApi: function(gridApi) {
+								$scope.viewSelectedSpotsGridApi = gridApi;
 							}
 	    };	
 
+	
+	
+
+	
 	// Define a function to set Form Grid Options data (Selected collection)
 	$scope.setFormSelectionData = function(options, target, linkedType) {
 			
 		CRUDService.getLinkedObjects(target)
 				.success(function(data){
-					if(linkedType == 'display')
-						$scope[options].data = [];
-		          		$scope[options].data.push(data);
-					if(linkedType == 'medias')
-						$scope[options].data = data._embedded.medias;
+						$scope[options].data = data._embedded[linkedType];
+						// Specific to playlists spots rendering
+						if(linkedType=='spots'){
+							
+							//sort by playOrder
+							$scope[options].data.sort(function(a, b) {
+							    return parseFloat(a.playOrder) - parseFloat(b.playOrder);
+							});
+							
+							//fetch and populate media info
+							$scope[options].data.forEach(function(spot){
+								spot.actionLink = CRUDService.getRelativePath(spot._links.self.href);
+								
+								CRUDService.getOne(CRUDService.getRelativePath(spot._links.media.href))
+									.success(function(media){
+										spot.media = media;
+									});								
+							});
+						}
+
 		         })
 				.error(function(data){
 					console.log("nothing found on : " + target );
 				});                                                      
 		 };		
-		
-	//Program CreateEditmodal filling
+
+	// Program CreateEditModal filling and ViewDeleteModal refreshing
 	if($scope.targetObject == 'program'){
-		// Get Form Grids Data from REST Api on modal show
+		// Get Form Grids Data from REST Api on create/edit modal show
 		angular.element(createEditObjectModal).on('shown.bs.modal', function (e) {
 			$scope.setFormCollectionData('displaysGrid','displays', $scope.displaysPaginationOptions);
-			$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
-			
-			//refesh grids
+			$scope.setFormCollectionData('playlistsGrid','playlists', $scope.playlistsPaginationOptions);
+
+			// refesh grids
 			$scope.displaysGridApi.core.handleWindowResize();
-			$scope.mediasGridApi.core.handleWindowResize();
+			$scope.playlistsGridApi.core.handleWindowResize();
 			$scope.selectedDisplaysGridApi.core.handleWindowResize();
-			$scope.selectedMediasGridApi.core.handleWindowResize();
+			$scope.selectedPlaylistsGridApi.core.handleWindowResize();
 			});
-		
-		// Remove Form Grids Data from REST Api on modal hide
+
+		// Remove Form Grids Data from REST Api on create/edit modal hide
 		angular.element(createEditObjectModal).on('hidden.bs.modal', function (e) {
 			$scope.displaysGrid.data = [];
-			$scope.mediasGrid.data = [];
+			$scope.playlistsGrid.data = [];
 			$scope.selectedDisplaysGrid.data = [];
-			$scope.selectedMediasGrid.data = [];
+			$scope.selectedPlaylistsGrid.data = [];
+			});
+		
+		// Refresh selected Grids on view/delete modal show
+		angular.element(viewDeleteObjectModal).on('shown.bs.modal', function (e) {
+			$scope.viewSelectedDisplaysGridApi.core.handleWindowResize();
+			$scope.viewSelectedPlaylistsGridApi.core.handleWindowResize();
+			});
+		
+		// Remove Form Grids Data from REST Api on view/delete modal hide
+		angular.element(viewDeleteObjectModal).on('hidden.bs.modal', function (e) {
+			$scope.viewSelectedDisplaysGrid.data = [];
+			$scope.viewSelectedPlaylistsGrid.data = [];
+			});
+
+	}
+
+	// Playlist CreateEditModal filling and ViewDeleteModal refreshing
+	if($scope.targetObject == 'playlist'){
+		// Get Form Grids Data from REST Api on create/edit modal show
+		angular.element(createEditObjectModal).on('shown.bs.modal', function (e) {
+			$scope.setFormCollectionData('mediasGrid','medias', $scope.mediasPaginationOptions);
+
+			// refesh grids
+			$scope.mediasGridApi.core.handleWindowResize();
+			$scope.selectedSpotsGridApi.core.handleWindowResize();
+			});
+
+		// Remove Form Grids Data from REST Api on create/edit modal hide
+		angular.element(createEditObjectModal).on('hidden.bs.modal', function (e) {
+			$scope.mediasGrid.data = [];
+			$scope.selectedSpotsGrid.data = [];
+			});
+		
+		// Refresh selected Grids on view/delete modal show
+		angular.element(viewDeleteObjectModal).on('shown.bs.modal', function (e) {
+			$scope.viewSelectedSpotsGridApi.core.handleWindowResize();
+			});
+		
+		// Remove Form Grids Data from REST Api on view/delete modal hide
+		angular.element(viewDeleteObjectModal).on('hidden.bs.modal', function (e) {
+			$scope.viewSelectedSpotsGrid.data = [];
 			});
 	}
-	
+
 	// Define functions for select/de-select display and medias
-	$scope.addSelectedObjects = function(object){
-		
-		if(object == 'display'){
-			if($scope.displaysGridApi.selection.getSelectedCount() == 1){
-				$scope.displaysGridApi.selection.getSelectedRows().forEach(function(display){
-					if($scope.selectedDisplaysGrid.data.filter(d => d.name == display.name).length < 1){
-						$scope.selectedDisplaysGrid.data = [];
-						$scope.selectedDisplaysGrid.data.push(display);
+	$scope.addSelectedObjects = function(object, sourceGridApi, targetGrid){
+
+			if(sourceGridApi.selection.getSelectedCount() > 0){
+				sourceGridApi.selection.getSelectedRows().forEach(function(obj){
+					if(targetGrid.data.filter(m => m.name == obj.name).length < 1){
+						if(object == 'medias'){
+							var spot = {};
+							spot.duration = 5;
+							spot.media = obj;
+							obj = spot;
+						}
+						targetGrid.data.push(obj);
 					}
+						
 				});
-				$scope.displaysGridApi.selection.clearSelectedRows();
-			}
-
-				
-		}
-		
-		if(object == 'medias'){
-			if($scope.mediasGridApi.selection.getSelectedCount() > 0){
-				$scope.mediasGridApi.selection.getSelectedRows().forEach(function(media){
-					if($scope.selectedMediasGrid.data.filter(m => m.name == media.name).length < 1)
-						$scope.selectedMediasGrid.data.push(media);
-				});
-				$scope.mediasGridApi.selection.clearSelectedRows();
-			}
-		}		
+				sourceGridApi.selection.clearSelectedRows();
+				if(object == 'medias')
+					$scope.recalculateOrder();
+			}	
 	};
 	
-	$scope.removeSelectedObjects = function(object){
-		
-		if(object == 'display'){
-			if($scope.selectedDisplaysGridApi.selection.getSelectedCount() > 0){
-				$scope.selectedDisplaysGridApi.selection.getSelectedRows().forEach(function(display){
-						$scope.selectedDisplaysGrid.data.splice(
-								$scope.selectedDisplaysGrid.data.indexOf(display), 1);
-				});
-			$scope.selectedDisplaysGridApi.selection.clearSelectedRows();
-			}
+	$scope.removeSelectedObjects = function(object, targetGridApi, targetGrid){
 
-				
-		}
-		
-		if(object == 'medias'){
-			if($scope.selectedMediasGridApi.selection.getSelectedCount() > 0){
-				$scope.selectedMediasGridApi.selection.getSelectedRows().forEach(function(media){
-						$scope.selectedMediasGrid.data.splice(
-								$scope.selectedMediasGrid.data.indexOf(media), 1);
+			if(targetGridApi.selection.getSelectedCount() > 0){
+				targetGridApi.selection.getSelectedRows().forEach(function(obj){
+					targetGrid.data.splice(
+							targetGrid.data.indexOf(obj), 1);
 				});
-			$scope.selectedMediasGridApi.selection.clearSelectedRows();
-			}
 				
-		}
+				targetGridApi.selection.clearSelectedRows();
+				if(object == 'medias')
+					$scope.recalculateOrder();
+			}
 	};
-	
-	
-	// Define a function to create or update or delete program display or medias (via links)
+
+	// Define a function to create or update or delete program (displays and
+	// playlists) and playlist (medias and spots) (via links)
 	$scope.addLinkedObjects = function(target, selected, callback){
 
 		if(selected.length > 0){
 				CRUDService.setLinkedObjects(target, $scope.selectedToLinks(selected)).success(function(data){
 					console.log("set linked objects: " + $scope.selectedToLinks(selected) + "\n" + "on link: " + target);
-					createAlert('success', 'successfully set '+ $scope.targetObject +' linked objects', 5000);
+					createAlert(main_nav, 'success', 'successfully set '+ $scope.targetObject +' linked objects', 5000);
 					callback();
 				})
 				.error(function(data){
-					createAlert('danger', 'an issue occured setting '+ $scope.targetObject +' linked objects \n reason: '+data.toString(), null);
+					createAlert(main_nav, 'danger', 'an issue occured setting '+ $scope.targetObject +' linked objects <br> reason: '
+							+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
 				});
 			}								
 	};
@@ -581,7 +1100,8 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					callback();
 				})
 				.error(function(data){
-					createAlert('danger', 'an issue occured setting '+ $scope.targetObject +' linked objects \n reason: '+data.toString(), null);
+					createAlert(main_nav, 'danger', 'an issue occured setting '+ $scope.targetObject +' linked objects <br> reason: '
+							+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
 				});
 				
 			}else{
@@ -590,12 +1110,13 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 					callback();
 				})
 				.error(function(data){
-					createAlert('danger', 'an issue occured deleting '+ $scope.targetObject +' linked objects \n reason: '+data.toString(), null);
+					createAlert(main_nav, 'danger', 'an issue occured deleting '+ $scope.targetObject +' linked objects <br> reason: '
+							+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
 				});
 			}
 					
 	};
-	
+
 	// Utility function to transform selected list into string
 	$scope.selectedToLinks = function(selectedObjects){
 		var str ='';
@@ -605,9 +1126,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 		return str;
 	};
 	
-	
-	
-	
+
+
+
 	// --------------------------------------------------------------------
 	// END OF SPECIFIC
 	// --------------------------------------------------------------------
@@ -626,7 +1147,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService',
 
 // SERVICE LAYER
 // --------------------------------------------------------
-//list of CRUD calls
+// list of CRUD calls
 app.service('CRUDService',['$http', function ($http) {
     
 	    function getScheme(target) {
@@ -639,12 +1160,12 @@ app.service('CRUDService',['$http', function ($http) {
 	    
 	    function getAll(target, page, size, sortCols, filterCols, specificFilters) {
 	        page = page > 0?page - 1:0;
-	        //build sort string
+	        // build sort string
 	        var sort = '';
 	        angular.forEach(sortCols, function(value, key) {
 				  sort = sort + '&sort=' + value.field + ',' + value.sort.direction;
 				});
-	        //build filter string
+	        // build filter string
 	        var filter = '';
 	        angular.forEach(filterCols, function(value, key) {
 				  if(value.filters[0].term != null)
@@ -671,8 +1192,10 @@ app.service('CRUDService',['$http', function ($http) {
 	    	if(target=='medias'){
 	    		var formData = new FormData();
 	    		formData.append("name", data.name);
-	    		formData.append("mediaType", data.mediaType);
-	    		formData.append("file", data.file); 
+	    		formData.append("category", data.category);
+	    		formData.append("verified", data.verified);
+	    		formData.append("file", data.file);
+	    		formData.append("thumbFile", data.thumbFile);
 		        return $http({
 			          method: 'POST',
 			          	url: '/api/medias/uploads',
@@ -680,6 +1203,15 @@ app.service('CRUDService',['$http', function ($http) {
 			            transformRequest: angular.identity,
 			            headers: {'Content-Type': undefined}
 			        });
+	    	}
+	    	
+	    	if(target=='playlists'
+	    		|| target=='programs'){
+		        return $http({
+			          method: 'POST',
+			          	url: '/api/'+target+'/creates',
+			            data: data
+			        });	
 	    	}
 	    		
 	    		
@@ -691,11 +1223,14 @@ app.service('CRUDService',['$http', function ($http) {
 	    };
 	
 	    function updateOne(url, data) {
-	    	if(url.indexOf('/api/medias') !== -1){
+	    	if(url.includes('/api/medias')){
 	    		var formData = new FormData();
+	    		formData.append("id", data.id);
 	    		formData.append("name", data.name);
-	    		formData.append("mediaType", data.mediaType);
+	    		formData.append("category", data.category);
+	    		formData.append("verified", data.verified);
 	    		formData.append("file", data.file); 
+	    		formData.append("thumbFile", data.thumbFile);
 		        return $http({
 			          method: 'POST',
 			          	url: '/api/medias/updates',
@@ -704,7 +1239,23 @@ app.service('CRUDService',['$http', function ($http) {
 			            headers: {'Content-Type': undefined}
 			        });	
 	    	}
-	    		
+
+	    	if(url.includes('/api/playlists')){
+		        return $http({
+			          method: 'POST',
+			          	url: '/api/playlists/updates',
+			            data: data
+			        });	
+	    	}
+	    	
+	    	if(url.includes('/api/programs')){
+		        return $http({
+			          method: 'POST',
+			          	url: '/api/programs/updates',
+			            data: data
+			        });	
+	    	}	
+	    	
 	        return $http({
 	          method: 'PATCH',
 	            url: url,
@@ -742,7 +1293,7 @@ app.service('CRUDService',['$http', function ($http) {
 	        });
 	    };
 	    
-	    //tool to go from URL to URI
+	    // tool to go from URL to URI
 	    function getRelativePath(absolutePath){
 	    	    var l = document.createElement("a");
 	    	    l.href = absolutePath;

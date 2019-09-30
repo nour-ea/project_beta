@@ -1,6 +1,5 @@
 package com.platformia.winkwide.app.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -8,8 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import com.platformia.winkwide.app.WinkWideApp;
  
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {

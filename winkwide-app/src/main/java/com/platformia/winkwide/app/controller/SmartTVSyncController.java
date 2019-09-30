@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.platformia.winkwide.core.entity.Display;
-import com.platformia.winkwide.core.entity.Media;
+import com.platformia.winkwide.core.entity.Playlist;
 import com.platformia.winkwide.core.entity.Program;
 import com.platformia.winkwide.core.entity.Report;
+import com.platformia.winkwide.core.entity.Spot;
 import com.platformia.winkwide.core.repository.DisplayRepository;
 import com.platformia.winkwide.core.repository.MediaRepository;
+import com.platformia.winkwide.core.repository.PlaylistRepository;
 import com.platformia.winkwide.core.repository.ProgramRepository;
 import com.platformia.winkwide.core.repository.ReportRepository;
 
@@ -29,39 +31,50 @@ public class SmartTVSyncController {
 
 	private final DisplayRepository displayRepo;
 	private final MediaRepository mediaRepo;
+	private final PlaylistRepository playlistRepo;
 	private final ProgramRepository programRepo;
 	private final ReportRepository reportRepo;
 
 	@Autowired
-	public SmartTVSyncController(DisplayRepository dRepo, MediaRepository mRepo, ProgramRepository pRepo,
-			ReportRepository rRepo) {
+	public SmartTVSyncController(DisplayRepository dRepo, MediaRepository mRepo, PlaylistRepository plRepo,
+			ProgramRepository pRepo, ReportRepository rRepo) {
 		displayRepo = dRepo;
 		mediaRepo = mRepo;
+		playlistRepo = plRepo;
 		programRepo = pRepo;
 		reportRepo = rRepo;
 	}
-	
+
 	@GetMapping("sync/programs")
 	public @ResponseBody ResponseEntity<?> getPrograms() {
 
 		try {
 
 			// identify display
-			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+			//Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+			Long dispId = Long.parseLong("6970173894");
 			Display display = displayRepo.getOne(dispId);
 
 			// get programs & their media url lists (ONLY Current and Futur Programs)
 			@SuppressWarnings("deprecation")
 			List<Program> programs = programRepo
-					.findByCustomFilters(dispId, null, null, new Date(), new Date(2100, 1, 1), null).getContent();
+					.findByCustomFilters(null, dispId, null, null, new Date(), new Date(2100, 1, 1), null).getContent();
 
-			// removing the infinite object encapsulation problem (setting programs and
-			// reports to null
+ 
+			//some sanitization
 			for (Program program : programs) {
-				program.setDisplay(null);
-				for (Media media : program.getMedias()) {
-					media.setPrograms(null);
-					media.setReports(null);
+				// avoiding Lazy Loading versus Jackson serialization problem by setting displays to null
+				program.setDisplays(null);
+				
+				// removing the infinite object encapsulation problem (setting programs and sposts.playlists & sposts.media.spots to null)
+				for (Playlist playlist : program.getPlaylists()) {
+					playlist.setPrograms(null);
+					for (Spot spot : playlist.getSpots()) {
+						spot.setPlaylist(null);
+						spot.getMedia().setSpots(null);
+						spot.getMedia().setReports(null);
+						
+					}
 				}
 			}
 
@@ -80,14 +93,13 @@ public class SmartTVSyncController {
 	}
 
 	@PostMapping("sync/reports")
-	public @ResponseBody ResponseEntity<?> updateReports(
-			@RequestBody ArrayList<Report> reports) {
+	public @ResponseBody ResponseEntity<?> updateReports(@RequestBody ArrayList<Report> reports) {
 
 		try {
 
 			// identify display
 			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-			
+
 			// set reports
 			for (Report report : reports) {
 				report.setDisplay(displayRepo.getOne((dispId)));
@@ -95,14 +107,13 @@ public class SmartTVSyncController {
 					reportRepo.save(report);
 				} catch (Exception e) {
 					e.printStackTrace();
-				} 
+				}
 			}
 
 			// set display lastReportSync time and status (SUCCESS CASE)
 			Display display = displayRepo.getOne((dispId));
 			display.setLastSyncTime(new Date());
 			displayRepo.save(display);
-			
 
 			// return success message
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -114,7 +125,7 @@ public class SmartTVSyncController {
 		}
 
 	}
-	
+
 	@GetMapping("sync/displayId")
 	public @ResponseBody ResponseEntity<?> getDisplayId() {
 
@@ -122,12 +133,12 @@ public class SmartTVSyncController {
 
 			// identify display
 			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-			//Display display = displayRepo.getOne(dispId);
+			// Display display = displayRepo.getOne(dispId);
 
 			// check if the mac adress is correct
-			//----
-			//----
-			
+			// ----
+			// ----
+
 			// return programs
 			return ResponseEntity.ok(dispId);
 
