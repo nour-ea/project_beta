@@ -39,7 +39,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 					// SPECIFIC for media edition and deletion
 					if($scope.targetObject == 'media'){	
 			    		$scope.resetPreview();
-			    		angular.element(thumbPreview).attr("class", "w-50 d-block");
+			    		angular.element(thumbPreview).attr("class", "d-block");
 			    		if($scope.formData.type == 'App')
 			    			$scope.generateHTMLPreview();
 					}
@@ -502,10 +502,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 
 				    	if($scope.formData.thumbFile.type.includes('image')){
 				    		angular.element(thumbPreview).attr("src", e.target.result);
-				    		angular.element(thumbPreview).attr("class", "w-50 d-block");
+				    		angular.element(thumbPreview).attr("class", "d-block");
 				    	}
 			    	}
-			    	angular.element(thumbPreview).attr("class", "w-50 d-block");
+			    	angular.element(thumbPreview).attr("class", "d-block");
 				    $scope.$apply();
 				}
 			    
@@ -515,7 +515,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 	
 	$scope.resetPreview = function () {
 		//hide all previews
-		angular.element(thumbPreview).attr("class", "w-50 d-none");
+		angular.element(thumbPreview).attr("class", "d-none");
 		angular.element(imagePreview).attr("class", "w-100 d-none");
 		angular.element(videoPreview).attr("class", "w-100 d-none");
 		angular.element(audioPreview).attr("class", "w-100 d-none");

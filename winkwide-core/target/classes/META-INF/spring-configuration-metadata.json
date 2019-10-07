@@ -10,12 +10,22 @@
       "sourceType": "com.platformia.winkwide.core.utils.MachineAccountProperties",
       "name": "machine",
       "type": "com.platformia.winkwide.core.utils.MachineAccountProperties"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings",
+      "type": "com.platformia.winkwide.core.utils.AdminSettingsProperties"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings",
+      "type": "com.platformia.winkwide.core.utils.AppSettingsProperties"
     }
   ],
   "properties": [
     {
       "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
-      "name": "file.download-dir",
+      "name": "file.log-dir",
       "type": "java.lang.String"
     },
     {
@@ -27,6 +37,71 @@
       "sourceType": "com.platformia.winkwide.core.utils.MachineAccountProperties",
       "name": "machine.default-password",
       "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings.max-display-loop-time",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings.max-display-spots",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings.max-displays",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings.max-medias",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings.max-storage-size",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.auto-off-time",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.auto-on-time",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.auto-sleep-active",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.offline-mode-active",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.refresh-period",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.remote-logging-active",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.reporting-active",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.sync-period",
+      "type": "java.lang.Integer"
     }
   ]
 }

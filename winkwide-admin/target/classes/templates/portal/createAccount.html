@@ -11,11 +11,12 @@
 </head>
 
 <body ng-app="AccountManagement" ng-controller="CreateAccountController">
-	<th:block th:include="portal/_header"></th:block>
+	<!-- The background video -->
+	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4"></video>
 	
 	<section class="container-fluid p-3 bg-welcome">
 
-		<div class="col-md-4 mx-auto p-3 bg-white rounded">
+		<div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
 		     
 		 <div class="">
 	         <h4 class="mx-auto">Create a new account </h4>
@@ -68,7 +69,8 @@
 			<div class="form-group mt-2">
 				<button type="submit" class="btn btn-primary" ng-disabled="userForm.$invalid" >Create Account</button>		
 	         <hr>	         
-	         or, <a href="/login">Login with your account</a>			
+	         or, <a class="text-primary" href="/login">Login with your account</a>
+	         	 <a class="float-right text-primary" href="/">to Home Website</a>			
 			</div>
 			
 		 </form>

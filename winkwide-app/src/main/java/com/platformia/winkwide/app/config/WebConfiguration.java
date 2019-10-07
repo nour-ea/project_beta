@@ -21,21 +21,5 @@ public class WebConfiguration implements WebMvcConfigurer {
         return messageSource;
         //comment
     }
-    
-    //configure file path retrieval outside jar
-  
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    	
-
-   	    ApplicationHome home = new ApplicationHome();
-    	
-   	    System.out.println(home.getDir());
-   	    System.out.println(home.getSource());
-
-        registry
-          .addResourceHandler("/uploads/**")
-          .addResourceLocations("file:"+home.getDir()+"/uploads/");
-     }
   
 }

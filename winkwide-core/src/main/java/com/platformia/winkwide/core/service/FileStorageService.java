@@ -1,6 +1,8 @@
 package com.platformia.winkwide.core.service;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,15 +27,18 @@ import com.platformia.winkwide.core.utils.FileStorageProperties;
 public class FileStorageService {
 
 	private final Path fileStorageLocation;
+	private final Path logStorageLocation;
 
 	@Autowired
 	public FileStorageService(FileStorageProperties fileStorageProperties) {
 		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
+		this.logStorageLocation = Paths.get(fileStorageProperties.getLogDir()).toAbsolutePath().normalize();
 
 		try {
 			Files.createDirectories(this.fileStorageLocation);
+			Files.createDirectories(this.logStorageLocation);
 		} catch (Exception ex) {
-			throw new FileStorageException("Could not create the directory where the uploaded files will be stored.",
+			throw new FileStorageException("Could not create the directory where the uploaded files or downloaded logs will be stored.",
 					ex);
 		}
 	}
@@ -60,7 +65,7 @@ public class FileStorageService {
             String month = new SimpleDateFormat("MMM").format(Calendar.getInstance().getTime());
 
             // Build Target Location (relative and absolute)
-            Path relativeTargetLocation = Paths.get("/uploads", location, year, month, random +"_"+ fileName);
+            Path relativeTargetLocation = Paths.get(location, year, month, random +"_"+ fileName);
             Path targetLocation = Paths.get(this.fileStorageLocation.toString(), relativeTargetLocation.toString());
             
             // Create target Folder
@@ -98,6 +103,20 @@ public class FileStorageService {
             
         } catch (Exception ex) {
             throw new FileStorageException("Could not delete file at " + url + ". Please try again or contact your Admin!", ex);
+        }
+    }
+	
+	public void writeTextInLogFile(String fileName, String text) {
+
+        try {
+        	Path targetLocation = Paths.get(this.logStorageLocation.toString(), fileName);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(targetLocation.toString(), true));
+            writer.append('\n');
+            writer.append(text);           
+            writer.close();
+            
+        } catch (Exception ex) {
+            throw new FileStorageException("Could not write in text in log file : " + fileName + ". Please try again or contact your Admin!", ex);
         }
     }
 

@@ -3,6 +3,7 @@ com/platformia/winkwide/admin/controller/MediaRepositoryController.class
 com/platformia/winkwide/admin/controller/DisplayRepositoryController.class
 com/platformia/winkwide/admin/controller/ProgramRepositoryController.class
 com/platformia/winkwide/admin/WinkWideAdmin.class
+com/platformia/winkwide/admin/controller/HtmlUnitRestController.class
 com/platformia/winkwide/admin/config/PersistenceConfig.class
 com/platformia/winkwide/admin/controller/PlaylistRepositoryController.class
 com/platformia/winkwide/admin/config/ValidatorEventRegister.class

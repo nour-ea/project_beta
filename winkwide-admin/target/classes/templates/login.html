@@ -7,8 +7,9 @@
 </head>
 
 <body>
-	<th:block th:include="portal/_header"></th:block>
-	
+	<!-- The background video -->
+	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4"></video>
+		
 	<section id="loginSection" class="container-fluid p-3 bg-welcome">
       
       <div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
@@ -43,7 +44,8 @@
 	     </th:block>         
          <hr>
          
-         or, <a href="/portal/createAccount">Create a new account</a>
+         or, <a class="text-primary" href="/portal/createAccount">Create a new account</a>
+         	 <a class="float-right text-primary" href="/">to Home Website</a>
          
       </div>
 

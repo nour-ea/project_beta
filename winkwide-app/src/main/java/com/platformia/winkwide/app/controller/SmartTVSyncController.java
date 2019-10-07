@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,8 +25,10 @@ import com.platformia.winkwide.core.repository.MediaRepository;
 import com.platformia.winkwide.core.repository.PlaylistRepository;
 import com.platformia.winkwide.core.repository.ProgramRepository;
 import com.platformia.winkwide.core.repository.ReportRepository;
+import com.platformia.winkwide.core.service.FileStorageService;
+import com.platformia.winkwide.core.utils.AppSettingsProperties;
 
-//@RepositoryRestController
+@EnableConfigurationProperties({ AppSettingsProperties.class })
 @RestController
 public class SmartTVSyncController {
 
@@ -44,7 +47,20 @@ public class SmartTVSyncController {
 		programRepo = pRepo;
 		reportRepo = rRepo;
 	}
+	
+	@Autowired
+	AppSettingsProperties appSettingsProperties;
+	
+	@Autowired
+	private FileStorageService fileStorageService;
 
+	@GetMapping("sync/settings")
+	public @ResponseBody ResponseEntity<?> getSettings() {
+		
+		// return settings
+		return ResponseEntity.ok(appSettingsProperties);
+		}
+	
 	@GetMapping("sync/programs")
 	public @ResponseBody ResponseEntity<?> getPrograms() {
 
@@ -148,6 +164,27 @@ public class SmartTVSyncController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 
+	}
+	
+	@PostMapping("sync/logs")
+	public @ResponseBody ResponseEntity<?> saveLogs(@RequestBody String logs) {
+		
+		try {
+			// identify display
+			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+			
+			//write logs
+			fileStorageService.writeTextInLogFile("display_" + dispId, logs);
+			
+			// return success message
+			return new ResponseEntity<>(HttpStatus.OK);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+		}
+		
 	}
 
 }

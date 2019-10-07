@@ -5,25 +5,11 @@
 <title>Bienvenue sur WinkWide</title>
 <th:block th:include="includes/_include"></th:block>
 
-<script type="text/javascript">
-
-//Load video background
-$(window).bind("load", function() {  
-	myVar = setTimeout(function() {
-		//$('.bg-welcome').css('background-image', 'url(img/backgrounds/etoiles.mp4)');
-		$(backgroundVideo).attr('src', 'img/backgrounds/etoiles.mp4');
-	}, 1000);
-
-}); 
-
-</script>
-
 </head>
 
 <body>
-	<!-- The video -->
-	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4">
-	</video>
+	<!-- The background video -->
+	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4"></video>
 
 	<!-- Navigation -->
 	<nav class="navbar navbar-expand-lg navbar-dark fixed-top">

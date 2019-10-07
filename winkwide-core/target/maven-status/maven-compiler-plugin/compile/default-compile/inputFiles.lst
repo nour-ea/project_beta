@@ -1,11 +1,12 @@
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Account.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/service/FileStorageService.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/handler/AccountEventHandler.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/projection/ProgramProjection.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Program.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/projection/MediaProjection.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Media.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/model/MachineAccountProperties.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/repository/SpotRepository.java
-/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/service/MediaFileStorageService.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/repository/MediaRepository.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/validator/MediaValidator.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Report.java
@@ -17,6 +18,8 @@
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Spot.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/utils/FileStorageProperties.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/model/Auditable.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/model/AdminSettingsProperties.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/model/FileProperties.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/exception/ApiError.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/repository/ReportRepository.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/repository/ProgramRepository.java
@@ -26,9 +29,9 @@
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/projection/ReportProjection.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/repository/AccountRepository.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/validator/DisplayValidator.java
+/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/model/AppSettingsProperties.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/utils/MyRandomNumericGenerator.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/entity/Display.java
-/Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/utils/MachineAccountProperties.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/handler/DisplayEventHandler.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/exception/MyFileNotFoundException.java
 /Users/nour/Desktop/DevEnv/myworkspace/winkwide/winkwide-core/src/main/java/com/platformia/winkwide/core/validator/AccountValidator.java
