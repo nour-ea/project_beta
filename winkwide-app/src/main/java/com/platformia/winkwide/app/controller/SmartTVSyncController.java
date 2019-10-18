@@ -67,8 +67,7 @@ public class SmartTVSyncController {
 		try {
 
 			// identify display
-			//Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-			Long dispId = Long.parseLong("6970173894");
+			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
 			Display display = displayRepo.getOne(dispId);
 
 			// get programs & their media url lists (ONLY Current and Futur Programs)
@@ -115,10 +114,11 @@ public class SmartTVSyncController {
 
 			// identify display
 			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-
+			Display display = displayRepo.getOne(dispId);
+			
 			// set reports
 			for (Report report : reports) {
-				report.setDisplay(displayRepo.getOne((dispId)));
+				report.setDisplay(display);
 				try {
 					reportRepo.save(report);
 				} catch (Exception e) {
@@ -127,7 +127,6 @@ public class SmartTVSyncController {
 			}
 
 			// set display lastReportSync time and status (SUCCESS CASE)
-			Display display = displayRepo.getOne((dispId));
 			display.setLastSyncTime(new Date());
 			displayRepo.save(display);
 

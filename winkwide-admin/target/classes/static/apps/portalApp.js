@@ -7,27 +7,29 @@ var app = angular.module('portalApp', ['ui.grid','ui.grid.pagination', 'ui.grid.
 app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConstants',
 	    function ($scope, objectModel, CRUDService, uiGridConstants) {
 		
-		// Get current path
-		$scope.currentPath = window.location.pathname;
-		// Define the Object Target for the CRUD App (Display, Media...)
-		$scope.targetObject = objectModel;
-		$scope.targetCollection = $scope.targetObject + 's';
+		$scope.init = function(objModel){
+			// Get current path
+			$scope.currentPath = window.location.pathname;
+			// Define the Object Target for the CRUD App (Display, Media...)
+			$scope.targetObject = objModel;
+			$scope.targetCollection = $scope.targetObject + 's';
+			
+			// Define columnList object (for the table column titles)
+			$scope.columnList = {};
+			
+			// Define Pagination options & Specific filters for GetAll Request to
+			// fill the UI Grid  
+			$scope.paginationOptions = {pageNumber: 1, pageSize: 20, sortColumns: [], filterColumns: []};
+			$scope.specificFilters = {};
+					
+			// Define Edit / Delete target object url link and fill $scope.formData
+			var targetObjectUrl = '/api/'+$scope.targetCollection;
+			$scope.schema = {};
+			$scope.formData = {};
+			$scope.isCreateModalType = true; // to differentiate create and edit modal
+			$scope.isDeleteModalType = true; // to differentiate delete and view modal			
+		}
 		
-		// Define columnList object (for the table column titles)
-		$scope.columnList = {};
-		
-		// Define Pagination options & Specific filters for GetAll Request to
-		// fill the UI Grid  
-		$scope.paginationOptions = {pageNumber: 1, pageSize: 20, sortColumns: [], filterColumns: []};
-		$scope.specificFilters = {};
-				
-		// Define Edit / Delete target object url link and fill $scope.formData
-		var targetObjectUrl = '/api/'+$scope.targetCollection;
-		$scope.schema = {};
-		$scope.formData = {};
-		$scope.isCreateModalType = true; // to differentiate create and edit modal
-		$scope.isDeleteModalType = true; // to differentiate delete and view modal
-
 		$scope.setFormData = function(url, operation){
 			if(operation == 'edit' || operation == 'delete' || operation =='view') {
 				targetObjectUrl = url;
@@ -120,22 +122,31 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 					if(value.name=='thumbUrl' && $scope.targetObject == 'media')
 						this.unshift({ field: value.name , name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering:false, pinnedLeft:true, width: '*', minWidth:100 });
 					// ---------------------------------------
-					// enabling filtering only for string fields
+					
+					// enabling filtering only for string fields and boolean
 					else if(value.type=='Date' || value.name=='mac')
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:150 });
 					else if(value.name=='name')
 						this.push({ field: value.name , name: value.title, enableFiltering:true, pinnedLeft:true, width: '*', minWidth:150 });
-					else if(value.type=='String' && value.name!=='url')
+					else if(value.name=='userRole' )
+						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100,
+							filter: {
+						          type: uiGridConstants.filter.SELECT,
+						          selectOptions: [ { value: 'ROLE_ADMIN', label: 'Admin' }, 
+						        	  				{ value: 'ROLE_CLIENT', label: 'Client' },
+						        	  				{ value: 'ROLE_PARTNER', label: 'Partner' }, 
+						        	  				{ value: 'ROLE_MACHINE', label: 'Machine' }]}
+						          });
+					else if(value.type=='String' && ![ 'url', 'password', 'confirmPassword'].includes(value.name))
 						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100 });
-
 					else if(value.name!=='id' && [ 'int', 'Long', 'BigDecimal'].includes(value.type))
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:100 });
 					else if(value.type=='boolean')
 						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100,
 							filter: {
-						          term: '1',
 						          type: uiGridConstants.filter.SELECT,
-						          selectOptions: [ { value: true, label: 'true' }, { value: false, label: 'false' }]}
+						          selectOptions: [ { value: true, label: 'true' }, 
+						        	  				{ value: false, label: 'false' }]}
 						          });
 					
 					}, columnList);
@@ -203,235 +214,267 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 				$scope.paginationOptions.filterColumns,
 				$scope.specificFilters);                            
 		 };
-		
-		// Build columnList (titles of the table columns)
-		$scope.getColumnList();
-		
-		// Get Grid Data from REST Api
-		$scope.setGridData();
 	 	
 		// Define UI grid options & define update function
-	    $scope.mainGrid = {
-			rowHeight: 40,
-		    enableGridMenu: true,
-		    gridMenuCustomItems: [{ title: 'Delete Selection',
-		          				action: function ($event) {
-		          					angular.element(deleteSelectionModal).modal('show');
-		          				}, order: 1}],
-		    enableSelectAll: true,
-		    exporterMenuCsv: false,
-		    exporterMenuPdf: false,
-		    exporterExcelFilename: 'export.xlsx',
-		    exporterExcelSheetName: 'Sheet1',
-	        paginationPageSizes: [5, 10, 20, 50, 100, 500, 1000, 10000],
-	        paginationPageSize: $scope.paginationOptions.pageSize,
-	        enableColumnMenus:false,
-	    	useExternalPagination: true,
-			useExternalSorting: true,
-			enableFiltering: true,
-			useExternalFiltering: true,
-	        columnDefs: $scope.columnList,
-	        onRegisterApi: function(gridApi) {
-	           	$scope.gridApi = gridApi;
-	           	$scope.gridApi.pagination.on.paginationChanged(
-	             	$scope, function (newPage, pageSize) {
-				     	$scope.paginationOptions.pageNumber = newPage;
-		     		 	$scope.paginationOptions.pageSize = pageSize;
-						$scope.setGridData();
-				 	});
-				$scope.gridApi.core.on.sortChanged(
-					$scope, function (grid, sortColumns) {
-						$scope.paginationOptions.sortColumns = sortColumns;
-						$scope.setGridData();
-				 	});
-		        $scope.gridApi.core.on.filterChanged(
-		        	$scope, function() {
-		        		$scope.paginationOptions.filterColumns = this.grid.columns.filter(c => c.enableFiltering == true);
-						$scope.setGridData();
-	        			});
+		$scope.setMainGrid = function(){
+		    $scope.mainGrid = {
+				rowHeight: 40,
+			    enableGridMenu: true,
+			    gridMenuCustomItems: [{ title: 'Delete Selection',
+			          				action: function ($event) {
+			          					angular.element(deleteSelectionModal).modal('show');
+			          				}, order: 1}],
+			    enableSelectAll: true,
+			    exporterMenuCsv: false,
+			    exporterMenuPdf: false,
+			    exporterExcelFilename: 'export.xlsx',
+			    exporterExcelSheetName: 'Sheet1',
+		        paginationPageSizes: [5, 10, 20, 50, 100, 500, 1000, 10000],
+		        paginationPageSize: $scope.paginationOptions.pageSize,
+		        enableColumnMenus:false,
+		    	useExternalPagination: true,
+				useExternalSorting: true,
+				enableFiltering: true,
+				useExternalFiltering: true,
+		        columnDefs: $scope.columnList,
+		        onRegisterApi: function(gridApi) {
+		           	$scope.gridApi = gridApi;
+		           	$scope.gridApi.pagination.on.paginationChanged(
+		             	$scope, function (newPage, pageSize) {
+					     	$scope.paginationOptions.pageNumber = newPage;
+			     		 	$scope.paginationOptions.pageSize = pageSize;
+							$scope.setGridData();
+					 	});
+					$scope.gridApi.core.on.sortChanged(
+						$scope, function (grid, sortColumns) {
+							$scope.paginationOptions.sortColumns = sortColumns;
+							$scope.setGridData();
+					 	});
+			        $scope.gridApi.core.on.filterChanged(
+			        	$scope, function() {
+			        		$scope.paginationOptions.filterColumns = this.grid.columns.filter(c => c.enableFiltering == true);
+							$scope.setGridData();
+		        			});
+				}
+		    };	
+		}
+
+	
+		// Define the Create function
+		$scope.createTargetObject = function(){
+	
+			// Animate loader in screen
+			$(".se-pre-con").show();
+			
+			// SPECIFIC for playlist and program creation
+			if($scope.targetObject == 'playlist')
+				$scope.formData.spots = $scope.selectedSpotsGrid.data;
+			if($scope.targetObject == 'program'){
+				$scope.formData.displays = $scope.selectedDisplaysGrid.data;
+				$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
 			}
-	    };
+		
+			CRUDService.createOne($scope.targetCollection, $scope.formData).success(function(data){
+				console.log('created object');
+				createAlert(main_nav, 'success', 'successfully created '+ $scope.targetObject, 5000);
+				$scope.setGridData();
+				angular.element(createEditObjectModal).modal('hide');
+				// Animate loader off screen
+				$(".se-pre-con").fadeOut("slow");
 	
-	// Define the Create function
-	$scope.createTargetObject = function(){
-
-		// Animate loader in screen
-		$(".se-pre-con").show();
-		
-		// SPECIFIC for playlist and program creation
-		if($scope.targetObject == 'playlist')
-			$scope.formData.spots = $scope.selectedSpotsGrid.data;
-		if($scope.targetObject == 'program'){
-			$scope.formData.displays = $scope.selectedDisplaysGrid.data;
-			$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
-		}
-	
-		CRUDService.createOne($scope.targetCollection, $scope.formData).success(function(data){
-			console.log('created object');
-			createAlert(main_nav, 'success', 'successfully created '+ $scope.targetObject, 5000);
-			$scope.setGridData();
-			angular.element(createEditObjectModal).modal('hide');
-			// Animate loader off screen
-			$(".se-pre-con").fadeOut("slow");
-
-		})
-		.error(function(data){
-			console.log('Did not create object correctly');
-			
-			//Validate Form with remote answer errors & Alert 
-			$scope.validateObjectForm(data);
-			
-			$scope.setGridData();
-			//angular.element(createEditObjectModal).modal('hide');
-			// Animate loader off screen
-			$(".se-pre-con").fadeOut("slow");
-		});
-
-	};
-	
-	// Define the Edit function
-	$scope.updateTargetObject = function(){	
-		
-		// Animate loader in screen
-		$(".se-pre-con").show();
-		
-		// SPECIFIC for playlist update
-		if($scope.targetObject == 'playlist')
-			$scope.formData.spots = $scope.selectedSpotsGrid.data;	
-		if($scope.targetObject == 'program'){
-			$scope.formData.displays = $scope.selectedDisplaysGrid.data;
-			$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
-		}
-		
-		CRUDService.updateOne(targetObjectUrl, $scope.formData).success(function(data){
-			console.log('updated object');
-			createAlert(main_nav, 'success', 'successfully updated '+ $scope.targetObject, 5000);
-			$scope.clearFormData();
-			$scope.setGridData();
-			angular.element(createEditObjectModal).modal('hide');
-			// Animate loader off screen
-			$(".se-pre-con").fadeOut("slow");
-		})
-		.error(function(data){
-			console.log('Did not update object correctly');
-			
-			//Validate Form with remote answer errors & Alert 
-			$scope.validateObjectForm(data);
-			
-			$scope.setGridData();
-			//angular.element(createEditObjectModal).modal('hide');
-			// Animate loader off screen
-			$(".se-pre-con").fadeOut("slow");
-		});
-	};
-	
-	// Define the Delete function
-	$scope.deleteTargetObject = function(){		
-		
-		// Animate loader in screen
-		$(".se-pre-con").show();
-		
-		CRUDService.deleteOne(targetObjectUrl).success(function(data){
-			console.log('deleted object');
-			createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject, 5000);
-			$scope.clearFormData();
-			$scope.setGridData();
-			angular.element(viewDeleteObjectModal).modal('hide');
-			// Animate loader off screen
-			$(".se-pre-con").fadeOut("slow");
-		})
-		.error(function(data){
-			console.log('Did not delete object correctly');
-			createAlert(viewDeleteObjectModalBody, 'danger', 'an issue occured deleting '+ $scope.targetObject +'<br> reason: '
-					+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
-			//$scope.clearFormData();
-			$scope.setGridData();
-			// angular.element(viewDeleteObjectModal).modal('hide');
-			// Animate loader off screen
-			$(".se-pre-con").fadeOut("slow");
-		});
-	};
-
-	// Define the Clean form function
-	$scope.clearFormData = function(){			
-		$scope.formData = {};
-		$scope.objectForm.$setPristine();
-		
-		if($scope.targetObject == 'media'){
-
-    		angular.element(file)[0].value = '';
-			angular.element(thumbFile)[0].value = '';
-
-			angular.element(imagePreview).attr('src', '');
-			angular.element(videoPreview).attr('src', '');
-			angular.element(audioPreview).attr('src', '');
-			angular.element(htmlPreview).html('');
-			$('.modal-backdrop').remove();
-			angular.element(thumbPreview).attr('src', '');
-						
-			$scope.resetPreview();
-		}
-	};
-	
-	// Define function to Delete a whole selection of objects (selected rows)
-	$scope.deleteSelection = function(){
-		$scope.gridApi.selection.getSelectedRows().forEach(function(obj){
-			CRUDService.deleteOne(CRUDService.getRelativePath(obj._links.self.href))
-			.success(function(data){
-				console.log('deleted object: ' + obj._links.self.href);
-				createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject+'s', 5000);
-				$scope.setGridData();		
 			})
 			.error(function(data){
-				createAlert(main_nav, 'danger', 'an issue occured deleting '+ $scope.targetObject +'s <br> reason: '
-						+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
+				console.log('Did not create object correctly');
+				
+				//Validate Form with remote answer errors & Alert 
+				$scope.validateObjectForm(data);
+				
+				$scope.setGridData();
+				//angular.element(createEditObjectModal).modal('hide');
+				// Animate loader off screen
+				$(".se-pre-con").fadeOut("slow");
 			});
-		});
-		angular.element(deleteSelectionModal).modal('hide');
-	};
-
-	//Function to Validate Form with remote answer errors
-	$scope.validateObjectForm = function(data){		
+	
+		};
 		
-		if (typeof(data.errors) !== 'undefined'){
-			if(data.errors[0].includes('\"name\"')){
-				$scope.objectForm.name.$invalid = true;
-				$scope.objectForm.name.$error.nameInvalid = true;
-				angular.element(nameInvalidMessage).html('&nbsp' + data.message);
-			}else if(data.errors[0].includes('\"mac\"')){
-				$scope.objectForm.mac.$invalid = true;
-				$scope.objectForm.mac.$error.macInvalid = true;
-				angular.element(macInvalidMessage).html('&nbsp' + data.message);
-			}else{
+		// Define the Edit function
+		$scope.updateTargetObject = function(){	
+			
+			// Animate loader in screen
+			$(".se-pre-con").show();
+			
+			// SPECIFIC for playlist update
+			if($scope.targetObject == 'playlist')
+				$scope.formData.spots = $scope.selectedSpotsGrid.data;	
+			if($scope.targetObject == 'program'){
+				$scope.formData.displays = $scope.selectedDisplaysGrid.data;
+				$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
+			}
+			
+			CRUDService.updateOne(targetObjectUrl, $scope.formData).success(function(data){
+				console.log('updated object');
+				createAlert(main_nav, 'success', 'successfully updated '+ $scope.targetObject, 5000);
+				$scope.clearFormData();
+				$scope.setGridData();
+				angular.element(createEditObjectModal).modal('hide');
+				// Animate loader off screen
+				$(".se-pre-con").fadeOut("slow");
+			})
+			.error(function(data){
+				console.log('Did not update object correctly');
+				
+				//Validate Form with remote answer errors & Alert 
+				$scope.validateObjectForm(data);
+				
+				$scope.setGridData();
+				//angular.element(createEditObjectModal).modal('hide');
+				// Animate loader off screen
+				$(".se-pre-con").fadeOut("slow");
+			});
+		};
+		
+		// Define the Delete function
+		$scope.deleteTargetObject = function(){		
+			
+			// Animate loader in screen
+			$(".se-pre-con").show();
+			
+			CRUDService.deleteOne(targetObjectUrl).success(function(data){
+				console.log('deleted object');
+				createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject, 5000);
+				$scope.clearFormData();
+				$scope.setGridData();
+				angular.element(viewDeleteObjectModal).modal('hide');
+				// Animate loader off screen
+				$(".se-pre-con").fadeOut("slow");
+			})
+			.error(function(data){
+				console.log('Did not delete object correctly');
+				createAlert(viewDeleteObjectModalBody, 'danger', 'an issue occured deleting '+ $scope.targetObject +'<br> reason: '
+						+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
+				//$scope.clearFormData();
+				$scope.setGridData();
+				// angular.element(viewDeleteObjectModal).modal('hide');
+				// Animate loader off screen
+				$(".se-pre-con").fadeOut("slow");
+			});
+		};
+	
+		// Define the Clean form function
+		$scope.clearFormData = function(){			
+			$scope.formData = {};
+			$scope.objectForm.$setPristine();
+			
+			if($scope.targetObject == 'media'){
+	
+	    		angular.element(file)[0].value = '';
+				angular.element(thumbFile)[0].value = '';
+	
+				angular.element(imagePreview).attr('src', '');
+				angular.element(videoPreview).attr('src', '');
+				angular.element(audioPreview).attr('src', '');
+				angular.element(htmlPreview).html('');
+				$('.modal-backdrop').remove();
+				angular.element(thumbPreview).attr('src', '');
+							
+				$scope.resetPreview();
+			}
+		};
+		
+		// Define function to Delete a whole selection of objects (selected rows)
+		$scope.deleteSelection = function(){
+			$scope.gridApi.selection.getSelectedRows().forEach(function(obj){
+				CRUDService.deleteOne(CRUDService.getRelativePath(obj._links.self.href))
+				.success(function(data){
+					console.log('deleted object: ' + obj._links.self.href);
+					createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject+'s', 5000);
+					$scope.setGridData();		
+				})
+				.error(function(data){
+					createAlert(main_nav, 'danger', 'an issue occured deleting '+ $scope.targetObject +'s <br> reason: '
+							+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
+				});
+			});
+			angular.element(deleteSelectionModal).modal('hide');
+		};
+	
+		//Function to Validate Form with remote answer errors
+		$scope.validateObjectForm = function(data){		
+			
+			if (typeof(data.errors) !== 'undefined'){
+			
+				/*if(data.errors[0].includes('\"name\"')){
+					$scope.objectForm.name.$invalid = true;
+					$scope.objectForm.name.$error.nameInvalid = true;
+					angular.element(nameInvalidMessage).html('&nbsp' + data.message);
+				}else if(data.errors[0].includes('\"mac\"')){
+					$scope.objectForm.mac.$invalid = true;
+					$scope.objectForm.mac.$error.macInvalid = true;
+					angular.element(macInvalidMessage).html('&nbsp' + data.message);
+				}else{
+					$scope.clearObjectFormValidation();
+					createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
+							+ data.message, null);
+				}*/
+				
+				
+				angular.forEach($scope.objectForm, function(field, key) {
+					if(data.errors[0].includes('\"'+key+'\"')){
+						field.$invalid = true;
+						document.getElementById(key+'InvalidMessage').innerHTML = '&nbsp' + data.message;
+					}
+				});
+				
+			}
+			else {
+				
 				$scope.clearObjectFormValidation();
 				createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
-						+ data.message, null);
+						+ data.toString(), null);
 			}
-		}
-		else {
+		};
+		
+		//Function to Clear validateObjectForm(data) messages
+		$scope.clearObjectFormValidation = function(){
+			if(typeof($scope.objectForm.name) !== 'undefined'){
+				angular.element(nameInvalidMessage).html('');
+				$scope.objectForm.name.$invalid = false;
+				$scope.objectForm.name.$error = {};
+			} 
+			if(typeof($scope.objectForm.mac) !== 'undefined'){
+				angular.element(macInvalidMessage).html('');
+				$scope.objectForm.mac.$invalid = false;
+				$scope.objectForm.mac.$error = {};
+			}
+			clearModalAlert();
+		};
+		
+		//Function to refresh App view from outside controller (for example in Settings View)
+		$scope.refreshAppView = function (objModel){
 			
-			$scope.clearObjectFormValidation();
-			createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
-					+ data.toString(), null);
-		}
-	};
+			// Initalize controller variables
+			$scope.init(objModel);
+			
+			// Build columnList (titles of the table columns)
+			$scope.getColumnList();
+			
+			// Get Grid Data from REST Api
+			$scope.setGridData();
+			
+			// Define UI grid options & define update function
+			$scope.setMainGrid();
 	
-	//Function to Clear validateObjectForm(data) messages
-	$scope.clearObjectFormValidation = function(){
-		if(typeof($scope.objectForm.name) !== 'undefined'){
-			angular.element(nameInvalidMessage).html('');
-			$scope.objectForm.name.$invalid = false;
-			$scope.objectForm.name.$error = {};
-		} 
-		if(typeof($scope.objectForm.mac) !== 'undefined'){
-			angular.element(macInvalidMessage).html('');
-			$scope.objectForm.mac.$invalid = false;
-			$scope.objectForm.mac.$error = {};
-		}
-		clearModalAlert();
-	};
-	
-	
+		};
+		
+		// Refresh App view at controller load
+		$scope.refreshAppView(objectModel);
+		
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// END OF GENERIC
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+
 	
 	
 	
@@ -724,8 +767,8 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 
 	
 	
-	// Define All Medias table
-	$scope.mediasPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: []};
+	// Define All Verified Medias table
+	$scope.mediasPaginationOptions = {pageNumber: 1, pageSize: 10, sortColumns: [], filterColumns: [{field:'verified', filters:[{term:'true'}]}]};
 	$scope.mediasGrid = {
 			rowHeight:40,
 		    enableSelectAll: true,

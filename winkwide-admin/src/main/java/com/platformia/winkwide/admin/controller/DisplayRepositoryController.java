@@ -33,8 +33,9 @@ public class DisplayRepositoryController {
 			Optional<Display> display = displayRepo.findById(displayId);
 			if (display.isPresent()) {
 				// delete associated Machine Account
-				Optional<Account> machineAccount = Optional.of(accountRepo.findByUserName(displayId.toString()));
-				accountRepo.delete(machineAccount.get());
+				Account machineAccount = accountRepo.findByUserName(displayId.toString());
+				if(machineAccount != null)
+					accountRepo.delete(machineAccount);
 
 				// delete links with objects
 				displayRepo.deleteDisplayProgramLinks(display.get().getId());

@@ -2,6 +2,7 @@ package com.platformia.winkwide.admin.controller;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +29,7 @@ public class SchemaRestController {
 		    Class<?> entityClass = Class.forName("com.platformia.winkwide.core.entity." + entity);
 
 		    	for (Field field : entityClass.getDeclaredFields())
-		    		//if(field.getName()!="id" && field.getName()!="serialVersionUID" && isNotJSONIgnore(field.getAnnotations()) )
-		    		if( 						  field.getName()!="serialVersionUID" && isNotJSONIgnore(field.getAnnotations()) )
+		    		if( !Modifier.isStatic(field.getModifiers()) && isNotJSONIgnore(field.getAnnotations()) )
 		    			schema.add(new EntitySchemaElement( field.getName(), toFirstUpperCase(field.getName()),  field.getType().getSimpleName() ) );
 		    	
 		 } catch (Exception e) {

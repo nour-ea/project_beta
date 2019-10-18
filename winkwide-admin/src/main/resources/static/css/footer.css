@@ -1,10 +1,7 @@
 .footer {
-    padding: 20px 0 0px 0;
     background-color: #090c14;
     color: #878c94;
     min-height: 10vh !important;
     position: relative;
-    top:0;
-    width:100%;
 }
 

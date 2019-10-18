@@ -46,8 +46,8 @@ app.controller("CreateAccountController", function($scope, $http) {
 		
 		//if status is OK then show confirmation
 		if(status==201){
-			createAlert("success","account successfully created for user : "+ data.userName 
-					+ ". <br> <strong> Please confirm your email by clicking on the link we sent you.</string>");
+			createAlert(main_section, "success","account successfully created for user : "+ data.userName 
+					+ ". <br> <strong> Please confirm your email by clicking on the link we sent you.</string>", 5000);
 			$scope.userForm.userName.$error.alreadyUsed = false;
 			$scope.userForm.userName.$invalid = false;
 			$scope.userForm.userName.$error.email = false;
@@ -56,7 +56,7 @@ app.controller("CreateAccountController", function($scope, $http) {
 				$(".se-pre-con").fadeOut("slow");
 				_clearFormData();
 				window.location.href = '/login'; 
-				}, 10000);
+				}, 17000);
 
 		}
 	
@@ -70,17 +70,17 @@ app.controller("CreateAccountController", function($scope, $http) {
 		var errors = res.data.errors;
 		
 		//if status is BAD REQUEST then highlight where form error are
-		if(errors[0] == 'userName: Duplicate.account.userName'){
+		if(errors[0] == '"userName": "Duplicate.account.userName"'){
 				$scope.userForm.userName.$invalid = true;
 				$scope.userForm.userName.$error.alreadyUsed = true;
 		}
-		else if(errors[0] == 'userName: Pattern.account.email'){
+		else if(errors[0] == '"userName": "Pattern.account.email"'){
 				$scope.userForm.userName.$error.alreadyUsed = false;
 				$scope.userForm.userName.$invalid = true;
 				$scope.userForm.userName.$error.email = true;
 		}
 		else
-			createAlert("danger","Sorry: " + status + "\n" + message + "\n" + errors.toString());
+			createAlert(main_section, "danger","Sorry: " + status + "\n" + message + "\n" + errors.toString(), null);
 	}
 	
 	// Clear the form

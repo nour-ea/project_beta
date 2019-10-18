@@ -30,6 +30,11 @@
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
+      "name": "file.root-dir",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
       "name": "file.upload-dir",
       "type": "java.lang.String"
     },

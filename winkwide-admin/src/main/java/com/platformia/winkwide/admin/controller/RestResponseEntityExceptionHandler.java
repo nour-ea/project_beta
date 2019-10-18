@@ -3,6 +3,7 @@ package com.platformia.winkwide.admin.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.rest.core.RepositoryConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import com.platformia.winkwide.core.exception.FileStorageException;
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler({ RepositoryConstraintViolationException.class })
+	@ExceptionHandler({ RepositoryConstraintViolationException.class, ConstraintViolationException.class })
 	@ResponseBody
 	public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
 		RepositoryConstraintViolationException nevEx = (RepositoryConstraintViolationException) ex;
@@ -29,12 +30,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 		//send back list of errors
 		HttpStatus httpStatus = HttpStatus.NOT_ACCEPTABLE;
-		String message = "Review your request please !" ;
+		String message = "Review your request please !  " ;
 		List<String> errors = new ArrayList<String>();
 		
 		for (FieldError error : nevEx.getErrors().getFieldErrors()) {
 	        errors.add("\""+ error.getField() + "\": \"" + error.getCode() + "\"");
 	    }
+		
+		if(errors.size()>0)
+			message = " " + nevEx.getErrors().getFieldErrors().get(0).getCode();
+		
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 

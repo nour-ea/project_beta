@@ -51,6 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			http.authorizeRequests().antMatchers("/portal/playlists").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/programs").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/reports").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/settings").access("hasAnyRole('ROLE_ADMIN')");
 
 
 			// Configuration for Login.

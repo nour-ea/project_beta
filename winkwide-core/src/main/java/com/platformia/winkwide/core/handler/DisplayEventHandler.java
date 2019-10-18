@@ -29,8 +29,7 @@ public class DisplayEventHandler {
 		// Create an Account with default password
 		try {
 			Account machineAccount = new Account(display.getId().toString(), display.getId().toString(), display.getId().toString(), null, null,
-					SecurityUtils.encrytPassword(machineAccountProperties.getDefaultPassword()), true, true, 
-					Account.ROLE_MACHINE);
+					SecurityUtils.encrytPassword(machineAccountProperties.getDefaultPassword()), Account.ROLE_MACHINE, true, true);
 			
 			accountRepo.save(machineAccount);
 			

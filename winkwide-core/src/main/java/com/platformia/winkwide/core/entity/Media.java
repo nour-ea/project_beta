@@ -27,7 +27,7 @@ import lombok.Setter;
 public class Media extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = -5558760606017435981L;
-	public static final String[] allowedMediaFormats = {"image/jpeg","image/png","image/gif","video/mp4","audio/mp3","text/html"};
+	public static final String[] allowedMediaFormats = {"image/jpeg","image/png","image/gif","video/mp4","audio/mp3","audio/mpeg","text/html"};
 	public static final String[] allowedThumbnailFormats = {"image/jpeg","image/png", "image/gif"};
 	
 

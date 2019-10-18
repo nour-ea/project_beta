@@ -2,10 +2,7 @@ package com.platformia.winkwide.admin.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -69,21 +66,19 @@ public class MainController {
 	public String reports() {
 		return "portal/reports";
 	}
+	
+	@RequestMapping("/portal/settings")
+	public String settings() {
+		return "portal/settings";
+	}
 
 	@RequestMapping("/portal/createAccount")
-	public String createAccount(Model model) {
+	public String createAccount() {
 		return "portal/createAccount";
 	}
 
 	@RequestMapping("/portal/accountInfo")
-	public String accountInfo(Model model) {
-
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		System.out.println(userDetails.getPassword());
-		System.out.println(userDetails.getUsername());
-		System.out.println(userDetails.isEnabled());
-
-		model.addAttribute("userDetails", userDetails);
+	public String accountInfo() {
 		return "portal/accountInfo";
 	}
 

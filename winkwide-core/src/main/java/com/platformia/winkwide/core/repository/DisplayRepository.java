@@ -62,5 +62,10 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 	public void deleteDisplayReportLinks(
 			@Param("displayId") Long displayId);
 	
+	@Query("select c from #{#entityName} c where c.name = :name")
+	public Display findByName(@Param("name") String name);	
+	
+	@Query("select c from #{#entityName} c where c.mac = :mac")
+	public Display findByMac(@Param("mac") String mac);	
 	
 }

@@ -62,6 +62,10 @@ public class PlaylistRepositoryController {
 			for (Spot s : playlist.getSpots()) {
 				Optional<Media> media = mediaRepo.findById(s.getMedia().getId());
 
+				//check if media is verified
+				if(!media.get().isVerified())
+					return createValidationErrors("NotVerified.playlist.media");
+				
 				Spot spot = new Spot();
 				spot.setDuration(s.getDuration());
 				spot.setPlayOrder(s.getPlayOrder());
@@ -125,6 +129,10 @@ public class PlaylistRepositoryController {
 			for (Spot s : playlist.getSpots()) {
 				Optional<Media> media = mediaRepo.findById(s.getMedia().getId());
 
+				//check if media is verified
+				if(!media.get().isVerified())
+					return createValidationErrors("NotVerified.playlist.media");
+				
 				Spot spot = new Spot();
 				spot.setDuration(s.getDuration());
 				spot.setPlayOrder(s.getPlayOrder());
@@ -220,6 +228,11 @@ public class PlaylistRepositoryController {
 			message = "The playlist you want to edit was not found!";
 			errors.add("\"id\": \"NotFound.playlist.id\"");
 			break;
+		case "NotVerified.playlist.media":
+			message = "The playlist contains non verified media(s), please check the spots medias!";
+			errors.add("\"id\": \"NotVerified.playlist.media\"");
+			break;
+			
 
 		}
 		HttpHeaders httpHeaders = new HttpHeaders();

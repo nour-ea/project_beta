@@ -26,17 +26,20 @@ import com.platformia.winkwide.core.utils.FileStorageProperties;
 @EnableConfigurationProperties({FileStorageProperties.class})
 public class FileStorageService {
 
-	private final Path fileStorageLocation;
-	private final Path logStorageLocation;
+
+	private final FileStorageProperties fileStorageProperties;
+	private final Path uploadsStorageLocation;
+	private final Path logsStorageLocation;
 
 	@Autowired
-	public FileStorageService(FileStorageProperties fileStorageProperties) {
-		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
-		this.logStorageLocation = Paths.get(fileStorageProperties.getLogDir()).toAbsolutePath().normalize();
+	public FileStorageService(FileStorageProperties fsp) {
+		this.fileStorageProperties = fsp;
+		this.uploadsStorageLocation = Paths.get(this.fileStorageProperties.getRootDir(), this.fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
+		this.logsStorageLocation = Paths.get(this.fileStorageProperties.getRootDir(), this.fileStorageProperties.getLogDir()).toAbsolutePath().normalize();
 
 		try {
-			Files.createDirectories(this.fileStorageLocation);
-			Files.createDirectories(this.logStorageLocation);
+			Files.createDirectories(this.uploadsStorageLocation);
+			Files.createDirectories(this.logsStorageLocation);
 		} catch (Exception ex) {
 			throw new FileStorageException("Could not create the directory where the uploaded files or downloaded logs will be stored.",
 					ex);
@@ -66,15 +69,16 @@ public class FileStorageService {
 
             // Build Target Location (relative and absolute)
             Path relativeTargetLocation = Paths.get(location, year, month, random +"_"+ fileName);
-            Path targetLocation = Paths.get(this.fileStorageLocation.toString(), relativeTargetLocation.toString());
+            Path targetLocation = Paths.get(this.uploadsStorageLocation.toString(), relativeTargetLocation.toString());
             
             // Create target Folder
             FileUtils.forceMkdirParent(new File(targetLocation.toString()) );
             
             // Create File
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("stored file :" + relativeTargetLocation);
-            String url = relativeTargetLocation.toString();
+
+            String url = Paths.get(fileStorageProperties.getUploadDir(), relativeTargetLocation.toString()).toString();
+            System.out.println("stored file :" + url);
             
             //Populate fileProperties
             fileProperties.setName(fileName);
@@ -93,7 +97,7 @@ public class FileStorageService {
 
         try {
             // Build Target Location
-        	Path targetLocation = Paths.get(this.fileStorageLocation.toString(), url);
+        	Path targetLocation = Paths.get(this.uploadsStorageLocation.toString(), url);
             
             // Delete File
         	if(Files.exists(targetLocation)) {
@@ -109,7 +113,7 @@ public class FileStorageService {
 	public void writeTextInLogFile(String fileName, String text) {
 
         try {
-        	Path targetLocation = Paths.get(this.logStorageLocation.toString(), fileName);
+        	Path targetLocation = Paths.get(this.logsStorageLocation.toString(), fileName);
             BufferedWriter writer = new BufferedWriter(new FileWriter(targetLocation.toString(), true));
             writer.append('\n');
             writer.append(text);           
@@ -117,6 +121,21 @@ public class FileStorageService {
             
         } catch (Exception ex) {
             throw new FileStorageException("Could not write in text in log file : " + fileName + ". Please try again or contact your Admin!", ex);
+        }
+    }
+	
+	public long getUploadsDirectorySize() {
+
+        try {
+        	Path targetFolder = Paths.get(this.uploadsStorageLocation.toString());
+            long size = Files.walk(targetFolder)
+            	      .filter(p -> p.toFile().isFile())
+            	      .mapToLong(p -> p.toFile().length())
+            	      .sum();
+            return size;
+            
+        } catch (Exception ex) {
+            throw new FileStorageException("Could not get Upload Directory size fo", ex);
         }
     }
 

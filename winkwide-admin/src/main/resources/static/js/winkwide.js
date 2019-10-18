@@ -15,7 +15,7 @@ $(window).on('load', function(){
 		if($('#backgroundVideo').length)
 			myVar = setTimeout(function() {
 				$(backgroundVideo).attr('src', '/img/backgrounds/etoiles.mp4');
-			}, 1000);	
+			}, 100);	
 	}); 
 
 
@@ -65,10 +65,12 @@ function initiateDateTimePickers(){
 								        autoclose: true,
 										minuteStep: 15});
 
-	$(".icon-arrow-right").addClass("fa fa-arrow-right").removeClass(".glyphicon",".icon-arrow-right");
-	$(".glyphicon-arrow-right").addClass("fa fa-arrow-right").removeClass(".glyphicon",".glyphicon-arrow-right");
-	$(".icon-arrow-left").addClass("fa fa-arrow-left").removeClass(".glyphicon",".icon-arrow-left");
-	$(".glyphicon-arrow-left").addClass("fa fa-arrow-left").removeClass(".glyphicon",".glyphicon-arrow-left");
+	$(".icon-arrow-right").addClass("fa fa-arrow-right").removeClass("glyphicon",".icon-arrow-right");
+	$(".glyphicon-arrow-right").addClass("fa fa-arrow-right").removeClass("glyphicon","glyphicon-arrow-right");
+	$(".icon-arrow-left").addClass("fa fa-arrow-left").removeClass("glyphicon",".icon-arrow-left");
+	$(".glyphicon-arrow-left").addClass("fa fa-arrow-left").removeClass("glyphicon","glyphicon-arrow-left");
+	$(".glyphicon-arrow-left").addClass("fa fa-arrow-left").removeClass("glyphicon","glyphicon-arrow-left");
+	$(".icon-remove").addClass("fa-times").removeClass("fa-remove");
 	
 	$('.clockpicker').clockpicker({
 	    placement: 'bottom',

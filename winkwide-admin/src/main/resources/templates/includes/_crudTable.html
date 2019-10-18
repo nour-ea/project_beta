@@ -28,7 +28,7 @@
 						<!-- ------------------------------------- -->
 						
 						<div ng-repeat="field in schema" 
-							 ng-if="targetObject!='media' 
+							 ng-if="targetObject!='media' && targetObject!='account'
 							 		&& field.name!='id'
 									&& !(targetObject=='display' && field.name=='lastSyncTime')
 									&& !(targetObject=='playlist' && field.name=='duration')"
@@ -41,17 +41,15 @@
 						    <div ng-if="field.type=='String'" class="col-sm-10">
 								<input type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" required>
 								<small ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine  && objectForm[field.name].$viewValue==''" class="text-danger"> &nbsp field {{field.title}} is required </small>
-								<small id="nameInvalidMessage" ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine && objectForm[field.name].$error.nameInvalid" class="text-danger"></small>
-								<small id="macInvalidMessage" ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine && objectForm[field.name].$error.macInvalid" class="text-danger"></small>
-																
+								<small id="{{field.name+'InvalidMessage'}}" ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine" class="text-danger"></small>																
 							</div>
 							
 							
 							<!-- case of a Boolean -->
 						    <div ng-if="field.type=='boolean'" class="col-sm-10">
 								<select type="text" class="form-control" name="{{field.name}}" ng-model="formData[field.name]" required>
-									<option ng-selected="formData[field.name] == true">true</option>
-									<option ng-selected="formData[field.name] == false">false</option>
+									<option value="true" ng-selected="formData[field.name] == true">true</option>
+									<option value="false" ng-selected="formData[field.name] == false">false</option>
 								</select>
 								<small ng-show="objectForm[field.name].$invalid && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
 							</div> 
@@ -92,7 +90,7 @@
 						<div ng-repeat="field in schema" ng-if="targetObject=='playlist'">
 							<div  ng-if="field.name=='spots'" >
 								<div  class="form-group row" >
-									 <label  class="col-sm-2 col-form-label">Available Medias</label>
+									 <label  class="col-sm-2 col-form-label">Available Verified Medias</label>
 									 <div class="col-sm-10">
 									 	<div ui-grid="mediasGrid" class="grid small" ui-grid-pagination ui-grid-selection  ></div>						 		
 									 </div>
@@ -168,6 +166,8 @@
 							    <div class="col-sm-10">
 									<input type="file" class="form-control" name="file" id="file" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.file.$invalid && !objectForm.file.$pristine }">
 									<small ng-show="objectForm.file.$invalid && !objectForm.file.$pristine" class="text-danger"> &nbsp field Media File is required </small>
+									<small id="fileInvalidMessage" ng-show="objectForm.file.$invalid && !objectForm.file.$pristine" class="text-danger"></small>
+									
 								</div>
 							</div>
 							<div class="form-group row">
@@ -185,6 +185,7 @@
 							    <div class="col-sm-10">
 									<input type="file" class="form-control" name="thumbFile" id="thumbFile" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine }">
 									<small ng-show="objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine" class="text-danger"> &nbsp field Thumbnail is required </small>
+									<small id="thumbFileInvalidMessage" ng-show="objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine" class="text-danger"></small>
 								</div>
 							</div>
 							<div class="form-group row">
@@ -198,34 +199,127 @@
 							    <div class="col-sm-10">
 									<input type="text" class="form-control" name="name" ng-model="formData.name" ng-class="{ 'is-invalid' : objectForm.name.$invalid && !objectForm.name.$pristine }" required>
 									<small ng-show="objectForm.name.$invalid && !objectForm.name.$pristine  && objectForm.name.$viewValue==''" class="text-danger"> &nbsp field Name is required </small>
-									<small id="nameInvalidMessage" ng-show="objectForm.name.$invalid && !objectForm.name.$pristine && objectForm.name.$error.nameInvalid" class="text-danger"></small>									
+									<small id="nameInvalidMessage" ng-show="objectForm.name.$invalid && !objectForm.name.$pristine" class="text-danger"></small>									
 								</div>
 							</div>
 							<div class="form-group row">						
 								<label class="col-sm-2 col-form-label">Verified</label>
 								<div class="col-sm-10">
 									<select type="text" class="form-control" name="verified" ng-model="formData.verified" ng-class="{ 'is-invalid' : objectForm.verified.$invalid && !objectForm.verified.$pristine }" required>
-										<option ng-selected="formData.verified == true">true</option>
-										<option ng-selected="formData.verified == false">false</option>
+										<option value="true" ng-selected="formData.verified == true">true</option>
+										<option value="false" ng-selected="formData.verified == false">false</option>
 									</select>
 									<small ng-show="objectForm.verified.$invalid && !objectForm.verified.$pristine" class="text-danger"> &nbsp field Verified is required </small>
+									<small id="verifiedInvalidMessage" ng-show="objectForm.verified.$invalid && !objectForm.verified.$pristine" class="text-danger"></small>
 								</div> 
 							</div>
 							<div class="form-group row">						
 								<label class="col-sm-2 col-form-label">Category</label>
 							    <div class="col-sm-10">
 									<select type="text" class="form-control" name="category" ng-model="formData.category" ng-class="{ 'is-invalid' : objectForm.category.$invalid && !objectForm.category.$pristine }" required>
-										<option ng-selected="formData.category=='ad'">ad</option>
-										<option ng-selected="formData.category=='entertain'">entertain</option>
-										<option ng-selected="formData.category=='private'">private</option>
-										<option ng-selected="formData.category=='other'">other</option>
+										<option value="ad" ng-selected="formData.category=='ad'">ad</option>
+										<option value="entertain" ng-selected="formData.category=='entertain'">entertain</option>
+										<option value="private" ng-selected="formData.category=='private'">private</option>
+										<option value="other" ng-selected="formData.category=='other'">other</option>
 									</select>
 									<small ng-show="objectForm.category.$invalid && !objectForm.category.$pristine" class="text-danger"> &nbsp field Category is required </small>
+									<small id="categoryInvalidMessage" ng-show="objectForm.category.$invalid && !objectForm.category.$pristine" class="text-danger"></small>
 								</div>
 							</div>							
 							
 							
-						</div>	
+						</div>
+						
+						<!-- case of a Account -->
+						<div ng-if="targetObject=='account'">
+						
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">User Name</label>
+							    <div class="col-sm-8">
+						            <input type="text" name="userName" class="form-control" placeholder="Email address" ng-model="formData.userName" ng-class="{ 'is-invalid' : objectForm.userName.$invalid && !objectForm.userName.$pristine }" required>
+						            <!-- <small ng-show="objectForm.userName.$invalid && !objectForm.userName.$pristine && (objectForm.userName.$error.email || objectForm.userName.$error.required) " class="text-danger"> &nbsp please enter a valid email </small> -->
+					 	            <small id="userNameInvalidMessage" ng-show="objectForm.userName.$invalid && !objectForm.userName.$pristine" class="text-danger"></small>
+				 	            </div>
+					        </div>
+					        
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">First Name</label>
+								<div class="col-sm-8">
+						            <input type="text" name="firstName" class="form-control" placeholder="First name" ng-model="formData.firstName" ng-class="{ 'is-invalid' : objectForm.firstName.$invalid && !objectForm.firstName.$pristine }" required>
+						            <small ng-show="objectForm.firstName.$invalid && !objectForm.firstName.$pristine" class="text-danger"> &nbsp your First name is required </small>
+						            <small id="firstNameInvalidMessage" ng-show="objectForm.firstName.$invalid && !objectForm.firstName.$pristine" class="text-danger"></small>
+					           	</div>
+				   	        </div>
+				   	        
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Last Name</label>
+							    <div class="col-sm-8">
+						            <input type="text" name="lastName" class="form-control" placeholder="Last name" ng-model="formData.lastName" ng-class="{ 'is-invalid' : objectForm.lastName.$invalid && !objectForm.lastName.$pristine }" required>
+						            <small ng-show="objectForm.lastName.$invalid && !objectForm.lastName.$pristine" class="text-danger"> &nbsp your last name is required </small>
+						            <small id="lastNameInvalidMessage" ng-show="objectForm.lastName.$invalid && !objectForm.lastName.$pristine" class="text-danger"></small>
+					   	        </div>
+							</div>
+				
+					        <div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Password</label>
+								<div class="col-md-8" >
+						            <input type="password" name="password" class="form-control" placeholder="{{isCreateModalType ? 'Password' : '********'}}" ng-model="formData.password" ng-minlength="8" ng-maxlength="20" ng-class="{ 'is-invalid' : objectForm.password.$invalid && !objectForm.password.$pristine }" ng-required="isCreateModalType">
+						            <small ng-show="objectForm.password.$error.required && !objectForm.password.$pristine" class="text-danger">&nbsp a password is required </small>
+								    <!-- <small ng-show="!objectForm.password.$error.required && !objectForm.password.$error.minlength && !objectForm.password.$error.maxlength && objectForm.password.$error.pattern && !objectForm.password.$pristine" class="text-danger">&nbsp must contain one lower &amp; uppercase letter, and one number </small> -->
+								    <small ng-show="!objectForm.password.$error.required && (objectForm.password.$error.minlength || objectForm.password.$error.maxlength) && !objectForm.password.$pristine" class="text-danger">&nbsp password must be between 8 and 20 characters </small>
+							    </div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Confirm Password</label>
+								<div class="col-md-8" >
+									<input type="password" name="confirmPassword" class="form-control" placeholder="{{isCreateModalType ? 'Confirm Password' : '********'}}" ng-model="formData.confirmPassword" ng-class="{ 'is-invalid' : objectForm.confirmPassword.$invalid && !objectForm.confirmPassword.$pristine }" match-password="objectForm.password" ng-required="isCreateModalType">
+						            <small ng-show="objectForm.confirmPassword.$error.required && !objectForm.confirmPassword.$pristine" class="text-danger"> &nbsp please confirm your password </small>
+						            <small ng-show="!objectForm.confirmPassword.$error.required && objectForm.confirmPassword.$error.matchPassword && !objectForm.confirmPassword.$pristine" class="text-danger">&nbsp passwords should match.</small>								
+								</div>
+					        </div>
+					        				
+							<div class="form-group row">						
+								<label class="col-sm-4 col-form-label">User Role</label>
+								<div class="col-sm-8">
+									<select type="text" class="form-control" name="userRole" ng-model="formData.userRole" ng-class="{ 'is-invalid' : objectForm.userRole.$invalid && !objectForm.userRole.$pristine }" required>
+										<option value="" disabled selected >-- select an option --</option>
+										<option value="ROLE_ADMIN" ng-selected="formData.userRole == 'ROLE_ADMIN'">Admin</option>
+										<option value="ROLE_CLIENT" ng-selected="formData.userRole == 'ROLE_CLIENT'">Client</option>
+										<option value="ROLE_PARTNER" ng-selected="formData.userRole == 'ROLE_PARTNER'">Partner</option>
+										<option value="ROLE_MACHINE" ng-selected="formData.userRole == 'ROLE_MACHINE'">Machine</option>
+									</select>
+									<small ng-show="objectForm.userRole.$invalid && !objectForm.userRole.$pristine" class="text-danger"> &nbsp field User Role is required </small>
+									<small id="userRoleInvalidMessage" ng-show="objectForm.userRole.$invalid && !objectForm.userRole.$pristine" class="text-danger"></small>
+								</div> 
+							</div>
+							
+							<div class="form-group row">						
+								<label class="col-sm-4 col-form-label">Active</label>
+								<div class="col-sm-8">
+									<select type="text" class="form-control" name="active" ng-model="formData.active" ng-class="{ 'is-invalid' : objectForm.active.$invalid && !objectForm.active.$pristine }" required>
+										<option value="" disabled selected >-- select an option --</option>
+										<option value="true" ng-selected="formData.active == true">true</option>
+										<option value="false" ng-selected="formData.active == false">false</option>
+									</select>
+									<small ng-show="objectForm.active.$invalid && !objectForm.active.$pristine" class="text-danger"> &nbsp field Verified is required </small>
+									<small id="activeInvalidMessage" ng-show="objectForm.active.$invalid && !objectForm.active.$pristine" class="text-danger"></small>
+								</div> 
+							</div>
+							
+							<div class="form-group row">						
+								<label class="col-sm-4 col-form-label">Conditions Accepted</label>
+								<div class="col-sm-8">
+									<select type="text" class="form-control" name="conditionsAccepted" ng-model="formData.conditionsAccepted" ng-class="{ 'is-invalid' : objectForm.conditionsAccepted.$invalid && !objectForm.conditionsAccepted.$pristine }" required>
+										<option value="" disabled selected >-- select an option --</option>
+										<option value="true" ng-selected="formData.conditionsAccepted == true">true</option>
+										<option value="false" ng-selected="formData.conditionsAccepted == false">false</option>
+									</select>
+									<small ng-show="objectForm.conditionsAccepted.$invalid && !objectForm.conditionsAccepted.$pristine" class="text-danger"> &nbsp field Verified is required </small>
+									<small id="conditionsAcceptedInvalidMessage" ng-show="objectForm.conditionsAccepted.$invalid && !objectForm.conditionsAccepted.$pristine" class="text-danger"></small>
+								</div> 
+							</div>
+
+						</div>
 							
 				</div>
 												
@@ -257,7 +351,7 @@
 					<!-- AUTOMATIC form fields for each object -->
 					<!-- ------------------------------------- -->
 						
-					<div ng-repeat="field in schema" ng-if="targetObject!='media'" class="form-group row">
+					<div ng-repeat="field in schema" ng-if="targetObject!='media' && targetObject!='account' " class="form-group row">
 						<label ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].includes(field.type)" 
 							class="col-sm-2 col-form-label">{{field.title}}</label>
 						<div ng-if="['String','boolean', 'int', 'Long', 'BigDecimal', 'Date'].includes(field.type)" 
@@ -342,6 +436,55 @@
 							</div>
 					</div>						
 					
+						<!-- case of a Account -->
+						<div ng-if="targetObject=='account'">
+						
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">User Name</label>
+							    <div class="col-sm-8">
+							    	<div class="form-control">{{formData.userName}}</div>
+				 	            </div>
+					        </div>
+					        
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">First Name</label>
+								<div class="col-sm-8">
+									<div class="form-control">{{formData.firstName}}</div>
+					           	</div>
+				   	        </div>
+				   	        
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Last Name</label>
+							    <div class="col-sm-8">
+							    	<div class="form-control">{{formData.lastName}}</div>
+					   	        </div>
+							</div>
+					        				
+							<div class="form-group row">						
+								<label class="col-sm-4 col-form-label">User Role</label>
+								<div class="col-sm-8">
+									<div class="form-control" ng-if="formData.userRole == 'ROLE_ADMIN'">Admin</div>
+									<div class="form-control" ng-if="formData.userRole == 'ROLE_CLIENT'">Client</div>
+									<div class="form-control" ng-if="formData.userRole == 'ROLE_PARTNER'">Partner</div>
+									<div class="form-control" ng-if="formData.userRole == 'ROLE_MACHINE'">Machine</div>
+								</div> 
+							</div>
+							
+							<div class="form-group row">						
+								<label class="col-sm-4 col-form-label">Active</label>
+								<div class="col-sm-8">
+									<div class="form-control">{{formData.active}}</div>
+								</div> 
+							</div>
+							
+							<div class="form-group row">						
+								<label class="col-sm-4 col-form-label">Conditions Accepted</label>
+								<div class="col-sm-8">
+									<div class="form-control">{{formData.conditionsAccepted}}</div>
+								</div> 
+							</div>
+
+						</div>
 						
 				</div>
 				<div class="modal-footer">

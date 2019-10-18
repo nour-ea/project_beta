@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,9 @@ import com.platformia.winkwide.core.exception.ApiError;
 import com.platformia.winkwide.core.model.FileProperties;
 import com.platformia.winkwide.core.repository.MediaRepository;
 import com.platformia.winkwide.core.service.FileStorageService;
+import com.platformia.winkwide.core.utils.AdminSettingsProperties;
 
+@EnableConfigurationProperties({ AdminSettingsProperties.class })
 @RepositoryRestController
 public class MediaRepositoryController {
 
@@ -36,6 +39,9 @@ public class MediaRepositoryController {
 	}
 
 	@Autowired
+	AdminSettingsProperties adminSettingsProperties;
+
+	@Autowired
 	private FileStorageService fileStorageService;
 
 	@PostMapping("/medias/uploads")
@@ -45,7 +51,11 @@ public class MediaRepositoryController {
 
 		try {
 
-			// first, check validation and send back errors
+			// check if Max Media Objects would be exceeded
+			if( isMaxMediaObjectsReached())
+				return createValidationErrors("Limitation.media.maxObjects");
+			
+			// check validation and send back errors
 			if (name == null || name.isEmpty())
 				return createValidationErrors("NotEmpty.media.name");
 			if (mediaRepo.findByName(name) != null)
@@ -58,7 +68,7 @@ public class MediaRepositoryController {
 			FileProperties fileProperties = new FileProperties();
 			FileProperties thumbFileProperties = new FileProperties();
 
-			//check file and thumbnail
+			// check file and thumbnail
 			if (file == null)
 				return createValidationErrors("NotEmpty.media.file");
 			if (!Arrays.stream(Media.allowedMediaFormats).anyMatch(file.getContentType()::equals))
@@ -67,26 +77,30 @@ public class MediaRepositoryController {
 				return createValidationErrors("NotEmpty.media.thumbFile");
 			if (!Arrays.stream(Media.allowedThumbnailFormats).anyMatch(thumbFile.getContentType()::equals))
 				return createValidationErrors("NotValid.media.thumbFileFormat");
+
+			// check if Max Storage would be exceeded
+			if( isMaxStorageSizeReached(file.getSize() + thumbFile.getSize() ))
+				return createValidationErrors("Limitation.media.maxStorage");
 			
-			//store file and thumbnail and generate media type
+			// then store file and thumbnail and generate media type
 			if (file.getContentType().equals("text/html")) {
 				fileProperties = fileStorageService.storeFile("", "/apps/feed", file);
 				newMedia.setType("App");
 				thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/apps/feed", thumbFile);
-				
+
 			} else {
 				fileProperties = fileStorageService.storeFile("", "/medias/" + category, file);
 				thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/medias/" + category, thumbFile);
-				
-				if(Arrays.stream(Media.allowedThumbnailFormats).anyMatch(file.getContentType()::equals))
+
+				if (Arrays.stream(Media.allowedThumbnailFormats).anyMatch(file.getContentType()::equals))
 					newMedia.setType("Image");
-				else if(file.getContentType().equals("video/mp4"))
+				else if (file.getContentType().equals("video/mp4"))
 					newMedia.setType("Video");
-				else if(file.getContentType().equals("audio/mp3"))
-					newMedia.setType("Audio");					
+				else if (file.getContentType().equals("audio/mp3"))
+					newMedia.setType("Audio");
 			}
-			
-			//populate media object
+
+			// populate media object
 			newMedia.setName(name);
 			newMedia.setCategory(category);
 			newMedia.setVerified(false);
@@ -135,64 +149,72 @@ public class MediaRepositoryController {
 			// ---------------------------------
 
 			// then do the patch with files update
-		
+
 			oldMedia.get().setVerified(verified);
 
-			if (file != null) {
+			if (file != null) {				
 				FileProperties fileProperties = new FileProperties();
 
-				//check file formats
+				// check if Max Storage would be exceeded
+				if( isMaxStorageSizeReached(file.getSize()))
+					return createValidationErrors("Limitation.media.maxStorage");
+				
+				// check file formats
 				if (!Arrays.stream(Media.allowedMediaFormats).anyMatch(file.getContentType()::equals))
 					return createValidationErrors("NotValid.media.fileFormat");
 
-				//store file
+				// store file
 				if (file.getContentType().equals("text/html")) {
 					fileProperties = fileStorageService.storeFile("", "/apps/feed", file);
 					oldMedia.get().setType("App");
 				} else {
 					fileProperties = fileStorageService.storeFile("", "/medias/" + category, file);
-					
-					if(Arrays.stream(Media.allowedThumbnailFormats).anyMatch(file.getContentType()::equals))
+
+					if (Arrays.stream(Media.allowedThumbnailFormats).anyMatch(file.getContentType()::equals))
 						oldMedia.get().setType("Image");
-					else if(file.getContentType().equals("video/mp4"))
+					else if (file.getContentType().equals("video/mp4"))
 						oldMedia.get().setType("Video");
-					else if(file.getContentType().equals("audio/mp3"))
-						oldMedia.get().setType("Audio");	
+					else if (file.getContentType().equals("audio/mp3"))
+						oldMedia.get().setType("Audio");
 				}
 
-				//delete old file
+				// delete old file
 				fileStorageService.deleteFile(oldMedia.get().getUrl());
-				
+
 				oldMedia.get().setFormat(fileProperties.getFormat());
 				oldMedia.get().setSize(fileProperties.getSize());
 				oldMedia.get().setUrl(fileProperties.getUrl());
 				oldMedia.get().setVerified(false);
 
 			}
-			
-			if(thumbFile != null) {
-				FileProperties thumbFileProperties = new FileProperties();	
 
-				//check thumbnail format
+			if (thumbFile != null) {
+				FileProperties thumbFileProperties = new FileProperties();
+
+				// check if Max Storage would be exceeded
+				if( isMaxStorageSizeReached(thumbFile.getSize()))
+					return createValidationErrors("Limitation.media.maxStorage");
+
+				// check thumbnail format
 				if (!Arrays.stream(Media.allowedThumbnailFormats).anyMatch(thumbFile.getContentType()::equals))
 					return createValidationErrors("NotValid.media.thumbFileFormat");
 
-				//store thumbnail
+				// store thumbnail
 				if (oldMedia.get().getType().equals("App"))
 					thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/apps/feed", thumbFile);
 				else
 					thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/medias/" + category, thumbFile);
-								
-				//delete old thumbnail
+
+				// delete old thumbnail
 				fileStorageService.deleteFile(oldMedia.get().getThumbUrl());
-				
+
 				oldMedia.get().setThumbUrl(thumbFileProperties.getUrl());
 
 			}
-			
+
 			oldMedia.get().setName(name);
 			oldMedia.get().setCategory(category);
-			
+
 			mediaRepo.save(oldMedia.get());
 
 			Resource<Media> resource = new Resource<Media>(oldMedia.get());
@@ -280,6 +302,14 @@ public class MediaRepositoryController {
 			message = "Media thumbnail file format not accepted! (accepted formats: jpeg, jpg, png, gif)";
 			errors.add("\"thumbFileFormat\": \"NotValid.media.thumbFileFormat\"");
 			break;
+		case "Limitation.media.maxStorage":
+			message = "Max Media Storage exceeded, max is now set to: " + Math.round(adminSettingsProperties.getMaxStorageSize()/1000000) + "MB";
+			errors.add("\"id\": \"Limitation.media.maxStorage\"");
+			break;
+		case "Limitation.media.maxObjects":
+			message = "Max Media objects exceeded, max is set to: " + adminSettingsProperties.getMaxMedias();
+			errors.add("\"id\": \"Limitation.media.maxObjects\"");
+			break;
 
 		}
 
@@ -287,6 +317,24 @@ public class MediaRepositoryController {
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
 		return new ResponseEntity<Object>(new ApiError(httpStatus, message, errors), httpHeaders, httpStatus);
+	}
+
+	// method for checking if Max Storage setting is reached
+	private boolean isMaxStorageSizeReached(Long fileSize) {
+
+		if (adminSettingsProperties.getMaxStorageSize() < fileStorageService.getUploadsDirectorySize() + fileSize)
+			return true;
+		else
+			return false;
+	}
+
+	// method for checking if Max Media Objects setting is reached
+	private boolean isMaxMediaObjectsReached() {
+
+		if (adminSettingsProperties.getMaxMedias() < mediaRepo.count() + 1)
+			return true;
+		else
+			return false;
 	}
 
 }

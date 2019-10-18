@@ -6,15 +6,15 @@
 <th:block th:include="includes/_include"></th:block>
 
 <!-- angular js app -->
-<script th:src="@{/apps/account.js}"></script>
+<script th:src="@{/apps/createAccount.js}"></script>
 
 </head>
 
-<body ng-app="AccountManagement" ng-controller="CreateAccountController">
+<body ng-app="AccountManagement" ng-controller="CreateAccountController" ng-cloak>
 	<!-- The background video -->
 	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4"></video>
 	
-	<section class="container-fluid p-3 bg-welcome">
+	<section id="main_section" class="container-fluid p-3 bg-welcome">
 
 		<div class="col-md-4 mx-auto p-3 bg-white rounded centered-div">
 		     
@@ -24,7 +24,7 @@
 	     </div>
 	     
 	     
-	     <form name="userForm" ng-submit="createAccount()" novalidate>
+	     <form name="userForm" ng-submit="createAccount()" novalidate >
 
             <div class="form-group form-row">
 	          <div class="col-md-6" >

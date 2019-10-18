@@ -24,6 +24,7 @@ import com.platformia.winkwide.core.exception.ApiError;
 import com.platformia.winkwide.core.repository.DisplayRepository;
 import com.platformia.winkwide.core.repository.PlaylistRepository;
 import com.platformia.winkwide.core.repository.ProgramRepository;
+import com.platformia.winkwide.core.utils.AdminSettingsProperties;
 
 @RepositoryRestController
 public class ProgramRepositoryController {
@@ -32,6 +33,9 @@ public class ProgramRepositoryController {
 	private final DisplayRepository displayRepo;
 	private final PlaylistRepository playlistRepo;
 
+	@Autowired
+	AdminSettingsProperties adminSettingsProperties;
+	
 	@Autowired
 	public ProgramRepositoryController(ProgramRepository progRepo, DisplayRepository dispRepo,
 			PlaylistRepository playRepo) {
@@ -73,12 +77,19 @@ public class ProgramRepositoryController {
 				playlists.add(playlist);
 			}
 
+			//check if Max Spots per Display is reached
+			/*String maxDisplayConstraints = getMaxDisplayConstraints(program, displays);
+			if( !maxDisplayConstraints.isEmpty())
+				return createValidationErrors( maxDisplayConstraints);*/
+
+						
+			//create new program
 			newProgram.setName(program.getName());
 			newProgram.setStartTime(program.getStartTime());
 			newProgram.setEndTime(program.getEndTime());
 			newProgram.setDisplays(displays);
 			newProgram.setPlaylists(playlists);
-
+			
 			programRepo.save(newProgram);
 
 			Resource<Program> resource = new Resource<Program>(newProgram);
@@ -217,6 +228,14 @@ public class ProgramRepositoryController {
 			message = "The program you want to edit was not found!";
 			errors.add("\"id\": \"NotFound.program.id\"");
 			break;
+		case "Limitation.program.maxDisplaySpots":
+			message = "Max Spots per Display is exceeded! the maximum is set to: " + adminSettingsProperties.getMaxDisplaySpots();
+			errors.add("\"id\": \"Limitation.program.maxDisplaySpots\"");
+			break;
+		case "Limitation.program.maxDisplayLoopTime":
+			message = "Max Loop Time per Display is exceeded! The maximum is set to: " + adminSettingsProperties.getMaxDisplayLoopTime();
+			errors.add("\"id\": \"Limitation.program.maxDisplayLoopTime\"");
+			break;
 
 		}
 		HttpHeaders httpHeaders = new HttpHeaders();
@@ -224,5 +243,92 @@ public class ProgramRepositoryController {
 
 		return new ResponseEntity<Object>(new ApiError(httpStatus, message, errors), httpHeaders, httpStatus);
 	}
+	
+	
+	
+	
+	// method for checking if Max Spots per Display or Max Loop Time per Display is reached
+	/*private String getMaxDisplayConstraints(Program program, ArrayList<Display> displays) {
 
+		//Cutting time into section to study overlap constrains on display spots and loop time ;)
+		
+		ArrayList<Program> overlapPrograms = new ArrayList<Program>();
+		
+		ArrayList<Date> sectionDates = new ArrayList<Date>();
+		ArrayList<Program> sectionOverlapPrograms = new ArrayList<Program>();
+		ArrayList<Playlist> sectionOverlapPlaylists = new ArrayList<Playlist>();
+		
+		int sectionOverlapSpotsNumber = 0;
+		long sectionOverlapLoopTime = 0;
+		
+		for (Display display : displays) {
+			overlapPrograms.clear();
+			overlapPrograms.add(program);
+			//Get all programs overlapping with the currently created/edited one
+			overlapPrograms.addAll( programRepo.findByCustomFilters(null, display.getId(), program.getStartTime(), program.getEndTime(), null, null, null).getContent());
+			overlapPrograms.addAll( programRepo.findByCustomFilters(null, display.getId(), null, null, program.getStartTime(), program.getEndTime(), null).getContent());
+			overlapPrograms.addAll( programRepo.findByCustomFilters(null, display.getId(), new Date(2000, 1, 1), program.getStartTime(), program.getEndTime(), new Date(2100, 1, 1), null).getContent());
+			
+			//Unique overlapping programs
+			overlapPrograms = (ArrayList<Program>) overlapPrograms.stream().distinct().collect(Collectors.toList());
+			
+			//Build time sections Dates Aggregate Programs start and End Time
+			sectionDates.clear();
+			for (Program prog : overlapPrograms) {
+				sectionDates.add(prog.getStartTime());
+				sectionDates.add(prog.getEndTime());				
+			}
+			
+			//and sort them
+			sectionDates.sort(new Comparator<Date>() {
+				@Override
+				public int compare(Date d1, Date d2) {
+					return Long.valueOf(d1.getTime()).compareTo(d2.getTime());
+				}
+			});
+			
+			//then on each section consider overlapping programs playlists
+			for (int i=0; i < sectionDates.size() -1; i++) {
+				
+				Date sectionStartTime = sectionDates.get(i);
+				Date sectionEndTime = sectionDates.get(i+1);
+				
+				
+				//filter overlapPrograms on time section
+				sectionOverlapPrograms.clear();
+				sectionOverlapPrograms = (ArrayList<Program>) overlapPrograms.stream()
+											.filter(prog -> prog.getStartTime().getTime() <= sectionStartTime.getTime() 
+															&& prog.getEndTime().getTime() >= sectionEndTime.getTime())
+											.collect(Collectors.toList());      
+				
+				//build section overlapping playlists
+				sectionOverlapPlaylists.clear();
+				for (Program p : sectionOverlapPrograms)
+					sectionOverlapPlaylists.addAll(p.getPlaylists());
+					
+				//count spots in overlapping playlists
+				sectionOverlapSpotsNumber = 0;
+				sectionOverlapLoopTime = 0;
+				for (Playlist playlist : sectionOverlapPlaylists) {
+					sectionOverlapSpotsNumber += playlist.getSpots().size();
+					sectionOverlapLoopTime += playlist.getDuration();
+				}
+				
+				//check whether MaxDisplaySpots is exceeded
+				if (adminSettingsProperties.getMaxDisplaySpots() < sectionOverlapSpotsNumber)
+					return "Limitation.program.maxDisplaySpots";
+				
+				//check whether MaxDisplayLoopTime is exceeded
+				if (adminSettingsProperties.getMaxDisplayLoopTime() < sectionOverlapLoopTime)
+					return "Limitation.program.maxDisplayLoopTime";				
+				
+			}
+			
+			//empty objects
+			overlapPrograms.clear();
+			sectionDates.clear();
+		}		
+		
+		return "";
+	}*/
 }

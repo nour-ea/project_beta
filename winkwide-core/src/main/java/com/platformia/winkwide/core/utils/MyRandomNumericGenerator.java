@@ -13,6 +13,6 @@ public class MyRandomNumericGenerator implements IdentifierGenerator {
 
 	    @Override
 	    public Serializable generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object object) throws HibernateException {
-	        return new Long(RandomStringUtils.randomNumeric(10));
+	        return new Long(RandomStringUtils.randomNumeric(5));
 	    }
 }

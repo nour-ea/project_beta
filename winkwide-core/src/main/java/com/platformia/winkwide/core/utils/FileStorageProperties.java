@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @ConfigurationProperties(prefix = "file")
 public class FileStorageProperties {
 
+	private String rootDir;
+	
 	private String uploadDir;
 	
 	private String logDir;
