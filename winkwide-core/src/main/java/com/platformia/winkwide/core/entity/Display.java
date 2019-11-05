@@ -2,7 +2,7 @@ package com.platformia.winkwide.core.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -13,8 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -50,10 +48,9 @@ public class Display extends Auditable implements Serializable {
     private String area;
     
 	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "last_sync_time")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
-	private Date lastSyncTime;
+	@Column(name = "last_sync_time", columnDefinition = "TIMESTAMP")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	private LocalDateTime lastSyncTime;
     
     @Column(name = "weekday_audience", nullable = false)
     private int weekdayAudience;

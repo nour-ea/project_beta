@@ -1,6 +1,6 @@
 package com.platformia.winkwide.core.repository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -29,10 +29,10 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 			@Param("mediaId") Long mediaId, 
 			@Param("displayName") String displayName,
 			@Param("mediaName") String mediaName,
-			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date startTimeMin,
-			@Param("startTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date startTimeMax,
-			@Param("endTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date endTimeMin,
-			@Param("endTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date endTimeMax,
+			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startTimeMin,
+			@Param("startTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startTimeMax,
+			@Param("endTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endTimeMin,
+			@Param("endTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endTimeMax,
 			Pageable p);
 	
 	public List<Record> findByDisplayId(@Param("displayId") Long displayId);

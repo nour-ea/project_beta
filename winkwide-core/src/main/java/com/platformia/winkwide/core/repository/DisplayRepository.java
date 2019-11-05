@@ -1,7 +1,7 @@
 package com.platformia.winkwide.core.repository;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +34,8 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 			+ "and ( :holidayAudienceMin is null or :holidayAudienceMax is null or (c.holidayAudience between :holidayAudienceMin and :holidayAudienceMax) )"
 			+ "and ( :weekdayVisitorsMin is null or :weekdayVisitorsMax is null or (c.weekdayVisitors between :weekdayVisitorsMin and :weekdayVisitorsMax) )"
 			+ "and ( :holidayVisitorsMin is null or :holidayVisitorsMax is null or (c.holidayVisitors between :holidayVisitorsMin and :holidayVisitorsMax) )"
+			+ "and ( :averageAudienceMin is null or :averageAudienceMax is null or (c.weekdayAudience between :averageAudienceMin and :averageAudienceMax) or (c.holidayAudience between :averageAudienceMin and :averageAudienceMax) )"
+			+ "and ( :averageVisitorsMin is null or :averageVisitorsMax is null or (c.weekdayVisitors between :averageVisitorsMin and :averageVisitorsMax) or (c.holidayVisitors between :averageVisitorsMin and :averageVisitorsMax) )"
 			+ "and ( :lastSyncTimeMin is null or :lastSyncTimeMax is null or (c.lastSyncTime between :lastSyncTimeMin and :lastSyncTimeMax) )")
 	
 	public Page<Display> findByCustomFilters(
@@ -59,8 +61,12 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 			@Param("weekdayVisitorsMax") Integer weekdayVisitorsMax,
 			@Param("holidayVisitorsMin") Integer holidayVisitorsMin,
 			@Param("holidayVisitorsMax") Integer holidayVisitorsMax,
-			@Param("lastSyncTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date lastSyncTimeMin,
-			@Param("lastSyncTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date lastSyncTimeMax,
+			@Param("averageAudienceMin") Integer averageAudienceMin,
+			@Param("averageAudienceMax") Integer averageAudienceMax,
+			@Param("averageVisitorsMin") Integer averageVisitorsMin,
+			@Param("averageVisitorsMax") Integer averageVisitorsMax,
+			@Param("lastSyncTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime lastSyncTimeMin,
+			@Param("lastSyncTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime lastSyncTimeMax,
 			Pageable p);
 
 	@Modifying

@@ -1,7 +1,7 @@
 package com.platformia.winkwide.core.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,8 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -41,16 +39,14 @@ public class Record extends Auditable implements Serializable {
     private String displayName;
            
 	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "start_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
-	private Date startTime;
+	@Column(name = "start_time", nullable = false, columnDefinition = "TIMESTAMP")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime startTime;
 	
 	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "end_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
-	private Date endTime;
+	@Column(name = "end_time", nullable = false, columnDefinition = "TIMESTAMP")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime endTime;
     
 	@Column(name = "display_time")
 	private Long displayTime;

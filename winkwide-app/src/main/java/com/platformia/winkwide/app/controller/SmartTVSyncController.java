@@ -1,7 +1,8 @@
 package com.platformia.winkwide.app.controller;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,9 +85,8 @@ public class SmartTVSyncController {
 			Display display = displayRepo.getOne(dispId);
 
 			// get programs & their media url lists (ONLY Current and Futur Programs)
-			@SuppressWarnings("deprecation")
 			List<Program> programs = programRepo
-					.findByCustomFilters(null, dispId, null, null, new Date(), new Date(2100, 1, 1), null).getContent();
+					.findByCustomFilters(null, dispId, null, null, LocalDateTime.now(), LocalDateTime.of(2100, 1, 1, 0, 0), null).getContent();
 
 			// some sanitization
 			for (Program program : programs) {
@@ -106,7 +106,7 @@ public class SmartTVSyncController {
 			}
 
 			// set display lastProgramsSync time and status (SUCCESS CASE)
-			display.setLastSyncTime(new Date());
+			display.setLastSyncTime(LocalDateTime.now());
 
 			// return programs
 			return ResponseEntity.ok(programs);
@@ -131,8 +131,7 @@ public class SmartTVSyncController {
 			// set records displayId (for security) and displayTime
 			for (Record record : records) {
 				record.setDisplayId(dispId);
-				record.setDisplayTime( Long.valueOf(Math.round( 
-						(record.getEndTime().getTime() - record.getStartTime().getTime()) /1000 )));
+				record.setDisplayTime( record.getStartTime().until(record.getEndTime(), ChronoUnit.SECONDS));
 				try {
 					recordRepo.save(record);
 				} catch (Exception e) {
@@ -141,7 +140,7 @@ public class SmartTVSyncController {
 			}
 
 			// set display lastRecordSync time and status (SUCCESS CASE)
-			display.setLastSyncTime(new Date());
+			display.setLastSyncTime(LocalDateTime.now());
 			displayRepo.save(display);
 
 			// return success message

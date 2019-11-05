@@ -1,5 +1,6 @@
 package com.platformia.winkwide.core.projection;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,9 +15,9 @@ public interface ProgramProjection {
 	   	
 	   	String getName();
 	    
-	   	Date getStartTime();
+	   	LocalDateTime getStartTime();
 	   	
-	   	Date getEndTime();
+	   	LocalDateTime getEndTime();
 	   	
 	    List<Long> getMediaIds();
 	    

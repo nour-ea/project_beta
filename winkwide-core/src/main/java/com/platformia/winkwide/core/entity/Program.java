@@ -1,7 +1,7 @@
 package com.platformia.winkwide.core.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -15,8 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.platformia.winkwide.core.model.Auditable;
@@ -42,16 +40,14 @@ public class Program extends Auditable implements Serializable {
     private String name;
     
 	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "start_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
-	private Date startTime;
+	@Column(name = "start_time", nullable = false, columnDefinition = "TIMESTAMP")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	private LocalDateTime startTime;
 	
 	@Basic
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "end_time", nullable = false)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
-	private Date endTime;
+	@Column(name = "end_time", nullable = false, columnDefinition = "TIMESTAMP")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	private LocalDateTime endTime;
         
     @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinTable(

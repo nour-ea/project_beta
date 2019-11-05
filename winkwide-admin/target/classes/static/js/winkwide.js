@@ -59,8 +59,8 @@ function clearModalAlert(){
 function initiateDateTimePickers(){
 	
 	$(".form_datetime").datetimepicker({
-										format: 'yyyy-mm-dd HH:ii p',
-										startDate: '2018-01-01 00:01 am',
+										format: 'yyyy-mm-dd hh:ii',
+										startDate: '2019-01-01 00:01',
 										userCurrent: true,
 								        autoclose: true,
 										minuteStep: 15});

@@ -1,6 +1,6 @@
 package com.platformia.winkwide.core.repository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +27,10 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 	public Page<Program> findByCustomFilters(
 			@Param("name") String name, 
 			@Param("displayId") Long displayId,
-			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date startTimeMin,
-			@Param("startTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date startTimeMax,
-			@Param("endTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date endTimeMin,
-			@Param("endTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm a") Date endTimeMax,
+			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startTimeMin,
+			@Param("startTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startTimeMax,
+			@Param("endTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endTimeMin,
+			@Param("endTimeMax") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endTimeMax,
 			Pageable p);
 	
 	public Program findByName( String name);

@@ -145,8 +145,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			
 		// Define HTML template for displays lastSyncTime
 		var lastSyncTimeHTML = '<div class="m-1">{{row.entity.lastSyncTime}} <br> <div ng-class="row.entity.syncAlertLevel == \'danger\' ? \'text-danger\' : \'text-success\' "> <i class="fa fa-clock fa-fw"></i> {{\' < \'+row.entity.timeToLastSync+\' hours ago\'}}</div></div>';
-		
-		
+				
 		// Define a function to Get Data Scheme from REST Api
 		$scope.getColumnList = function(){
 			var columnList = [];
@@ -166,7 +165,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 					// ---------------------------------------
 					
 					// enabling filtering only for string fields and boolean
-					else if(value.type=='Date' || value.name=='mac')
+					else if(value.type=='LocalDateTime' || value.name=='mac')
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:150 });
 					else if(value.type=='LocalTime' || value.name=='mac')
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:50 });

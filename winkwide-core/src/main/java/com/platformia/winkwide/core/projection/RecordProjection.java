@@ -1,6 +1,6 @@
 package com.platformia.winkwide.core.projection;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.data.rest.core.config.Projection;
 
@@ -11,9 +11,9 @@ public interface RecordProjection {
 
    	Long getDisplayId();
     
-   	Date getStartTime();
+   	LocalDateTime getStartTime();
    	
-   	Date getEndTime();
+   	LocalDateTime getEndTime();
    	
     Long getMediaId();
 }

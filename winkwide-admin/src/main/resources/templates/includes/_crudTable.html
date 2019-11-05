@@ -34,8 +34,8 @@
 									&& !(targetObject=='playlist' && field.name=='duration')"
 							 class="form-group row">
 						 
-						    <label ng-if="['String','boolean', 'int', 'Long', 'Double', 'BigDecimal', 'Date', 'LocalTime'].includes(field.type)"
-						    		class="col-sm-3 col-form-label">{{field.title}} <span ng-if="field.optional">(optional)</span></label>
+						    <label ng-if="['String','boolean', 'int', 'Long', 'Double', 'BigDecimal', 'LocalDateTime', 'LocalTime'].includes(field.type)"
+						    		class="col-sm-3 col-form-label font-weight-bold">{{field.title}} <span ng-if="field.optional">(optional)</span></label>
 						    
 						    <!-- case of a Textfield-->
 						    <div ng-if="field.type=='String' 
@@ -71,8 +71,8 @@
 								<small ng-show="!objectForm[field.name].$error.required  && objectForm[field.name].$error.pattern && !objectForm[field.name].$pristine" class="text-danger">&nbsp field {{field.title}} must be a decimal </small>				
 							</div>
 																			
-							<!-- case of a Date -->
-						    <div ng-if="field.type=='Date'" class="col-sm-9 input-append date form_datetime row">
+							<!-- case of a LocalDateTime -->
+						    <div ng-if="field.type=='LocalDateTime'" class="col-sm-9 input-append date form_datetime row">
 								<div class="col-sm-10 pr-0">
 								<input type="text" name="{{field.name}}" class="form-control form-control-sm small mt-1 " readonly  placeholder="yyyy-mm-dd hh:mm" ng-model="formData[field.name]" required>
 								</div>
@@ -87,7 +87,7 @@
 						 	
 						 	<!-- case of a LocalTime -->
 						    <div ng-if="field.type=='LocalTime'" class="col-sm-9">
-								<input type="text" class="form-control form-control-sm small mt-1" name="{{field.name}}" ng-model="formData[field.name]" placeholder="hh:mm" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" ng-pattern="/^((2[0-3]|[0-1]?[0-9]):([0-5][0-9]):([0-5][0-9]))$/" required>
+								<input type="text" class="form-control form-control-sm small mt-1" name="{{field.name}}" ng-model="formData[field.name]" placeholder="hh:mm" ng-class="{ 'is-invalid' : objectForm[field.name].$invalid && !objectForm[field.name].$pristine }" ng-pattern="/^((2[0-3]|[0-1]?[0-9]):([0-5][0-9]))$/" required>
 								<small ng-show="objectForm[field.name].$error.required && !objectForm[field.name].$pristine" class="text-danger"> &nbsp field {{field.title}} is required </small>
 								<small ng-show="!objectForm[field.name].$error.required  && objectForm[field.name].$error.pattern && !objectForm[field.name].$pristine" class="text-danger">&nbsp field {{field.title}} must be in a 24h "hh:mm" format </small>
 						 	</div>
@@ -121,7 +121,7 @@
 						<div ng-repeat="field in schema" ng-if="targetObject=='playlist'">
 							<div  ng-if="field.name=='spots'" >
 								<div  class="form-group row" >
-									 <label  class="col-sm-4 col-form-label">Available Verified Medias</label>
+									 <label  class="col-sm-4 col-form-label font-weight-bold">Available Verified Medias <i class="fa fa-image fa-fw"></i><i class="fa fa-check fa-fw text-success"></i></label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -135,7 +135,7 @@
 									 </div>
 								</div>
 								<div  class="form-group row" >
-									 <label  class="col-sm-3 col-form-label">Selected Spots</label>
+									 <label  class="col-sm-3 col-form-label font-weight-bold">Selected Spots <i class="fa fa-image fa-fw"></i> <i class="fa fa-clock fa-fw text-primary"></i></label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -149,7 +149,7 @@
 						<div ng-repeat="field in schema" ng-if="targetObject=='program'">
 							<div  ng-if="field.name=='displays'">
 								<div  class="form-group row" >
-									 <label class="col-sm-3 col-form-label">Available Displays</label>
+									 <label class="col-sm-3 col-form-label font-weight-bold">Available Displays <i class="fa fa-desktop fa-fw"></i></label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -163,7 +163,7 @@
 									 </div>
 								</div>
 								<div  class="form-group row" >
-									 <label class="col-sm-3 col-form-label">Selected Displays</label>
+									 <label class="col-sm-3 col-form-label font-weight-bold">Selected Displays <i class="fa fa-desktop fa-fw"></i> </label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -174,7 +174,7 @@
 							
 							<div  ng-if="field.name=='playlists'">
 								<div  class="form-group row" >		 	
-									 <label class="col-sm-3 col-form-label">Available Playlists</label>
+									 <label class="col-sm-3 col-form-label font-weight-bold">Available Playlists <i class="fa fa-play fa-fw"></i> </label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -188,7 +188,7 @@
 									 </div>
 								</div>
 								<div  class="form-group row" >
-									 <label class="col-sm-3 col-form-label">Selected Playlists</label>
+									 <label class="col-sm-3 col-form-label font-weight-bold">Selected Playlists <i class="fa fa-play fa-fw"></i></label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -205,7 +205,7 @@
 						<div ng-if="targetObject=='media'">
 						
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">File</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">File</label>
 							    <div class="col-sm-9">
 									<input type="file" class="form-control" name="file" id="file" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.file.$invalid && !objectForm.file.$pristine }">
 									<small ng-show="objectForm.file.$invalid && !objectForm.file.$pristine" class="text-danger"> &nbsp field Media File is required </small>
@@ -214,7 +214,7 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Preview</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Preview</label>
 							</div>
 							<div class="form-group row">
 							    <div class="col-sm-12">
@@ -226,7 +226,7 @@
 							</div>
 							<canvas id="thumbnailCanvas" class="d-none"></canvas>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Thumbnail</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Thumbnail</label>
 							    <div class="col-sm-9">
 									<input type="file" class="form-control" name="thumbFile" id="thumbFile" onchange="angular.element(this).scope().previewFile(this)"  ng-class="{ 'is-invalid' : objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine }">
 									<small ng-show="objectForm.thumbFile.$invalid && !objectForm.thumbFile.$pristine" class="text-danger"> &nbsp field Thumbnail is required </small>
@@ -234,13 +234,13 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-sm-3 col-form-label"></label>
+								<label class="col-sm-3 col-form-label font-weight-bold"></label>
 							    <div class="col-sm-9">
 									<img id="thumbPreview" ng-src="{{formData.thumbUrl}}" alt="Thumbnail Preview" class="d-none" style="width:100px">
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Name</label>
 							    <div class="col-sm-9">
 									<input type="text" class="form-control" name="name" ng-model="formData.name" ng-class="{ 'is-invalid' : objectForm.name.$invalid && !objectForm.name.$pristine }" required>
 									<small ng-show="objectForm.name.$invalid && !objectForm.name.$pristine  && objectForm.name.$viewValue==''" class="text-danger"> &nbsp field Name is required </small>
@@ -248,7 +248,7 @@
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Verified</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Verified</label>
 								<div class="col-sm-9">
 									<select type="text" class="form-control" name="verified" ng-model="formData.verified" ng-class="{ 'is-invalid' : objectForm.verified.$invalid && !objectForm.verified.$pristine }" required>
 										<option value="true" ng-selected="formData.verified == true">true</option>
@@ -259,7 +259,7 @@
 								</div> 
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Category</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Category</label>
 							    <div class="col-sm-9">
 									<select type="text" class="form-control" name="category" ng-model="formData.category" ng-class="{ 'is-invalid' : objectForm.category.$invalid && !objectForm.category.$pristine }" required>
 										<option ng-repeat="category in mediaCategories" ng-value="category.name" ng-selected="formData.category==category.name">{{category.name}}</option>
@@ -276,7 +276,7 @@
 						<div ng-if="targetObject=='account'">
 						
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">User Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">User Name</label>
 							    <div class="col-sm-9">
 						            <input type="text" name="userName" class="form-control" placeholder="Email address" ng-model="formData.userName" ng-class="{ 'is-invalid' : objectForm.userName.$invalid && !objectForm.userName.$pristine }" required>
 						            <!-- <small ng-show="objectForm.userName.$invalid && !objectForm.userName.$pristine && (objectForm.userName.$error.email || objectForm.userName.$error.required) " class="text-danger"> &nbsp please enter a valid email </small> -->
@@ -285,7 +285,7 @@
 					        </div>
 					        
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">First Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">First Name</label>
 								<div class="col-sm-9">
 						            <input type="text" name="firstName" class="form-control" placeholder="First name" ng-model="formData.firstName" ng-class="{ 'is-invalid' : objectForm.firstName.$invalid && !objectForm.firstName.$pristine }" required>
 						            <small ng-show="objectForm.firstName.$invalid && !objectForm.firstName.$pristine" class="text-danger"> &nbsp your First name is required </small>
@@ -294,7 +294,7 @@
 				   	        </div>
 				   	        
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Last Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Last Name</label>
 							    <div class="col-sm-9">
 						            <input type="text" name="lastName" class="form-control" placeholder="Last name" ng-model="formData.lastName" ng-class="{ 'is-invalid' : objectForm.lastName.$invalid && !objectForm.lastName.$pristine }" required>
 						            <small ng-show="objectForm.lastName.$invalid && !objectForm.lastName.$pristine" class="text-danger"> &nbsp your last name is required </small>
@@ -303,7 +303,7 @@
 							</div>
 				
 					        <div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Password</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Password</label>
 								<div class="col-md-8" >
 						            <input type="password" name="password" class="form-control" placeholder="{{isCreateModalType ? 'Password' : '********'}}" ng-model="formData.password" ng-minlength="8" ng-maxlength="20" ng-class="{ 'is-invalid' : objectForm.password.$invalid && !objectForm.password.$pristine }" ng-required="isCreateModalType">
 						            <small ng-show="objectForm.password.$error.required && !objectForm.password.$pristine" class="text-danger">&nbsp a password is required </small>
@@ -312,7 +312,7 @@
 							    </div>
 							</div>
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Confirm Password</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Confirm Password</label>
 								<div class="col-md-8" >
 									<input type="password" name="confirmPassword" class="form-control" placeholder="{{isCreateModalType ? 'Confirm Password' : '********'}}" ng-model="formData.confirmPassword" ng-class="{ 'is-invalid' : objectForm.confirmPassword.$invalid && !objectForm.confirmPassword.$pristine }" match-password="objectForm.password" ng-required="isCreateModalType">
 						            <small ng-show="objectForm.confirmPassword.$error.required && !objectForm.confirmPassword.$pristine" class="text-danger"> &nbsp please confirm your password </small>
@@ -321,7 +321,7 @@
 					        </div>
 					        				
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">User Role</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">User Role</label>
 								<div class="col-sm-9">
 									<select type="text" class="form-control" name="userRole" ng-model="formData.userRole" ng-class="{ 'is-invalid' : objectForm.userRole.$invalid && !objectForm.userRole.$pristine }" required>
 										<option value="" disabled selected >-- select an option --</option>
@@ -336,7 +336,7 @@
 							</div>
 							
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Active</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Active</label>
 								<div class="col-sm-9">
 									<select type="text" class="form-control" name="active" ng-model="formData.active" ng-class="{ 'is-invalid' : objectForm.active.$invalid && !objectForm.active.$pristine }" required>
 										<option value="" disabled selected >-- select an option --</option>
@@ -349,7 +349,7 @@
 							</div>
 							
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Conditions Accepted</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Conditions Accepted</label>
 								<div class="col-sm-9">
 									<select type="text" class="form-control" name="conditionsAccepted" ng-model="formData.conditionsAccepted" ng-class="{ 'is-invalid' : objectForm.conditionsAccepted.$invalid && !objectForm.conditionsAccepted.$pristine }" required>
 										<option value="" disabled selected >-- select an option --</option>
@@ -367,7 +367,7 @@
 						<div ng-if="targetObject=='bill'">
 						
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Bill Type</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Bill Type</label>
 								<div class="col-sm-9">
 									<select type="text" class="form-control" name="type" ng-model="formData.type" required>
 										<option value="" disabled selected >-- select an option --</option>
@@ -379,7 +379,7 @@
 				   	        </div>
 						
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Name</label>
 							    <div class="col-sm-9">
 									<input type="text" class="form-control" name="name" ng-model="formData.name" ng-class="{ 'is-invalid' : objectForm.name.$invalid && !objectForm.name.$pristine }" required>
 									<small ng-show="objectForm.name.$invalid && !objectForm.name.$pristine  && objectForm.name.$viewValue==''" class="text-danger"> &nbsp field Name is required </small>
@@ -388,7 +388,7 @@
 							</div>
 				   	        
 							<div class="form-group row" ng-if="formData.type == 'Client Bill'">
-								<label class="col-sm-3 col-form-label">Media Id</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Media Id</label>
 								<div class="col-sm-9">
 									<input type="text" class="form-control" name="mediaId" ng-model="formData.mediaId" ng-pattern="/^[0-9]*$/" ng-class="{ 'is-invalid' : objectForm.mediaId.$invalid && !objectForm.mediaId.$pristine }" 
 									ng-required="formData.type == 'Client Bill'" ng-change="formData.displayId = ''">
@@ -398,7 +398,7 @@
 				   	        </div>
 				   	        
 				   	        <div class="form-group row" ng-if="formData.type == 'Partner Bill'">
-								<label class="col-sm-3 col-form-label">Display Id</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Display Id</label>
 								<div class="col-sm-9">
 									<input type="text" class="form-control" name="displayId" ng-model="formData.displayId" ng-pattern="/^[0-9]*$/" ng-class="{ 'is-invalid' : objectForm.displayId.$invalid && !objectForm.displayId.$pristine }" 
 									ng-required="formData.type == 'Partner Bill'" ng-change="formData.mediaId = ''">
@@ -408,7 +408,7 @@
 				   	        </div>
 					        
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Start Time</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Start Time</label>
 								<div class="col-sm-9 input-append date form_datetime row">
 									<div class="col-sm-9 pr-0">
 										<input type="text" name="startTime" class="form-control form-control-sm small mt-1 " readonly  placeholder="yyyy-mm-dd hh:mm" ng-model="formData.startTime" required>
@@ -424,7 +424,7 @@
 				   	        </div>
 				   	        
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">End Time</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">End Time</label>
 								<div class="col-sm-9 input-append date form_datetime row">
 									<div class="col-sm-9 pr-0">
 										<input type="text" name="endTime" class="form-control form-control-sm small mt-1 " readonly  placeholder="yyyy-mm-dd hh:mm" ng-model="formData.endTime" required>
@@ -440,7 +440,7 @@
 				   	        </div>
 				   	  
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">CPM</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">CPM</label>
 								<div class="col-sm-9">
 									<input type="text" class="form-control" name="cpm" ng-model="formData.cpm" ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" ng-class="{ 'is-invalid' : objectForm.cpm.$invalid && !objectForm.cpm.$pristine }" required>
 									<small ng-show="objectForm.cpm.$error.required && !objectForm.cpm.$pristine" class="text-danger"> &nbsp field CPM is required </small>
@@ -450,7 +450,7 @@
 				   	        </div>
 				   	        
 				   	        <div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Average Attention Rate (optional override)</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Average Attention Rate (optional override)</label>
 								<div class="col-sm-9">
 									<input type="text" class="form-control" name="averageAttentionRate" ng-model="formData.averageAttentionRate" ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" ng-class="{ 'is-invalid' : objectForm.averageAttentionRate.$invalid && !objectForm.averageAttentionRate.$pristine }">
 									<small ng-show="!objectForm.averageAttentionRate.$error.required  && objectForm.averageAttentionRate.$error.pattern && !objectForm.averageAttentionRate.$pristine" class="text-danger">&nbsp field Average Attention Rate must be a decimal </small>
@@ -491,9 +491,9 @@
 					<!-- ------------------------------------- -->
 						
 					<div ng-repeat="field in schema" ng-if="targetObject!='media' && targetObject!='account' && targetObject!='bill' " class="form-group row">
-						<label ng-if="['String','boolean', 'int', 'Long', 'Double', 'BigDecimal', 'Date', 'LocalTime'].includes(field.type)" 
-							class="col-sm-3 col-form-label">{{field.title}}</label>
-						<div ng-if="['String','boolean', 'int', 'Long', 'Double', 'BigDecimal', 'Date', 'LocalTime'].includes(field.type)" 
+						<label ng-if="['String','boolean', 'int', 'Long', 'Double', 'BigDecimal', 'LocalDateTime', 'LocalTime'].includes(field.type)" 
+							class="col-sm-3 col-form-label font-weight-bold">{{field.title}}</label>
+						<div ng-if="['String','boolean', 'int', 'Long', 'Double', 'BigDecimal', 'LocalDateTime', 'LocalTime'].includes(field.type)" 
 							class="col-sm-9">
 							<div class="form-control">{{formData[field.name]}}</div>
 						</div>
@@ -506,7 +506,7 @@
 						<div ng-repeat="field in schema" ng-if="targetObject=='playlist'">
 							<div  ng-if="field.name=='spots'" >
 								<div  class="form-group row" >
-									 <label  class="col-sm-3 col-form-label">Selected Spots</label>
+									 <label  class="col-sm-3 col-form-label font-weight-bold">Selected Spots <i class="fa fa-image fa-fw"></i> <i class="fa fa-clock fa-fw text-primary"></i></label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -520,7 +520,7 @@
 						<div ng-repeat="field in schema" ng-if="targetObject=='program'">
 							<div  ng-if="field.name=='displays'">
 								<div  class="form-group row" >
-									 <label class="col-sm-3 col-form-label">Selected Displays</label>
+									 <label class="col-sm-3 col-form-label font-weight-bold">Selected Displays <i class="fa fa-desktop fa-fw"></i> </label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -531,7 +531,7 @@
 							
 							<div  ng-if="field.name=='playlists'">
 								<div  class="form-group row" >
-									 <label class="col-sm-3 col-form-label">Selected Playlists</label>
+									 <label class="col-sm-3 col-form-label font-weight-bold">Selected Playlists <i class="fa fa-play fa-fw"></i> </label>
 								</div>
 								<div  class="form-group row" >
 									 <div class="col-sm-12">
@@ -548,13 +548,13 @@
 					<!-- case of a Media -->
 					<div ng-if="targetObject=='media'">
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Id</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Id</label>
 							    <div class="col-sm-9">
 									<div class="form-control">{{formData.id}}</div>
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Preview</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Preview</label>
 							</div>
 							<div class="form-group row">						
 							    <div class="col-sm-12">
@@ -565,31 +565,31 @@
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Thumbnail</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Thumbnail</label>
 							    <div class="col-sm-9">
 									<img id="thumbPreview" ng-src="{{formData.thumbUrl}}" alt="Thumbnail Preview" class="d-none" style="width:100px">
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Name</label>
 							    <div class="col-sm-9">
 									<div class="form-control">{{formData.name}}</div>
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Verified</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Verified</label>
 								<div class="col-sm-9">
 									<div class="form-control">{{formData.verified}}</div>
 								</div> 
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Category</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Category</label>
 							    <div class="col-sm-9">
 									<div class="form-control">{{formData.category}}</div>
 								</div>
 							</div>
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Download Media File</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Download Media File</label>
 							    <div class="col-sm-9">
 									<a href="{{formData.url}}" download="media_{{formData.id}}_{{formData.name}}" class="btn btn-block btn-success float-left">
 											<i class="fa fa-download"></i>&nbsp; Download file
@@ -601,35 +601,35 @@
 						<!-- case of a Account -->
 						<div ng-if="targetObject=='account'">
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Id</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Id</label>
 							    <div class="col-sm-9">
 									<div class="form-control">{{formData.id}}</div>
 								</div>
 							</div>
 							
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">User Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">User Name</label>
 							    <div class="col-sm-9">
 							    	<div class="form-control">{{formData.userName}}</div>
 				 	            </div>
 					        </div>
 					        
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">First Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">First Name</label>
 								<div class="col-sm-9">
 									<div class="form-control">{{formData.firstName}}</div>
 					           	</div>
 				   	        </div>
 				   	        
 							<div class="form-group row" >
-								<label class="col-sm-3 col-form-label">Last Name</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Last Name</label>
 							    <div class="col-sm-9">
 							    	<div class="form-control">{{formData.lastName}}</div>
 					   	        </div>
 							</div>
 					        				
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">User Role</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">User Role</label>
 								<div class="col-sm-9">
 									<div class="form-control" ng-if="formData.userRole == 'ROLE_ADMIN'">Admin</div>
 									<div class="form-control" ng-if="formData.userRole == 'ROLE_CLIENT'">Client</div>
@@ -639,14 +639,14 @@
 							</div>
 							
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Active</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Active</label>
 								<div class="col-sm-9">
 									<div class="form-control">{{formData.active}}</div>
 								</div> 
 							</div>
 							
 							<div class="form-group row">						
-								<label class="col-sm-3 col-form-label">Conditions Accepted</label>
+								<label class="col-sm-3 col-form-label font-weight-bold">Conditions Accepted</label>
 								<div class="col-sm-9">
 									<div class="form-control">{{formData.conditionsAccepted}}</div>
 								</div> 
@@ -658,14 +658,14 @@
 					<!-- case of a Bill -->
 					<div ng-if="targetObject=='bill'">
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Id</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Id</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.id}}</div>
 							</div>
 						</div>
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Name</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Name</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.name}}</div>
 							</div>
@@ -673,67 +673,67 @@
 
 						<hr>
 						<div class="form-group row">						
-							<label class="col-sm-6 col-form-label font-weight-bold">Billing Parameters</label>
+							<label class="col-sm-6 col-form-label font-weight-bold font-weight-bold text-primary">Billing Parameters</label>
 						</div>	
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Type</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Type</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.type}}</div>
 							</div>
 						</div>
 												
 						<div class="form-group row" ng-if="formData.type == 'Client Bill'">						
-							<label class="col-sm-3 col-form-label">Media Id</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Media Id</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.mediaId}}</div>
 							</div>
 						</div>						
 
 						<div class="form-group row" ng-if="formData.type == 'Client Bill'">						
-							<label class="col-sm-3 col-form-label">Media Name</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Media Name</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.mediaName}}</div>
 							</div>
 						</div>
 						
 						<div class="form-group row" ng-if="formData.type == 'Partner Bill'">						
-							<label class="col-sm-3 col-form-label">Display Id</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Display Id</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.displayId}}</div>
 							</div>
 						</div>
 						
 						<div class="form-group row" ng-if="formData.type == 'Partner Bill'">						
-							<label class="col-sm-3 col-form-label">Display Name</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Display Name</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.displayName}}</div>
 							</div>
 						</div>
 												
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Start Time</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Start Time</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.startTime}}</div>
 							</div>
 						</div>
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">End Time</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">End Time</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.endTime}}</div>
 							</div>
 						</div>
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Id</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Id</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.id}}</div>
 							</div>
 						</div>
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">CPM</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">CPM</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.cpm}}</div>
 							</div>
@@ -741,69 +741,77 @@
 
 						<hr>
 						<div class="form-group row">						
-							<label class="col-sm-6 col-form-label font-weight-bold">Calculated Metrics</label>
+							<label class="col-sm-6 col-form-label font-weight-bold font-weight-bold text-primary">Calculated Metrics</label>
 						</div>						
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Average Attention Rate</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Average Attention Rate</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.averageAttentionRate}}</div>
 							</div>
 						</div>
 
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Average Display Audience</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Average Display Audience</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.averageDisplayAudience}}</div>
 							</div>
 						</div>						
 						
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Total Displays</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Total Displays</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.totalDisplays}}</div>
 							</div>
 						</div>						
 
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Total Display Time</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Total Display Time</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.totalDisplayTime}}</div>
 							</div>
 						</div>						
 
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Estimated Impressions</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Total Spots</label>
+						    <div class="col-sm-9">
+								<div class="form-control">{{formData.totalSpots}}</div>
+							</div>
+						</div>						
+
+						<div class="form-group row">						
+							<label class="col-sm-3 col-form-label font-weight-bold">Estimated Impressions</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.estimatedImpressions}}</div>
 							</div>
 						</div>		
 
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Estimated Reach</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Estimated Reach</label>
 						    <div class="col-sm-9">
 								<div class="form-control">{{formData.estimatedReach}}</div>
 							</div>
 						</div>		
 
+						<hr>
 						<div class="form-group row">						
-							<label class="col-sm-6 col-form-label font-weight-bold">Calculated Amount</label>
+							<label class="col-sm-6 col-form-label font-weight-bold font-weight-bold text-primary">Calculated Amount</label>
 						</div>				
 
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Total Amount</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Total Amount</label>
 						    <div class="col-sm-9">
-								<div class="form-control">{{formData.totalAmount}}</div>
+								<div class="form-control font-weight-bold">{{formData.totalAmount}}</div>
 							</div>
 						</div>							
 							
 						<hr>
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label font-weight-bold">Generated Bill File</label>
+							<label class="col-sm-3 col-form-label font-weight-bold font-weight-bold text-primary">Generated File</label>
 						</div>		
 
 						<div class="form-group row">						
-							<label class="col-sm-3 col-form-label">Download Detailed Bill</label>
+							<label class="col-sm-3 col-form-label font-weight-bold">Download Detailed Bill</label>
 						    <div class="col-sm-9">
 								<a href="{{formData.url}}" download="bill_{{formData.id}}_{{formData.name}}" class="btn btn-block btn-success float-left">
 										<i class="fa fa-download"></i>&nbsp; Download file

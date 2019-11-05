@@ -188,6 +188,11 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 					createLog('debug', 'setting current programs playlist timeout : '+ $scope.currentPlaylistTimeout);
 					$scope.stopCurrentPlaylistPID = setTimeout( $scope.stopCurrentPlaylist, $scope.currentPlaylistTimeout);
 
+					//if current Playlist empty return
+					if($scope.currentPlaylist.spots.length == 0){
+						createLog('debug', 'Current Playlist is empty, waiting for next Run cycle');
+						return;						
+					}
 					//display spots media
 					$scope.currentSpot = $scope.currentPlaylist.spots[0];
 					$scope.showNextMedia($scope.currentSpot.media);
@@ -201,8 +206,8 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 							//write record if recording active
 							if($scope.recordingActive)
 								$scope.records.push({ 
-									startTime: startTime.format('YYYY-MM-DD HH:mm:ss a'), 
-									endTime: moment().format('YYYY-MM-DD HH:mm:ss a'),
+									startTime: startTime.format('YYYY-MM-DD HH:mm:ss'), 
+									endTime: moment().format('YYYY-MM-DD HH:mm:ss'),
 									displayId: $scope.displayId, displayName: $scope.displayName,
 									mediaId: $scope.currentSpot.media.id, mediaName: $scope.currentSpot.media.name  });
 							
@@ -254,7 +259,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 
 		//Filter programs to only current ones
 		let currentPrograms = $scope.programs.filter(function(program){
-			return moment().isBetween( moment(program.startTime, 'YYYY-MM-DD HH:mm a') , moment(program.endTime, 'YYYY-MM-DD HH:mm a') );
+			return moment().isBetween( moment(program.startTime, 'YYYY-MM-DD HH:mm') , moment(program.endTime, 'YYYY-MM-DD HH:mm') );
 		});
 		
 		//reset playlist spots
@@ -264,7 +269,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		angular.forEach(currentPrograms, function(program) {
 			
 			//Set Timeout to the minimal one (and never more than 20 days / largest integer in milliseconds)
-			$scope.currentPlaylistTimeout =  Math.min( $scope.currentPlaylistTimeout, moment(program.endTime, 'YYYY-MM-DD HH:mm a').diff(moment())); 
+			$scope.currentPlaylistTimeout =  Math.min( $scope.currentPlaylistTimeout, moment(program.endTime, 'YYYY-MM-DD HH:mm').diff(moment())); 
 			
 			//Merge current programs playlists
 			angular.forEach(program.playlists, function(playlist) {
@@ -836,8 +841,8 @@ function createLog(type, message){
 	
 	if(debugModeActive){
 		switch(type){		
-			case 'debug': console.log(moment().format('YYYY-MM-DD HH:mm:ss a') + ' : DEBUG : '+ message); break;
-			case 'error': console.error(moment().format('YYYY-MM-DD HH:mm:ss a') + ' : ERROR : '+ message); break;
+			case 'debug': console.log(moment().format('YYYY-MM-DD HH:mm:ss') + ' : DEBUG : '+ message); break;
+			case 'error': console.error(moment().format('YYYY-MM-DD HH:mm:ss') + ' : ERROR : '+ message); break;
 		}
 	}
 
@@ -846,8 +851,8 @@ function createLog(type, message){
 		var storedLogs = localStorage.getItem('storedLogs');
 		
 		switch(type){		
-		case 'debug': storedLogs += '\n' + moment().format('YYYY-MM-DD HH:mm:ss a') + ' : DEBUG : '+ message; break;
-		case 'error': storedLogs += '\n' + moment().format('YYYY-MM-DD HH:mm:ss a') + ' : ERROR : '+ message; break;
+		case 'debug': storedLogs += '\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' : DEBUG : '+ message; break;
+		case 'error': storedLogs += '\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' : ERROR : '+ message; break;
 		}			
 		
 		localStorage.setItem('storedLogs', storedLogs);
