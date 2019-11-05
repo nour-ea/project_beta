@@ -29,8 +29,6 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
 			@Param("durationMax") Long durationMax,
 			Pageable p);
 
-	 
-	@Query("select c from #{#entityName} c where c.playlist.id = :playListId")
 	public List<Spot> findByPlaylistId(@Param("playListId") Long playListId);				
 			
 }

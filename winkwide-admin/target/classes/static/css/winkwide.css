@@ -7,6 +7,10 @@ html, body {
   color: #0079bf !important;
 }
 
+.bg-primary {
+  background-color: #0079bf !important;
+}
+
 .text-secondary {
   color: #B8FEEF !important;
 }

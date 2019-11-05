@@ -34,7 +34,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 			Pageable p);	
 	
 	
-	@Query("select c from #{#entityName} c where c.userName = :userName")
 	public Account findByUserName(@Param("userName") String userName);	
 	
 }

@@ -60,13 +60,18 @@ public class DisplaySaveValidator implements Validator {
 		
 		// Check the fields of display.
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty.display.name");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "category", "NotEmpty.display.category");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "area", "NotEmpty.display.area");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "phone", "NotEmpty.display.phone");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "NotEmpty.display.address");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "brand", "NotEmpty.display.brand");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "size", "NotEmpty.display.size");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mac", "NotEmpty.display.mac");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "smart", "NotEmpty.display.smart");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "averageAudience", "NotEmpty.display.averageAudience");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "weekdayAudience", "NotEmpty.display.weekdayAudience");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "holidayAudience", "NotEmpty.display.holidayAudience");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "weekdayVisitors", "NotEmpty.display.weekdayVisitors");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "holidayVisitors", "NotEmpty.display.holidayVisitors");
 		
 		// Check mac adress format
 		if (display.getMac() != null) {

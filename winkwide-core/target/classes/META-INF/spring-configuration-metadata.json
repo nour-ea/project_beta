@@ -25,6 +25,11 @@
   "properties": [
     {
       "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
+      "name": "file.billing-dir",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.FileStorageProperties",
       "name": "file.log-dir",
       "type": "java.lang.String"
     },
@@ -42,6 +47,11 @@
       "sourceType": "com.platformia.winkwide.core.utils.MachineAccountProperties",
       "name": "machine.default-password",
       "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "name": "winkwide.admin.settings.display-sync-warning-delay",
+      "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
@@ -70,6 +80,11 @@
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.alternate-media-categories",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
       "name": "winkwide.app.settings.auto-off-time",
       "type": "java.lang.String"
     },
@@ -90,17 +105,17 @@
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "name": "winkwide.app.settings.recording-active",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
       "name": "winkwide.app.settings.refresh-period",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
       "name": "winkwide.app.settings.remote-logging-active",
-      "type": "java.lang.Boolean"
-    },
-    {
-      "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
-      "name": "winkwide.app.settings.reporting-active",
       "type": "java.lang.Boolean"
     },
     {

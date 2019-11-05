@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -43,12 +42,12 @@ public class Display extends Auditable implements Serializable {
     
     @Column(name = "name", length = 128, nullable = false, unique=true)
     private String name;
+
+    @Column(name = "category", length = 128, nullable = false)
+    private String category;
     
-    @Column(name = "areas", length = 128, nullable = false)
+    @Column(name = "area", length = 128, nullable = false)
     private String area;
-    
-    @Column(name = "average_audience", nullable = false)
-    private int averageAudience;
     
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
@@ -56,13 +55,28 @@ public class Display extends Auditable implements Serializable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
 	private Date lastSyncTime;
     
+    @Column(name = "weekday_audience", nullable = false)
+    private int weekdayAudience;
+    
+    @Column(name = "holiday_audience", nullable = false)
+    private int holidayAudience;
+
+    @Column(name = "weekday_visitors", nullable = false)
+    private int weekdayVisitors;
+    
+    @Column(name = "holiday_Visitors", nullable = false)
+    private int holidayVisitors;
+    
+    @Column(name = "phone", length = 128, nullable = false)
+    private String phone;
+	
     @Column(name = "address", length = 128, nullable = false)
     private String address;
     
-    @Column(name = "longitude", columnDefinition = "DECIMAL")
+    @Column(name = "longitude", columnDefinition = "DECIMAL(10,5)")
     private BigDecimal longitude;
     
-    @Column(name = "latitude", columnDefinition = "DECIMAL")
+    @Column(name = "latitude", columnDefinition = "DECIMAL(10,5)")
     private BigDecimal latitude;
     
     @Column(name = "brand", length = 128, nullable = false)
@@ -78,10 +92,6 @@ public class Display extends Auditable implements Serializable {
     private boolean smart;
  
     @ManyToMany(mappedBy = "displays", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-    private List<Program> programs;
-    
-    @OneToMany(mappedBy="display")
-    private List<Report> reports;
-    
+    private List<Program> programs;    
 	
 }

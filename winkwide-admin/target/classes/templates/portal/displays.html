@@ -35,33 +35,6 @@
 							<!-- add specific filters here -->
 							<div class="form-row pt-2" ng-form name="specificForm">
 			
-								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
-									<small>Filter by size (inches)</small>
-									<div>
-										<input type="text" name="sizeMin" class="form-control form-control-sm mt-1" placeholder="min size" 
-											ng-model="specificFilters.sizeMin" ng-change="setGridData()"
-											ng-pattern="/^[0-9]*$/" >
-											<small ng-show="specificForm.sizeMin.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
-										<input type="text" name="sizeMax" class="form-control form-control-sm mt-1" placeholder="max size"
-											ng-model="specificFilters.sizeMax" ng-change="setGridData()"
-											ng-pattern="/^[0-9]*$/" >
-											<small ng-show="specificForm.sizeMax.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
-									</div>
-								</div>
-								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
-									<small>Filter by average audience</small>
-									<div>
-										<input type="text" name="averageAudienceMin" class="form-control form-control-sm mt-1" placeholder="min average audience" 
-											ng-model="specificFilters.averageAudienceMin" ng-change="setGridData()"
-											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
-											<small ng-show="specificForm.averageAudienceMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
-										<input type="text" name="averageAudienceMax" class="form-control form-control-sm mt-1" placeholder="max average audience"
-											ng-model="specificFilters.averageAudienceMax" ng-change="setGridData()"
-											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
-											<small ng-show="specificForm.averageAudienceMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
-											
-									</div>
-								</div>
 								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-3">
 									<small>Filter by last sync time</small>
 									<div class="input-append date form_datetime row">
@@ -89,6 +62,37 @@
     										</div>																											
 									</div>
 								</div>
+								
+								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+									<small>Filter by average audience</small>
+									<div>
+										<input type="text" name="averageAudienceMin" class="form-control form-control-sm mt-1" placeholder="min average audience" 
+											ng-model="specificFilters.averageAudienceMin" ng-change="setGridData()"
+											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
+											<small ng-show="specificForm.averageAudienceMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
+										<input type="text" name="averageAudienceMax" class="form-control form-control-sm mt-1" placeholder="max average audience"
+											ng-model="specificFilters.averageAudienceMax" ng-change="setGridData()"
+											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
+											<small ng-show="specificForm.averageAudienceMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
+											
+									</div>
+								</div>
+								
+								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+									<small>Filter by average daily visitors</small>
+									<div>
+										<input type="text" name="averageVisitorsMin" class="form-control form-control-sm mt-1" placeholder="min average audience" 
+											ng-model="specificFilters.averageVisitorsMin" ng-change="setGridData()"
+											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
+											<small ng-show="specificForm.averageVisitorsMin.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>											
+										<input type="text" name="averageVisitorsMax" class="form-control form-control-sm mt-1" placeholder="max average audience"
+											ng-model="specificFilters.averageVisitorsMax" ng-change="setGridData()"
+											ng-pattern="/^[0-9]{1,7}(\.[0-9]+)?$/" >
+											<small ng-show="specificForm.averageVisitorsMax.$error.pattern" class="text-danger">&nbsp field must be a decimal </small>				
+											
+									</div>
+								</div>
+
 								
 			
 								<div class="ml-auto col-lg-2 col-md-2 col-sm-6 mb-2 mb-md-0">

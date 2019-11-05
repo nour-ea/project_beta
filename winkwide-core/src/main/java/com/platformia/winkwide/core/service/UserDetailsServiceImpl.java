@@ -57,8 +57,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 account.getEncrytedPassword(), enabled, accountNonExpired, //
                 credentialsNonExpired, accountNonLocked, grantList);
         
-        //put account name in session
-        session.setAttribute("accountName", account.getFirstName());
+        //put account name and id in session
+        session.setAttribute("accountId", account.getId());
+        session.setAttribute("accountUserName", account.getUserName());
+        session.setAttribute("accountFirstName", account.getFirstName());
+        session.setAttribute("accountLastName", account.getLastName());
+        session.setAttribute("accountUserRole", account.getUserRole());
          
         return userDetails;
     }

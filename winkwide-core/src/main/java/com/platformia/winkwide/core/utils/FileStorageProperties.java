@@ -17,5 +17,7 @@ public class FileStorageProperties {
 	private String uploadDir;
 	
 	private String logDir;
+	
+	private String billingDir;
     
 }

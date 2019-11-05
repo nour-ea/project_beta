@@ -16,15 +16,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.platformia.winkwide.core.entity.Display;
+import com.platformia.winkwide.core.entity.MediaCategory;
 import com.platformia.winkwide.core.entity.Playlist;
 import com.platformia.winkwide.core.entity.Program;
-import com.platformia.winkwide.core.entity.Report;
+import com.platformia.winkwide.core.entity.Record;
 import com.platformia.winkwide.core.entity.Spot;
 import com.platformia.winkwide.core.repository.DisplayRepository;
+import com.platformia.winkwide.core.repository.MediaCategoryRepository;
 import com.platformia.winkwide.core.repository.MediaRepository;
 import com.platformia.winkwide.core.repository.PlaylistRepository;
 import com.platformia.winkwide.core.repository.ProgramRepository;
-import com.platformia.winkwide.core.repository.ReportRepository;
+import com.platformia.winkwide.core.repository.RecordRepository;
 import com.platformia.winkwide.core.service.FileStorageService;
 import com.platformia.winkwide.core.utils.AppSettingsProperties;
 
@@ -34,33 +36,44 @@ public class SmartTVSyncController {
 
 	private final DisplayRepository displayRepo;
 	private final MediaRepository mediaRepo;
+	private final MediaCategoryRepository mediaCategoryRepo;
 	private final PlaylistRepository playlistRepo;
 	private final ProgramRepository programRepo;
-	private final ReportRepository reportRepo;
+	private final RecordRepository recordRepo;
 
 	@Autowired
-	public SmartTVSyncController(DisplayRepository dRepo, MediaRepository mRepo, PlaylistRepository plRepo,
-			ProgramRepository pRepo, ReportRepository rRepo) {
+	public SmartTVSyncController(DisplayRepository dRepo, MediaRepository mRepo, MediaCategoryRepository mCatRepo,
+			PlaylistRepository plRepo, ProgramRepository pRepo, RecordRepository rRepo) {
 		displayRepo = dRepo;
 		mediaRepo = mRepo;
+		mediaCategoryRepo = mCatRepo;
 		playlistRepo = plRepo;
 		programRepo = pRepo;
-		reportRepo = rRepo;
+		recordRepo = rRepo;
 	}
-	
+
 	@Autowired
 	AppSettingsProperties appSettingsProperties;
-	
+
 	@Autowired
 	private FileStorageService fileStorageService;
 
 	@GetMapping("sync/settings")
 	public @ResponseBody ResponseEntity<?> getSettings() {
-		
+
 		// return settings
 		return ResponseEntity.ok(appSettingsProperties);
-		}
-	
+	}
+
+	@GetMapping("sync/mediaCategories")
+	public @ResponseBody ResponseEntity<?> getMediaCategories() {
+
+		// return all Media Categories
+		ArrayList<MediaCategory> mediaCategories = (ArrayList<MediaCategory>) mediaCategoryRepo.findAll();
+				
+		return ResponseEntity.ok(mediaCategories);
+	}
+
 	@GetMapping("sync/programs")
 	public @ResponseBody ResponseEntity<?> getPrograms() {
 
@@ -75,20 +88,19 @@ public class SmartTVSyncController {
 			List<Program> programs = programRepo
 					.findByCustomFilters(null, dispId, null, null, new Date(), new Date(2100, 1, 1), null).getContent();
 
- 
-			//some sanitization
+			// some sanitization
 			for (Program program : programs) {
-				// avoiding Lazy Loading versus Jackson serialization problem by setting displays to null
+				// avoiding Lazy Loading versus Jackson serialization problem by setting
+				// displays to null
 				program.setDisplays(null);
-				
-				// removing the infinite object encapsulation problem (setting programs and sposts.playlists & sposts.media.spots to null)
+
+				// removing the infinite object encapsulation problem (setting programs and
+				// sposts.playlists & sposts.media.spots to null)
 				for (Playlist playlist : program.getPlaylists()) {
 					playlist.setPrograms(null);
 					for (Spot spot : playlist.getSpots()) {
 						spot.setPlaylist(null);
 						spot.getMedia().setSpots(null);
-						spot.getMedia().setReports(null);
-						
 					}
 				}
 			}
@@ -107,26 +119,28 @@ public class SmartTVSyncController {
 
 	}
 
-	@PostMapping("sync/reports")
-	public @ResponseBody ResponseEntity<?> updateReports(@RequestBody ArrayList<Report> reports) {
+	@PostMapping("sync/records")
+	public @ResponseBody ResponseEntity<?> updateRecords(@RequestBody ArrayList<Record> records) {
 
 		try {
 
 			// identify display
 			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
 			Display display = displayRepo.getOne(dispId);
-			
-			// set reports
-			for (Report report : reports) {
-				report.setDisplay(display);
+
+			// set records displayId (for security) and displayTime
+			for (Record record : records) {
+				record.setDisplayId(dispId);
+				record.setDisplayTime( Long.valueOf(Math.round( 
+						(record.getEndTime().getTime() - record.getStartTime().getTime()) /1000 )));
 				try {
-					reportRepo.save(report);
+					recordRepo.save(record);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 
-			// set display lastReportSync time and status (SUCCESS CASE)
+			// set display lastRecordSync time and status (SUCCESS CASE)
 			display.setLastSyncTime(new Date());
 			displayRepo.save(display);
 
@@ -141,21 +155,25 @@ public class SmartTVSyncController {
 
 	}
 
-	@GetMapping("sync/displayId")
-	public @ResponseBody ResponseEntity<?> getDisplayId() {
+	@GetMapping("sync/display")
+	public @ResponseBody ResponseEntity<?> getDisplay() {
 
 		try {
 
 			// identify display
 			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-			// Display display = displayRepo.getOne(dispId);
+			Display display = displayRepo.getOne(dispId);
+			Display returnedDisplay = new Display();
+			
+			returnedDisplay.setId(dispId);
+			returnedDisplay.setName(display.getName());
 
 			// check if the mac adress is correct
 			// ----
 			// ----
 
 			// return programs
-			return ResponseEntity.ok(dispId);
+			return ResponseEntity.ok(returnedDisplay);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -164,26 +182,26 @@ public class SmartTVSyncController {
 		}
 
 	}
-	
+
 	@PostMapping("sync/logs")
 	public @ResponseBody ResponseEntity<?> saveLogs(@RequestBody String logs) {
-		
+
 		try {
 			// identify display
 			Long dispId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-			
-			//write logs
+
+			// write logs
 			fileStorageService.writeTextInLogFile("display_" + dispId, logs);
-			
+
 			// return success message
 			return new ResponseEntity<>(HttpStatus.OK);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
 		}
-		
+
 	}
 
 }

@@ -64,7 +64,4 @@ public class Media extends Auditable implements Serializable {
     @OnDelete(action=OnDeleteAction.CASCADE)
     private List<Spot> spots;
     
-    @OneToMany(mappedBy="media", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-    private List<Report> reports;
-    
 }

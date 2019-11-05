@@ -62,9 +62,14 @@ public class MainController {
 		return "portal/programs";
 	}
 
-	@RequestMapping("/portal/reports")
+	@RequestMapping("/portal/records")
 	public String reports() {
-		return "portal/reports";
+		return "portal/records";
+	}
+	
+	@RequestMapping("/portal/billing")
+	public String billing() {
+		return "portal/billing";
 	}
 	
 	@RequestMapping("/portal/settings")

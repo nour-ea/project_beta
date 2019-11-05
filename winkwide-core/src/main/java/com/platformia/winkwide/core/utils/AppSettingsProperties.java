@@ -15,11 +15,12 @@ public class AppSettingsProperties {
 	//WinkWide App Settings
 	private int syncPeriod;
 	private int refreshPeriod;
-	private boolean reportingActive;
+	private boolean recordingActive;
 	private boolean remoteLoggingActive;
 	private boolean offlineModeActive;
 	private boolean autoSleepActive;
 	private String autoOnTime;
 	private String autoOffTime;
+	private boolean alternateMediaCategories;
 
 }

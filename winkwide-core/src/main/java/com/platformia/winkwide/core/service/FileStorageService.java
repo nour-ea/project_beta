@@ -2,6 +2,7 @@ package com.platformia.winkwide.core.service;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,14 +30,18 @@ public class FileStorageService {
 
 
 	private final FileStorageProperties fileStorageProperties;
+	private final Path rootStorageLocation;
 	private final Path uploadsStorageLocation;
 	private final Path logsStorageLocation;
+	private final Path billingStorageLocation;
 
 	@Autowired
 	public FileStorageService(FileStorageProperties fsp) {
 		this.fileStorageProperties = fsp;
+		this.rootStorageLocation = Paths.get(this.fileStorageProperties.getRootDir()).toAbsolutePath().normalize();
 		this.uploadsStorageLocation = Paths.get(this.fileStorageProperties.getRootDir(), this.fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
 		this.logsStorageLocation = Paths.get(this.fileStorageProperties.getRootDir(), this.fileStorageProperties.getLogDir()).toAbsolutePath().normalize();
+		this.billingStorageLocation = Paths.get(this.fileStorageProperties.getRootDir(), this.fileStorageProperties.getBillingDir()).toAbsolutePath().normalize();
 
 		try {
 			Files.createDirectories(this.uploadsStorageLocation);
@@ -46,7 +52,7 @@ public class FileStorageService {
 		}
 	}
 
-	public FileProperties storeFile(String name, String location, MultipartFile file) {
+	public FileProperties storeMediaFile(String name, String location, MultipartFile file) {
 
 		FileProperties fileProperties = new FileProperties();
 		
@@ -91,13 +97,49 @@ public class FileStorageService {
             throw new FileStorageException("Could not store file " + fileName + ". Please try again or contact your Admin!", ex);
         }
     }
+	
+	public FileProperties storeBillFile(String name, String location, Workbook workbook) {
 
-	public void deleteFile(String url) {
+        try {
+        	
+        	FileProperties fileProperties = new FileProperties();
+        	
+            //Generate random path and calendar folders
+            String random = RandomStringUtils.randomAlphanumeric(10);
+            String year = new SimpleDateFormat("YYYY").format(Calendar.getInstance().getTime());
+            String month = new SimpleDateFormat("MMM").format(Calendar.getInstance().getTime());
+
+            // Build Target Location (relative and absolute)
+            Path relativeTargetLocation = Paths.get(location, year, month, random +"_"+ name);
+            Path targetLocation = Paths.get(this.billingStorageLocation.toString(), relativeTargetLocation.toString());
+            
+            // Create target Folder
+            FileUtils.forceMkdirParent(new File(targetLocation.toString()) );
+            
+            //write Workbook File
+            FileOutputStream outputStream = new FileOutputStream(targetLocation.toString());
+    		workbook.write(outputStream);
+    		workbook.close();
+
+            String url = Paths.get(fileStorageProperties.getBillingDir(), relativeTargetLocation.toString()).toString();
+            System.out.println("stored file :" + url);
+            
+            //Populate fileProperties
+            fileProperties.setUrl(url);
+            
+            return fileProperties;
+            
+        } catch (Exception ex) {
+            throw new FileStorageException("Could not store file " + name + ". Please try again or contact your Admin!", ex);
+        }
+    }
+	
+	public void deleteMediaFile(String url) {
 
 
         try {
             // Build Target Location
-        	Path targetLocation = Paths.get(this.uploadsStorageLocation.toString(), url);
+        	Path targetLocation = Paths.get(this.rootStorageLocation.toString(), url);
             
             // Delete File
         	if(Files.exists(targetLocation)) {
@@ -109,6 +151,26 @@ public class FileStorageService {
             throw new FileStorageException("Could not delete file at " + url + ". Please try again or contact your Admin!", ex);
         }
     }
+	
+	public void deleteBillFile(String url) {
+
+
+        try {
+            // Build Target Location
+        	Path targetLocation = Paths.get(this.rootStorageLocation.toString(), url);
+            
+            // Delete File
+        	if(Files.exists(targetLocation)) {
+        		Files.delete(targetLocation);
+            	System.out.println("deleted file :" + url);        		
+        	}
+            
+        } catch (Exception ex) {
+            throw new FileStorageException("Could not delete file at " + url + ". Please try again or contact your Admin!", ex);
+        }
+    }
+
+	
 	
 	public void writeTextInLogFile(String fileName, String text) {
 

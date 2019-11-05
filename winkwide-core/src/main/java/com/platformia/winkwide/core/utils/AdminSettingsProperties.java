@@ -18,5 +18,6 @@ public class AdminSettingsProperties {
 	private int maxMedias;
 	private int maxDisplaySpots;
 	private int maxDisplayLoopTime;
+	private int displaySyncWarningDelay;
 
 }

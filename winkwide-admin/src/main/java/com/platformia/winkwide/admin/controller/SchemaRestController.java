@@ -1,8 +1,5 @@
 package com.platformia.winkwide.admin.controller;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,44 +8,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.platformia.winkwide.core.model.EntitySchemaElement;
+import com.platformia.winkwide.core.utils.SchemaUtils;
 
 @RestController
 public class SchemaRestController {
 
-	//Get the schema for different entities
+	// Get the schema for different entities
 	@RequestMapping(value = "api/schema/{entity}")
-	public List<EntitySchemaElement> getEntitySchema(@PathVariable("entity") String entity){
-		
-		ArrayList<EntitySchemaElement> schema = new ArrayList<EntitySchemaElement>();
-		
-		//change entity first letter to Uppercase
-		if(entity.length()>0)
-			entity = toFirstUpperCase(entity);
-		//extract schema info from entity class
-		try {
-		    Class<?> entityClass = Class.forName("com.platformia.winkwide.core.entity." + entity);
+	public List<EntitySchemaElement> getEntitySchema(@PathVariable("entity") String entity) {
 
-		    	for (Field field : entityClass.getDeclaredFields())
-		    		if( !Modifier.isStatic(field.getModifiers()) && isNotJSONIgnore(field.getAnnotations()) )
-		    			schema.add(new EntitySchemaElement( field.getName(), toFirstUpperCase(field.getName()),  field.getType().getSimpleName() ) );
-		    	
-		 } catch (Exception e) {
-		        e.printStackTrace();
+		ArrayList<EntitySchemaElement> schema = new ArrayList<EntitySchemaElement>();
+
+		try {
+			schema = SchemaUtils.getEntitySchema(entity);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
+
 		return schema;
 	}
 
-	private boolean isNotJSONIgnore(Annotation[] annotations) {
-		for (Annotation annotation : annotations) {
-			if(annotation.annotationType().getSimpleName().equals("JsonIgnore")) 
-				return false;
-		}
-		return true;
-	}
-	
-	private String toFirstUpperCase (String name) {
-		return name.substring(0, 1).toUpperCase() + name.substring(1);
-	}
-	
+
 }

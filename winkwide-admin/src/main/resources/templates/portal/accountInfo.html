@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>WinkWide</title>
 <th:block th:include="includes/_include"></th:block>
-<script th:src="@{/apps/crudApp.js}"></script>
+<script th:src="@{/apps/portalApp.js}"></script>
 
 </head>
 
-<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+<body  ng-app="portalApp" ng-controller="crudCtrl as vm">
 	<th:block th:include="portal/_header"></th:block>
 		
 		<section class="row" id="mainContent">
@@ -23,29 +23,141 @@
 						
 				</div>
 				
+				<!-- CONFIGURE ANGULAR CRUD APP with object name -->
+				<script th:inline="javascript">
+				app.value('objectModel','account'); 
+				var myAccountURL = '/api/accounts/' + [[${session.accountId}]];
+				</script>
 
 				<div class="row m-2 rounded bg-light">
 					<div class="m-2 w-100">
-						
 					     <div class="account-container">
-					         <ul>
-					            <li>Welcome <span class="font-weight-bold" th:utext="${session.accountName}" th:unless="${session == null}"></span></li>
-								
-					            <li>
-					               You are connected with roles:
-					               <ul>
-					                  <li class="font-italic" th:each="auth : ${userDetails.authorities}" th:utext="${auth.authority}"></li>
-					               </ul>
-							          </li>
-					         </ul>
-					     </div>
+								<div class="m-1"> 
+					            	<button onclick="angular.element(this).scope().setFormData(myAccountURL, 'edit')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#createEditObjectModal" > Edit <i class="fa fa-pencil-alt fa-fw"></i></button>															
+								</div>
+								<br>
+					            <div class="m-1"> 
+					            	Profile Information:					
+								</div>
+								<br>
+								<div class="m-1" onload="angular.element(this).scope().setFormData(myAccountURL, 'view');">									
+									<div class="form-group row" >
+										<label class="col-sm-2 col-form-label">User Name</label>
+										<div class="col-sm-6">
+										<span class="form-control" th:utext="${session.accountUserName}" th:unless="${session == null}"></span>
+										</div>
+							        </div>
+							        
+									<div class="form-group row" >
+										<label class="col-sm-2 col-form-label">First Name</label>
+										<div class="col-sm-6">
+										<span class="form-control" th:utext="${session.accountFirstName}" th:unless="${session == null}"></span>
+										</div>
+							        </div>
+						   	        
+									<div class="form-group row" >
+										<label class="col-sm-2 col-form-label">Last Name</label>
+										<div class="col-sm-6">
+										<span class="form-control" th:utext="${session.accountLastName}" th:unless="${session == null}"></span>
+										</div>
+							        </div>
+							        				
+									<div class="form-group row">						
+										<label class="col-sm-2 col-form-label">User Role</label>
+										<div class="col-sm-6">
+											<span class="form-control" th:if="${session.accountUserRole=='ROLE_ADMIN'}" th:unless="${session == null}">Admin</span>
+											<span class="form-control" th:if="${session.accountUserRole=='ROLE_CLIENT'}" th:unless="${session == null}">Client</span>
+											<span class="form-control" th:if="${session.accountUserRole=='ROLE_PARTNER'}" th:unless="${session == null}">Partner</span>
+											<span class="form-control" th:if="${session.accountUserRole=='ROLE_MACHINE'}" th:unless="${session == null}">Machine</span>
+										</div> 
+									</div>			
+									
+								</div>
+						</div>
 					</div>
 				</div>
-															
+									
 			</div>
 		</section>
 
 	<th:block th:include="portal/_footer"></th:block>
+	
+	
+		<!-- CREATE / EDIT an object modal -->
+	<div class="modal fade" id="createEditObjectModal" tabindex="-1">
+		<div class="modal-dialog modal-lg" >
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="createEditObjectModalLabel">{{isCreateModalType ? 'Create '+targetObject : 'Edit '+targetObject}}</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				
+				<form id="objectForm" name="objectForm" class="m-2">
+				<div id="createEditObjectModalBody" class="modal-body m-1 p-1">	
+						
+						<!-- case of a Account -->
+						<div ng-if="targetObject=='account'">
+						
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">User Name</label>
+							    <div class="col-sm-8">
+						            <input type="text" name="userName" class="form-control" placeholder="Email address" ng-model="formData.userName" ng-class="{ 'is-invalid' : objectForm.userName.$invalid && !objectForm.userName.$pristine }" required>
+						            <!-- <small ng-show="objectForm.userName.$invalid && !objectForm.userName.$pristine && (objectForm.userName.$error.email || objectForm.userName.$error.required) " class="text-danger"> &nbsp please enter a valid email </small> -->
+					 	            <small id="userNameInvalidMessage" ng-show="objectForm.userName.$invalid && !objectForm.userName.$pristine" class="text-danger"></small>
+				 	            </div>
+					        </div>
+					        
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">First Name</label>
+								<div class="col-sm-8">
+						            <input type="text" name="firstName" class="form-control" placeholder="First name" ng-model="formData.firstName" ng-class="{ 'is-invalid' : objectForm.firstName.$invalid && !objectForm.firstName.$pristine }" required>
+						            <small ng-show="objectForm.firstName.$invalid && !objectForm.firstName.$pristine" class="text-danger"> &nbsp your First name is required </small>
+						            <small id="firstNameInvalidMessage" ng-show="objectForm.firstName.$invalid && !objectForm.firstName.$pristine" class="text-danger"></small>
+					           	</div>
+				   	        </div>
+				   	        
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Last Name</label>
+							    <div class="col-sm-8">
+						            <input type="text" name="lastName" class="form-control" placeholder="Last name" ng-model="formData.lastName" ng-class="{ 'is-invalid' : objectForm.lastName.$invalid && !objectForm.lastName.$pristine }" required>
+						            <small ng-show="objectForm.lastName.$invalid && !objectForm.lastName.$pristine" class="text-danger"> &nbsp your last name is required </small>
+						            <small id="lastNameInvalidMessage" ng-show="objectForm.lastName.$invalid && !objectForm.lastName.$pristine" class="text-danger"></small>
+					   	        </div>
+							</div>
+				
+					        <div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Password</label>
+								<div class="col-md-8" >
+						            <input type="password" name="password" class="form-control" placeholder="{{isCreateModalType ? 'Password' : '********'}}" ng-model="formData.password" ng-minlength="8" ng-maxlength="20" ng-class="{ 'is-invalid' : objectForm.password.$invalid && !objectForm.password.$pristine }" ng-required="isCreateModalType">
+						            <small ng-show="objectForm.password.$error.required && !objectForm.password.$pristine" class="text-danger">&nbsp a password is required </small>
+								    <!-- <small ng-show="!objectForm.password.$error.required && !objectForm.password.$error.minlength && !objectForm.password.$error.maxlength && objectForm.password.$error.pattern && !objectForm.password.$pristine" class="text-danger">&nbsp must contain one lower &amp; uppercase letter, and one number </small> -->
+								    <small ng-show="!objectForm.password.$error.required && (objectForm.password.$error.minlength || objectForm.password.$error.maxlength) && !objectForm.password.$pristine" class="text-danger">&nbsp password must be between 8 and 20 characters </small>
+							    </div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-sm-4 col-form-label">Confirm Password</label>
+								<div class="col-md-8" >
+									<input type="password" name="confirmPassword" class="form-control" placeholder="{{isCreateModalType ? 'Confirm Password' : '********'}}" ng-model="formData.confirmPassword" ng-class="{ 'is-invalid' : objectForm.confirmPassword.$invalid && !objectForm.confirmPassword.$pristine }" match-password="objectForm.password" ng-required="isCreateModalType">
+						            <small ng-show="objectForm.confirmPassword.$error.required && !objectForm.confirmPassword.$pristine" class="text-danger"> &nbsp please confirm your password </small>
+						            <small ng-show="!objectForm.confirmPassword.$error.required && objectForm.confirmPassword.$error.matchPassword && !objectForm.confirmPassword.$pristine" class="text-danger">&nbsp passwords should match.</small>								
+								</div>
+					        </div>
+
+						</div>
+							
+				</div>
+												
+				<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button id="createEditObjectModalAction" ng-click="isCreateModalType ? createTargetObject() : updateTargetObject()" type="button" class="btn btn-primary" ng-disabled="objectForm.$invalid ">{{isCreateModalType ? 'Create' : 'Update'}}</button>
+				</div>
+				</form>	
+																									
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>

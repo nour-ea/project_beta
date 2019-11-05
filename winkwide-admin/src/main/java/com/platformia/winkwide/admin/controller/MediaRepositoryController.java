@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.platformia.winkwide.core.entity.Media;
+import com.platformia.winkwide.core.entity.Record;
 import com.platformia.winkwide.core.exception.ApiError;
 import com.platformia.winkwide.core.model.FileProperties;
 import com.platformia.winkwide.core.repository.MediaRepository;
+import com.platformia.winkwide.core.repository.RecordRepository;
 import com.platformia.winkwide.core.service.FileStorageService;
 import com.platformia.winkwide.core.utils.AdminSettingsProperties;
 
@@ -32,15 +34,17 @@ import com.platformia.winkwide.core.utils.AdminSettingsProperties;
 public class MediaRepositoryController {
 
 	private final MediaRepository mediaRepo;
+	private final RecordRepository recordRepo;
 
 	@Autowired
-	public MediaRepositoryController(MediaRepository mRepo) {
+	public MediaRepositoryController(MediaRepository mRepo, RecordRepository rRepo) {
 		mediaRepo = mRepo;
+		recordRepo = rRepo;
 	}
 
 	@Autowired
-	AdminSettingsProperties adminSettingsProperties;
-
+	private AdminSettingsProperties adminSettingsProperties;
+	
 	@Autowired
 	private FileStorageService fileStorageService;
 
@@ -84,13 +88,13 @@ public class MediaRepositoryController {
 			
 			// then store file and thumbnail and generate media type
 			if (file.getContentType().equals("text/html")) {
-				fileProperties = fileStorageService.storeFile("", "/apps/feed", file);
+				fileProperties = fileStorageService.storeMediaFile("", "/apps/feed", file);
 				newMedia.setType("App");
-				thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/apps/feed", thumbFile);
+				thumbFileProperties = fileStorageService.storeMediaFile("", "/thumbnails/apps/feed", thumbFile);
 
 			} else {
-				fileProperties = fileStorageService.storeFile("", "/medias/" + category, file);
-				thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/medias/" + category, thumbFile);
+				fileProperties = fileStorageService.storeMediaFile("", "/medias/" + category, file);
+				thumbFileProperties = fileStorageService.storeMediaFile("", "/thumbnails/medias/" + category, thumbFile);
 
 				if (Arrays.stream(Media.allowedThumbnailFormats).anyMatch(file.getContentType()::equals))
 					newMedia.setType("Image");
@@ -165,10 +169,10 @@ public class MediaRepositoryController {
 
 				// store file
 				if (file.getContentType().equals("text/html")) {
-					fileProperties = fileStorageService.storeFile("", "/apps/feed", file);
+					fileProperties = fileStorageService.storeMediaFile("", "/apps/feed", file);
 					oldMedia.get().setType("App");
 				} else {
-					fileProperties = fileStorageService.storeFile("", "/medias/" + category, file);
+					fileProperties = fileStorageService.storeMediaFile("", "/medias/" + category, file);
 
 					if (Arrays.stream(Media.allowedThumbnailFormats).anyMatch(file.getContentType()::equals))
 						oldMedia.get().setType("Image");
@@ -179,7 +183,7 @@ public class MediaRepositoryController {
 				}
 
 				// delete old file
-				fileStorageService.deleteFile(oldMedia.get().getUrl());
+				fileStorageService.deleteMediaFile(oldMedia.get().getUrl());
 
 				oldMedia.get().setFormat(fileProperties.getFormat());
 				oldMedia.get().setSize(fileProperties.getSize());
@@ -201,12 +205,12 @@ public class MediaRepositoryController {
 
 				// store thumbnail
 				if (oldMedia.get().getType().equals("App"))
-					thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/apps/feed", thumbFile);
+					thumbFileProperties = fileStorageService.storeMediaFile("", "/thumbnails/apps/feed", thumbFile);
 				else
-					thumbFileProperties = fileStorageService.storeFile("", "/thumbnails/medias/" + category, thumbFile);
+					thumbFileProperties = fileStorageService.storeMediaFile("", "/thumbnails/medias/" + category, thumbFile);
 
 				// delete old thumbnail
-				fileStorageService.deleteFile(oldMedia.get().getThumbUrl());
+				fileStorageService.deleteMediaFile(oldMedia.get().getThumbUrl());
 
 				oldMedia.get().setThumbUrl(thumbFileProperties.getUrl());
 
@@ -233,21 +237,18 @@ public class MediaRepositoryController {
 
 		try {
 
-			// first, check validation and send back errors
-			/*
-			 * if (mediaId == null) return createValidationErrors("NotEmpty.media.id"); else
-			 * if (mediaRepo.findById(mediaId) == null) return
-			 * createValidationErrors("NotFound.media.id");
-			 */
-			// ---------------------------------
-
 			Optional<Media> media = mediaRepo.findById(mediaId);
 			if (media.isPresent()) {
+				//Never delete a Media that has linked Reports
+				List<Record> records = recordRepo.findByMediaId(mediaId);
+				if(records!=null && !records.isEmpty())
+					return createValidationErrors("NotPermitted.media.reports");
+				
 				mediaRepo.deleteMediaSpotLinks(media.get().getId());
-				mediaRepo.deleteMediaReportLinks(media.get().getId());
+				mediaRepo.deleteMediaRecordLinks(media.get().getId());
 				mediaRepo.delete(media.get());
-				fileStorageService.deleteFile(media.get().getUrl());
-				fileStorageService.deleteFile(media.get().getThumbUrl());
+				fileStorageService.deleteMediaFile(media.get().getUrl());
+				fileStorageService.deleteMediaFile(media.get().getThumbUrl());
 			}
 			return ResponseEntity.ok().build();
 
@@ -310,7 +311,10 @@ public class MediaRepositoryController {
 			message = "Max Media objects exceeded, max is set to: " + adminSettingsProperties.getMaxMedias();
 			errors.add("\"id\": \"Limitation.media.maxObjects\"");
 			break;
-
+		case "NotPermitted.media.reports":
+			message = "Can't delete Media because linked Reports exist. Please review them first!";
+			errors.add("\"reports\": \"NotPermitted.media.reports\"");
+			break;
 		}
 
 		HttpHeaders httpHeaders = new HttpHeaders();

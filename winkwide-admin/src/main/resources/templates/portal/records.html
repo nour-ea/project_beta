@@ -18,14 +18,14 @@
 				<!-- CONTEXT INFORMATION -->
 				<div class="row m-2 rounded bg-light" id="contextRow">
 					<div class="col m-2 ml-auto">	
-					<p class="text-primary font-weight-bold float-left" href="/portal/reports">Administration / Reports</p>
+					<p class="text-primary font-weight-bold float-left" href="/portal/records">Administration / Records</p>
 					</div>
 						
 				</div>
 				
 				
 				<!-- CONFIGURE ANGULAR CRUD APP with object name -->
-				<script> app.value('objectModel','report'); </script>
+				<script> app.value('objectModel','record'); </script>
 				
 				
 				<!-- SPECIFIC FILTERS and Create Button -->
@@ -35,6 +35,21 @@
 							<!-- add specific filters here -->
 							<div class="form-row pt-2" ng-form name="specificForm">
 			
+								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left">
+									<small>Filter by Media and/or Display</small>
+									<div>										
+										<input type="text" name="mediaId" class="form-control form-control-sm mt-1" placeholder="media Id"
+											ng-model="specificFilters.mediaId" ng-change="setGridData()"
+											ng-pattern="/^[0-9]*$/" >
+											<small ng-show="specificForm.mediaId.$error.pattern" class="text-danger">&nbsp field must be a number </small>
+										<input type="text" name="displayId" class="form-control form-control-sm mt-1" placeholder="display Id" 
+											ng-model="specificFilters.displayId" ng-change="setGridData()"
+											ng-pattern="/^[0-9]*$/" >
+											<small ng-show="specificForm.displayId.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
+																												
+									</div>
+								</div>
+											
 								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-3">
 									<small>Filter by start time</small>
 									<div class="input-append date form_datetime row">
@@ -88,20 +103,6 @@
     												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
 											</div>
     										</div>																											
-									</div>
-								</div>
-								
-								<div class="col-lg-3 col-md-23col-sm-6 mb-2 mb-md-0 float-left">
-									<small>Filter by display Id and media Id</small>
-									<div>										
-										<input type="text" name="displayId" class="form-control form-control-sm mt-1" placeholder="display Id" 
-											ng-model="specificFilters.displayId" ng-change="setGridData()"
-											ng-pattern="/^[0-9]*$/" >
-											<small ng-show="specificForm.displayId.$error.pattern" class="text-danger">&nbsp field must be a number </small>											
-										<input type="text" name="mediaId" class="form-control form-control-sm mt-1" placeholder="media Id"
-											ng-model="specificFilters.mediaId" ng-change="setGridData()"
-											ng-pattern="/^[0-9]*$/" >
-											<small ng-show="specificForm.mediaId.$error.pattern" class="text-danger">&nbsp field must be a number </small>																		
 									</div>
 								</div>
 			

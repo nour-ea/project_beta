@@ -9,8 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,18 +23,23 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
 @Entity
-@Table(name = "Reports", uniqueConstraints={@UniqueConstraint(columnNames={"start_time","end_time","display_id"})})
-public class Report extends Auditable implements Serializable {
+@Table(name = "Records", uniqueConstraints={@UniqueConstraint(columnNames={"start_time","end_time","display_id"})})
+public class Record extends Auditable implements Serializable {
 
 
 	private static final long serialVersionUID = -4747357433130949274L;
 
-	//Id should be the combination of dates and display id
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 	
+    @Column(name = "display_id", nullable = false)
+    private Long displayId;
+
+    @Column(name = "display_name", nullable = false)
+    private String displayName;
+           
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_time", nullable = false)
@@ -48,13 +51,14 @@ public class Report extends Auditable implements Serializable {
 	@Column(name = "end_time", nullable = false)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
 	private Date endTime;
-
-    @ManyToOne
-    @JoinColumn(name="display_id")
-    private Display display;
     
-    @ManyToOne
-    @JoinColumn(name="media_id")
-    private Media media;
+	@Column(name = "display_time")
+	private Long displayTime;
+	
+    @Column(name = "media_id", nullable = false)
+    private Long mediaId;
 
+    @Column(name = "media_name", nullable = false)
+    private String mediaName;
+        
 }

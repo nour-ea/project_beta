@@ -14,7 +14,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 	    function ($scope, CRUDService, STOREService, UTILSService) {
 	
 	//function at initialization to setup all the variables
-	$scope.init = async function(){
+	$scope.init = function(){
 		createLog('debug', 'started init');
 		
 		//Applying Settings and Setting up th local DB if offline mode active (remotely or default)
@@ -22,13 +22,13 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 				
 		//Application variables
 		$scope.programs = [];
-		$scope.reports = [];
+		$scope.records = [];
 		
 		//Local Storage variables
 		if(localStorage.getItem('storedPrograms') === null)
 			STOREService.storeJSONinLS('storedPrograms', []);
-		if(localStorage.getItem('storedReports') === null)
-			STOREService.storeJSONinLS('storedReports', []);
+		if(localStorage.getItem('storedRecords') === null)
+			STOREService.storeJSONinLS('storedRecords', []);
 		if(localStorage.getItem('storedLogs') === null)
 			localStorage.setItem('storedLogs', '');
 		
@@ -37,7 +37,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		
 		//Synchronization variables
 		$scope.programsSyncDONE = false;
-		$scope.reportsSyncDONE = false;
+		$scope.recordsSyncDONE = false;
 		$scope.setCurrentPlaylistDONE = false;
 		
 		//Timers process IDs
@@ -64,13 +64,17 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		//Default Static Settings
 		$scope.syncPeriod = 122000; //120000
 		$scope.refreshPeriod = 60000; //60000
-		$scope.reportingActive = true;
+		$scope.recordingActive = true;
 		$scope.autoSleepActive = false;
 		$scope.autoOnTime = 0;
 		$scope.autoOffTime = 0;
-
+		$scope.alternateMediaCategories = false;
+		
 		remoteLoggingActive = true;
 		offlineModeActive = true;
+		
+		//setting default Media Categories
+		$scope.mediaCategories = [{'name':'Private'}, {'name':'Entertain'}, {'name':'Ads'}, {'name':'Default'}];
 
 		createLog('debug', 'Settings set to default');
 
@@ -80,13 +84,19 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		CRUDService.getData('/sync/settings').success(function(data){
 			//$scope.syncPeriod = data.syncPeriod;
 			//$scope.refreshPeriod = data.refreshPeriod;
-			//$scope.reportingActive = data.reportingActive;
+			//$scope.recordingActive = data.recordingActive;
 			//$scope.autoSleepActive = data.autoSleepActive;
 			//$scope.autoOnTime = data.autoOnTime;
 			//$scope.autoOffTime = data.autoOffTime;
+			$scope.alternateMediaCategories = data.alternateMediaCategories
 		
 			//remoteLoggingActive = data.remoteLoggingActive;
 			//offlineModeActive = data.offlineModeActive;
+			
+			//setting Media Categories from server
+			CRUDService.getData('/sync/mediaCategories').success(function(res){										
+	          		$scope.mediaCategories = res;
+				});
 			
 			createLog('debug', 'Settings set from server to: ' + JSON.stringify(data));
 			
@@ -99,12 +109,14 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 	$scope.setDisplayId = function(){
 		//set default displayId
 		$scope.displayId = 0;
-		createLog('debug', 'Display Id set from LS to: ' + $scope.displayId);
+		$scope.displayName = "defaultDisplayName";
+		createLog('debug', 'Display set from LS to: id = ' + $scope.displayId + ', name = ' + $scope.displayName);
 		
 		//set it from server
-		CRUDService.getData('/sync/displayId').success(function(data){
-			$scope.displayId = data;
-			createLog('debug', 'Display Id set from server to: ' + $scope.displayId);
+		CRUDService.getData('/sync/display').success(function(data){
+			$scope.displayId = data.id;
+			$scope.displayName = data.name;
+			createLog('debug', 'Display set from server to: id = ' + $scope.displayId + ', name = ' + $scope.displayName);
 		});
 
 	};
@@ -134,14 +146,14 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		$scope.spotIndex = 0;
 		
 		//SYNC WITH INTERNET CONNECTION
-		//&& last startup succeeded to get remoteData and send reports
+		//&& last startup succeeded to get remoteData and send records
 		if(window.navigator.onLine && $scope.programsSyncDONE 
-				&& ($scope.reportsSyncDONE || !$scope.reportingActive) ){
+				&& ($scope.recordsSyncDONE || !$scope.recordingActive) ){
 			createLog('debug', 'doing a remote sync');
 			
 			//reset synchronization variables
 			$scope.programsSyncDONE = false;
-			$scope.reportsSyncDONE = false;
+			$scope.recordsSyncDONE = false;
 			
 			//remote update & run
 			$scope.remoteStartup();
@@ -186,12 +198,13 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 						//Check if spot duration is passed
 						if(moment().diff(startTime)  > $scope.currentSpot.duration*1000){
 
-							//write report if reporting active
-							if($scope.reportingActive)
-								$scope.reports.push({ 
+							//write record if recording active
+							if($scope.recordingActive)
+								$scope.records.push({ 
 									startTime: startTime.format('YYYY-MM-DD HH:mm:ss a'), 
 									endTime: moment().format('YYYY-MM-DD HH:mm:ss a'),
-									display: null, media: $scope.currentSpot.media });
+									displayId: $scope.displayId, displayName: $scope.displayName,
+									mediaId: $scope.currentSpot.media.id, mediaName: $scope.currentSpot.media.name  });
 							
 							//increment spotIndex and set next current Spot
 							if($scope.spotIndex + 1 < $scope.currentPlaylist.spots.length)
@@ -260,7 +273,8 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		});
 		
 		//Build Current Playlist by alterning private/entertain/ad/other Spots
-		$scope.currentPlaylist.spots = $scope.buildAlternedPlaylist();
+		if($scope.alternateMediaCategories)
+			$scope.currentPlaylist.spots = $scope.buildAlternedPlaylist();
 				
 		
 		$scope.setCurrentPlaylistDONE = true;
@@ -274,17 +288,23 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 	$scope.buildAlternedPlaylist = function(){
 		let spots = $scope.currentPlaylist.spots;
 		let alternedSpots = [];
-
+		let spotsCategoryLists = [];
+		
+		console.log('spots');
+		console.log(spots);
+		
 		//build spots lists by type
-		let privateSpots = spots.filter(function(spot){ return spot.media.category == 'private'; });
-		let entertainSpots = spots.filter(function(spot){ return spot.media.category == 'entertain'; });
-		let adSpots = spots.filter(function(spot){ return spot.media.category == 'ad'; });
-		let otherSpots = spots.filter(function(spot){ return spot.media.category == 'other'; });
+		$scope.mediaCategories.forEach(function(mediaCategory){
+			let mediaCategorySpots = spots.filter(function(spot){ return spot.media.category == mediaCategory.name; });
+			spotsCategoryLists.push(mediaCategorySpots);
+		});
+		console.log('spotsCategoryLists');
+		console.log(spotsCategoryLists);
 		
 		//fill alterned Playlist spots
 		let i=0;
-		while( i < $scope.currentPlaylist.spots.length){
-			[privateSpots, entertainSpots, adSpots, otherSpots].forEach(function(spotsList){
+		while( i < spots.length){
+			spotsCategoryLists.forEach(function(spotsList){
 				if( spotsList.length > 0 ){
 					alternedSpots.push(spotsList[0]);
 					spotsList.splice(0,1);
@@ -292,7 +312,8 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 				}
 			});
 		}
-		
+		console.log('alterned spots');
+		console.log(alternedSpots);
 		return alternedSpots;
 	};
 	
@@ -369,9 +390,9 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		if(remoteLoggingActive)
 			$scope.sendLogs();
 		
-		//Sync Reports
-		if($scope.reportingActive)
-			$scope.sendReports();
+		//Sync Records
+		if($scope.recordingActive)
+			$scope.sendRecords();
 		
 		//Sync Programs
 		$scope.getPrograms();
@@ -382,9 +403,9 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 	$scope.localStartup = function()	{
 		createLog('debug', 'launched a local Startup');
 
-		//store reports in LS
-		if($scope.reportingActive)
-			$scope.storeReports();
+		//store records in LS
+		if($scope.recordingActive)
+			$scope.storeRecords();
 		
 		//run with locally stored programs
 		$scope.programs = STOREService.getJSONfromLS('storedPrograms');
@@ -396,38 +417,38 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 	}
 	
 	
-	//Function to send Reports to server
-	$scope.sendReports = function() { 
-		createLog('debug', 'trying to send Reports to server');
+	//Function to send Records to server
+	$scope.sendRecords = function() { 
+		createLog('debug', 'trying to send Records to server');
 		
-		//store Reports in LS and empty reports object
-		$scope.storeReports();
-		var storedReports = STOREService.getJSONfromLS('storedReports');
+		//store Records in LS and empty records object
+		$scope.storeRecords();
+		var storedRecords = STOREService.getJSONfromLS('storedRecords');
 
-		// try to send reports and empty stored reports in LS
-		CRUDService.setData('/sync/reports', storedReports)
+		// try to send records and empty stored records in LS
+		CRUDService.setData('/sync/records', storedRecords)
 			.success(function(data){
-				createLog('debug', 'sent Reports successfully');
-				$scope.reportsSyncDONE = true;
-				createLog('debug', 'clearing LS Reports');
-				STOREService.storeJSONinLS('storedReports', []);
+				createLog('debug', 'sent Records successfully');
+				$scope.recordsSyncDONE = true;
+				createLog('debug', 'clearing LS Records');
+				STOREService.storeJSONinLS('storedRecords', []);
 				})
 			.error(function(errors){
-				createLog('error', 'sending Reports to server failed for reason: ' + errors);
-				$scope.reportsSyncDONE = true;
+				createLog('error', 'sending Records to server failed for reason: ' + errors);
+				$scope.recordsSyncDONE = true;
 				});
 		
 	};
 	
-	//Function to store Reports in LS and empty reports object
-	$scope.storeReports = function() { 
-		createLog('debug', 'storing reports in LS');
+	//Function to store Records in LS and empty records object
+	$scope.storeRecords = function() { 
+		createLog('debug', 'storing records in LS');
 		
-		var storedReports = STOREService.getJSONfromLS('storedReports');
-		storedReports.push.apply(storedReports, $scope.reports);		
-		STOREService.storeJSONinLS('storedReports', storedReports)
+		var storedRecords = STOREService.getJSONfromLS('storedRecords');
+		storedRecords.push.apply(storedRecords, $scope.records);		
+		STOREService.storeJSONinLS('storedRecords', storedRecords)
 		
-		$scope.reports = [];
+		$scope.records = [];
 		};
 
 			
@@ -437,7 +458,7 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		
 		var storedLogs = localStorage.getItem('storedLogs');
 
-		// try to send reports and empty stored reports in LS
+		// try to send records and empty stored records in LS
 		CRUDService.setData('/sync/logs', storedLogs)
 			.success(function(data){
 				createLog('debug', 'sent Logs successfully');
@@ -772,7 +793,7 @@ app.service('UTILSService',['$http', function($http){
                     		callback(new File([blob], fileName, {type: fileType}));
                     else	callback(result);
 
-                console.log('done url to file')
+                createLog('debug', 'done url to file');
             };
             // if not text/html = Load blob as Data URL
             if(fileType !== 'text/html')
@@ -793,7 +814,7 @@ app.service('UTILSService',['$http', function($http){
 			urltoFile(htmlUrl, 'text/html', 'preview.html',
 				function(html){
 				    	angular.element(mainHTML).html(html);
-						setTimeout(startAppPreview, 1000);
+						setTimeout(startAppPreview, 300);
 			});
 			
 		else {

@@ -12,7 +12,11 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			$scope.currentPath = window.location.pathname;
 			// Define the Object Target for the CRUD App (Display, Media...)
 			$scope.targetObject = objModel;
-			$scope.targetCollection = $scope.targetObject + 's';
+			//handle naming exceptions (Category -> Categories)
+			if(objModel.lastIndexOf('Category') !== - 1)
+				$scope.targetCollection = objModel.slice(0, objModel.length - 1) + 'ies';
+			else
+				$scope.targetCollection = objModel + 's';
 			
 			// Define columnList object (for the table column titles)
 			$scope.columnList = {};
@@ -24,10 +28,45 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 					
 			// Define Edit / Delete target object url link and fill $scope.formData
 			var targetObjectUrl = '/api/'+$scope.targetCollection;
-			$scope.schema = {};
+			$scope.schema = [];
 			$scope.formData = {};
 			$scope.isCreateModalType = true; // to differentiate create and edit modal
-			$scope.isDeleteModalType = true; // to differentiate delete and view modal			
+			$scope.isDeleteModalType = true; // to differentiate delete and view modal	
+			
+			//Default Settings Lists : Areas, Categories, etc.
+			$scope.mediaCategories = [];
+			$scope.displayCategories = [];
+			$scope.areas = [];
+			
+			//Default Setting for Display Sync Warning Delay (in hours)
+			$scope.displaySyncWarningDelay = 24;
+		}
+		
+		//Function to get Settings Lists : Areas, Categories, etc.
+		$scope.getSettingsLists = function (objModel){
+			if(objModel == 'media')
+				CRUDService.getAllCollection('mediaCategories')
+					.success(function(data){										
+		          		$scope.mediaCategories = data._embedded.mediaCategories;
+					});
+			
+			if(objModel == 'display'){
+				CRUDService.getAllCollection('displayCategories')
+				.success(function(data){										
+	          		$scope.displayCategories = data._embedded.displayCategories;
+				});
+				
+				CRUDService.getAllCollection('areas')
+				.success(function(data){										
+	          		$scope.areas = data._embedded.areas;
+				});
+				
+				CRUDService.getAllCollection('displays/settings')
+				.success(function(data){										
+	          		$scope.displaySyncWarningDelay = data.displaySyncWarningDelay;
+				});				
+			}
+				
 		}
 		
 		$scope.setFormData = function(url, operation){
@@ -96,36 +135,41 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 		var editButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'edit\')" type="button" class="btn btn-sm btn-secondary ml-1" data-toggle="modal" data-target="#createEditObjectModal" > <i class="fa fa-pencil-alt fa-fw"></i></button>';
 		var deleteButtonHTML = '<button ng-click="grid.appScope.setFormData(row.entity.actionLink, \'delete\')" type="button" class="btn btn-sm btn-danger ml-1" data-toggle="modal" data-target="#viewDeleteObjectModal" > <i class="fa fa-trash-alt fa-fw"></i></button>';
 		var actionButtonsHTML = '<div class="m-1">' + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
+				
+		// Download
+		var downloadButtonHTML = '<a href="{{row.entity.url}}" download="{{row.entity.id}}_{{row.entity.name}}" class="btn btn-sm btn-success ml-1"><i class="fa fa-download"></i></a>';
+		var actionDownloadButtonsHTML = '<div class="m-1">' + downloadButtonHTML + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
 		
 		// Define HTML template for media thumbnails
-		var thumbnailHTML = '<img ng-src="{{row.entity.thumbUrl}}" alt="No Image Found" class="m-1" height="80%" >'
+		var thumbnailHTML = '<img ng-src="{{row.entity.thumbUrl}}" alt="No Image Found" class="m-1" height="90%" >';
+			
+		// Define HTML template for displays lastSyncTime
+		var lastSyncTimeHTML = '<div class="m-1">{{row.entity.lastSyncTime}} <br> <div ng-class="row.entity.syncAlertLevel == \'danger\' ? \'text-danger\' : \'text-success\' "> <i class="fa fa-clock fa-fw"></i> {{\' < \'+row.entity.timeToLastSync+\' hours ago\'}}</div></div>';
+		
 		
 		// Define a function to Get Data Scheme from REST Api
 		$scope.getColumnList = function(){
 			var columnList = [];
 			CRUDService.getScheme($scope.targetObject).success(function(data){
 				$scope.schema = data;
-				
-				// SPECIFIC for programs and reports list (as they have related
-				// objects : display and media)
-				angular.forEach(data, function(value, key) {
-					if(value.type=='Display')
-						this.push({ field: 'display' , name: 'Display', enableFiltering:false, width: '*', minWidth:100 });
-					if(value.type=='Media')
-						this.push({ field: 'media' , name: 'Media', enableFiltering:false, width: '*', minWidth:100 });
-				}, columnList);
-				// ---------------------------------------
-				
-				angular.forEach(data, function(value, key) {
-					
+							
+				angular.forEach(data, function(value, key) {	
 					// SPECIFIC for media thumbnail
 					if(value.name=='thumbUrl' && $scope.targetObject == 'media')
-						this.unshift({ field: value.name , name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering:false, pinnedLeft:true, width: '*', minWidth:100 });
+						this.unshift({ field: value.name , name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering:false, pinnedLeft:true, width: '*', minWidth:150 });
+					// ---------------------------------------
+					
+					//SPECIFIC for display lastSyncTime
+					else if(value.name=='lastSyncTime' && $scope.targetObject == 'display')
+						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:150,
+							cellTemplate: lastSyncTimeHTML});
 					// ---------------------------------------
 					
 					// enabling filtering only for string fields and boolean
 					else if(value.type=='Date' || value.name=='mac')
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:150 });
+					else if(value.type=='LocalTime' || value.name=='mac')
+						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:50 });
 					else if(value.name=='name')
 						this.push({ field: value.name , name: value.title, enableFiltering:true, pinnedLeft:true, width: '*', minWidth:150 });
 					else if(value.name=='userRole' )
@@ -137,9 +181,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 						        	  				{ value: 'ROLE_PARTNER', label: 'Partner' }, 
 						        	  				{ value: 'ROLE_MACHINE', label: 'Machine' }]}
 						          });
-					else if(value.type=='String' && ![ 'url', 'password', 'confirmPassword'].includes(value.name))
+					else if(value.type=='String' && ![ 'url', 'fileUrl', 'password', 'confirmPassword'].includes(value.name))
 						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100 });
-					else if(value.name!=='id' && [ 'int', 'Long', 'BigDecimal'].includes(value.type))
+					else if(value.name!=='id' && [ 'int', 'Long', 'Double', 'BigDecimal'].includes(value.type))
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:100 });
 					else if(value.type=='boolean')
 						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100,
@@ -159,8 +203,11 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 					}, columnList);
 
 				
-				// create an Actions column (view, edit, delete)
-				columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130});
+				// create an Actions column (view, edit, delete) - except for records
+				if($scope.targetObject == 'bill' || $scope.targetObject == 'media')
+					columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionDownloadButtonsHTML, enableFiltering: false, pinnedRight:true, width:170});
+				else if($scope.targetObject !== 'record')
+					columnList.push({ field: 'actionLink', name: 'Actions', cellTemplate: actionButtonsHTML, enableFiltering: false, pinnedRight:true, width:130});
 				
 			});
 			
@@ -175,30 +222,32 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 		// some grid options
 		$scope.getCollectionData = function(options, target, page, size, sortCols, filterCols, specificFilters) {
 			
+			// Animate loader in screen
+			$(".se-pre-con").show();
+			
 		     CRUDService.getAll(target, page, size, sortCols, filterCols, specificFilters)
 				.success(function(data){
 										
 		          	$scope[options].data = data._embedded[target];
 		
 					angular.forEach($scope[options].data, function(value, key) {
-						value.actionLink =  CRUDService.getRelativePath(value._links.self.href);
+							value.actionLink =  CRUDService.getRelativePath(value._links.self.href);
 						
-						// Specific to reports (getting display.id and media.id)
-						if(target=='reports'){					
-							CRUDService.getLinkedObjects(value._links.display.href)
-								.success(function(display){
-									value.display = display.id;
-							});
-					
-							CRUDService.getLinkedObjects(value._links.media.href)
-								.success(function(media){
-									value.media = media.id;
-							});
-						}
-						// ------
+							// Specific to displays (syncAlertLevel)
+							if(target=='displays'){
+								value.timeToLastSync = Math.round( moment().diff(moment(value.lastSyncTime,'YYYY-MM-DD HH:mm a')) / (60*60*1000));
+								if(value.timeToLastSync > $scope.displaySyncWarningDelay)
+									value.syncAlertLevel = 'danger';
+								else
+									value.syncAlertLevel = 'success';
+							}
 						
 						});
 		            $scope[options].totalItems = data.page.totalElements;
+		
+					// Animate loader off screen
+					$(".se-pre-con").fadeOut("slow");
+
 		         });                            
 		};
 		
@@ -311,7 +360,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 				$scope.formData.playlists = $scope.selectedPlaylistsGrid.data;
 			}
 			
-			CRUDService.updateOne(targetObjectUrl, $scope.formData).success(function(data){
+			CRUDService.updateOne($scope.targetCollection, targetObjectUrl, $scope.formData).success(function(data){
 				console.log('updated object');
 				createAlert(main_nav, 'success', 'successfully updated '+ $scope.targetObject, 5000);
 				$scope.clearFormData();
@@ -387,7 +436,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 				CRUDService.deleteOne(CRUDService.getRelativePath(obj._links.self.href))
 				.success(function(data){
 					console.log('deleted object: ' + obj._links.self.href);
-					createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetObject+'s', 5000);
+					createAlert(main_nav, 'success', 'successfully deleted '+ $scope.targetCollection, 5000);
 					$scope.setGridData();		
 				})
 				.error(function(data){
@@ -401,23 +450,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 		//Function to Validate Form with remote answer errors
 		$scope.validateObjectForm = function(data){		
 			
-			if (typeof(data.errors) !== 'undefined'){
-			
-				/*if(data.errors[0].includes('\"name\"')){
-					$scope.objectForm.name.$invalid = true;
-					$scope.objectForm.name.$error.nameInvalid = true;
-					angular.element(nameInvalidMessage).html('&nbsp' + data.message);
-				}else if(data.errors[0].includes('\"mac\"')){
-					$scope.objectForm.mac.$invalid = true;
-					$scope.objectForm.mac.$error.macInvalid = true;
-					angular.element(macInvalidMessage).html('&nbsp' + data.message);
-				}else{
-					$scope.clearObjectFormValidation();
-					createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
-							+ data.message, null);
-				}*/
+			if (typeof(data.errors) !== 'undefined'){				
 				
-				
+				//check form fields against returned errors
 				angular.forEach($scope.objectForm, function(field, key) {
 					if(data.errors[0].includes('\"'+key+'\"')){
 						field.$invalid = true;
@@ -429,23 +464,25 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			else {
 				
 				$scope.clearObjectFormValidation();
-				createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating '+ $scope.targetObject +'<br> reason: '
-						+ data.toString(), null);
+				createAlert(createEditObjectModalBody, 'danger', 'an issue occured creating or updating '+ $scope.targetObject +'s <br> reason: '
+						+((typeof data.message == 'undefined') ? data.toString() : data.message), null);
 			}
 		};
 		
 		//Function to Clear validateObjectForm(data) messages
 		$scope.clearObjectFormValidation = function(){
-			if(typeof($scope.objectForm.name) !== 'undefined'){
-				angular.element(nameInvalidMessage).html('');
-				$scope.objectForm.name.$invalid = false;
-				$scope.objectForm.name.$error = {};
-			} 
-			if(typeof($scope.objectForm.mac) !== 'undefined'){
-				angular.element(macInvalidMessage).html('');
-				$scope.objectForm.mac.$invalid = false;
-				$scope.objectForm.mac.$error = {};
-			}
+			//remove validation errors from fields
+			angular.forEach($scope.objectForm, function(field, key) {
+				if(typeof(field) !== 'undefined'){
+					if(document.getElementById(key+'InvalidMessage') !== null)
+						document.getElementById(key+'InvalidMessage').innerHTML = '';
+					if(typeof(field.$invalid) !== 'undefined')
+						field.$invalid = false;
+					if(typeof(field.$error) !== 'undefined')
+						field.$error = {};
+				}
+			});
+			
 			clearModalAlert();
 		};
 		
@@ -454,6 +491,9 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			
 			// Initalize controller variables
 			$scope.init(objModel);
+			
+			//Get Settings Lists : Areas, Categories, etc.
+			$scope.getSettingsLists(objModel);
 			
 			// Build columnList (titles of the table columns)
 			$scope.getColumnList();
@@ -465,6 +505,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			$scope.setMainGrid();
 	
 		};
+		
 		
 		// Refresh App view at controller load
 		$scope.refreshAppView(objectModel);
@@ -705,7 +746,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+	        columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
 							{ field: 'name', name: 'Name', minWidth:100 },
 							{ field: 'area', name: 'area', minWidth:100}],
 	        onRegisterApi: function(gridApi) {
@@ -741,7 +782,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+	        columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
 							{ field: 'name', name: 'Name', minWidth:100},
 							{ field: 'duration', name: 'Duration', minWidth:100}] ,
 	        onRegisterApi: function(gridApi) {
@@ -779,10 +820,11 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: true,
-	        columnDefs: [	{ field: 'thumbUrl', name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering: false, minWidth:100 },
-							{ field: 'name', name: 'Name', minWidth:100},
+	        columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
+							{ field: 'thumbUrl', name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering: false, minWidth:100 },
+							{ field: 'name', name: 'Name', minWidth:200},
 							{ field: 'category', name: 'Category', minWidth:100},
-							{ field: 'type', name: 'Type', minWidth:100}] ,
+							{ field: 'type', name: 'Type', minWidth:60}] ,
 	        onRegisterApi: function(gridApi) {
 	           	$scope.mediasGridApi = gridApi;
 	           	$scope.mediasGridApi.pagination.on.paginationChanged(
@@ -829,7 +871,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
 							{ field: 'name', name: 'Name', minWidth:100 },
 							{ field: 'area', name: 'area', minWidth:100}],
 			onRegisterApi: function(gridApi) {
@@ -848,7 +890,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
 							{ field: 'name', name: 'Name', minWidth:100 },
 							{ field: 'area', name: 'area', minWidth:100}],
 			onRegisterApi: function(gridApi) {
@@ -870,7 +912,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
 							{ field: 'name', name: 'Name', minWidth:100},
 							{ field: 'duration', name: 'Duration', minWidth:100}] ,
 			onRegisterApi: function(gridApi) {
@@ -889,7 +931,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-		    columnDefs: [	{ field: 'id', name: 'id', minWidth:100 },
+		    columnDefs: [	{ field: 'id', name: 'id', minWidth:50 },
 							{ field: 'name', name: 'Name', minWidth:100},
 							{ field: 'duration', name: 'Duration', minWidth:100}] ,
 			onRegisterApi: function(gridApi) {
@@ -952,11 +994,15 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-			columnDefs: [	{ field: 'media.thumbUrl', name: 'Thumbnail', cellTemplate: spotThumbnailHTML, enableFiltering: false, enableCellEdit: false, minWidth:100},
-							{ field: 'media.name', name: 'Name', enableCellEdit: false, minWidth:100},
+			columnDefs: [	{ field: 'media.id', name: 'id', minWidth:50 },
+							{ field: 'media.thumbUrl', name: 'Thumbnail', cellTemplate: spotThumbnailHTML, enableFiltering: false, enableCellEdit: false, minWidth:100},
+							{ field: 'media.name', name: 'Name', enableCellEdit: false, minWidth:200},
 							{ field: 'media.category', name: 'Category', enableCellEdit: false, minWidth:100},
-							{ field: 'media.type', name: 'Type', enableCellEdit: false, minWidth:100},
-							{ field: 'duration', name: 'Duration', enableCellEdit: true, type: 'number', minWidth:100},
+							{ field: 'media.type', name: 'Type', enableCellEdit: false, minWidth:60},
+							{ field: 'duration', name: 'Duration', enableCellEdit: true, type: 'number', minWidth:100,
+								cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
+						              return 'btn btn-sm border-white text-primary font-weight-bold font-italic';
+						            }},
 							{ field: 'playOrder', name: 'Play Order', cellTemplate: reorderButtonsHTML, enableFiltering: false, minWidth:100}],
 			onRegisterApi: function(gridApi) {
 								$scope.selectedSpotsGridApi = gridApi;
@@ -973,11 +1019,15 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			useExternalSorting: true,
 			enableFiltering: true,
 			useExternalFiltering: false,
-			columnDefs: [	{ field: 'media.thumbUrl', name: 'Thumbnail', cellTemplate: spotThumbnailHTML, enableFiltering: false, enableCellEdit: false, minWidth:100},
-							{ field: 'media.name', name: 'Name', enableCellEdit: false, minWidth:100},
+			columnDefs: [	{ field: 'media.id', name: 'id', minWidth:50 },
+							{ field: 'media.thumbUrl', name: 'Thumbnail', cellTemplate: spotThumbnailHTML, enableFiltering: false, enableCellEdit: false, minWidth:100},
+							{ field: 'media.name', name: 'Name', enableCellEdit: false, minWidth:200},
 							{ field: 'media.category', name: 'Category', enableCellEdit: false, minWidth:100},
-							{ field: 'media.type', name: 'Type', enableCellEdit: false, minWidth:100},
-							{ field: 'duration', name: 'Duration', enableCellEdit: true, type: 'number', minWidth:100}],
+							{ field: 'media.type', name: 'Type', enableCellEdit: false, minWidth:60},
+							{ field: 'duration', name: 'Duration', enableCellEdit: true, type: 'number', minWidth:60, 
+								cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
+						              return 'btn btn-sm border-white text-primary font-weight-bold font-italic';
+						            }}],
 			onRegisterApi: function(gridApi) {
 								$scope.viewSelectedSpotsGridApi = gridApi;
 							}
@@ -1224,6 +1274,13 @@ app.service('CRUDService',['$http', function ($http) {
 	        });
 	    };
 	    
+	    function getAllCollection(target) {
+	        return $http({
+	          method: 'GET',
+	            url: '/api/'+target
+	        });
+	    };
+	    
 	    function getOne(url) {
 	        return $http({
 	          method: 'GET',
@@ -1249,7 +1306,8 @@ app.service('CRUDService',['$http', function ($http) {
 	    	}
 	    	
 	    	if(target=='playlists'
-	    		|| target=='programs'){
+	    		|| target=='programs'
+	    		|| target=='bills'){
 		        return $http({
 			          method: 'POST',
 			          	url: '/api/'+target+'/creates',
@@ -1265,8 +1323,8 @@ app.service('CRUDService',['$http', function ($http) {
 	        });
 	    };
 	
-	    function updateOne(url, data) {
-	    	if(url.includes('/api/medias')){
+	    function updateOne(target, url, data) {
+	    	if(target=='medias'){
 	    		var formData = new FormData();
 	    		formData.append("id", data.id);
 	    		formData.append("name", data.name);
@@ -1283,21 +1341,15 @@ app.service('CRUDService',['$http', function ($http) {
 			        });	
 	    	}
 
-	    	if(url.includes('/api/playlists')){
+	    	if(target=='playlists'
+	    		|| target=='programs'
+	    		|| target=='bills'){
 		        return $http({
 			          method: 'POST',
-			          	url: '/api/playlists/updates',
+			          url: '/api/'+target+'/updates',
 			            data: data
 			        });	
 	    	}
-	    	
-	    	if(url.includes('/api/programs')){
-		        return $http({
-			          method: 'POST',
-			          	url: '/api/programs/updates',
-			            data: data
-			        });	
-	    	}	
 	    	
 	        return $http({
 	          method: 'PATCH',
@@ -1348,6 +1400,7 @@ app.service('CRUDService',['$http', function ($http) {
 	    return {
 	    		getScheme: 						getScheme,
 	    		getAll:							getAll,
+	    		getAllCollection:				getAllCollection,	
 	    		getOne: 						getOne,
 	    		createOne: 						createOne,
 	    		updateOne: 						updateOne,

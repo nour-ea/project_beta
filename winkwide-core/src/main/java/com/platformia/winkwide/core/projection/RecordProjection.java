@@ -4,10 +4,10 @@ import java.util.Date;
 
 import org.springframework.data.rest.core.config.Projection;
 
-import com.platformia.winkwide.core.entity.Report;
+import com.platformia.winkwide.core.entity.Record;
 
-@Projection(types = { Report.class }) 
-public interface ReportProjection {
+@Projection(types = { Record.class }) 
+public interface RecordProjection {
 
    	Long getDisplayId();
     

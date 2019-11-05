@@ -8,7 +8,9 @@ import lombok.Data;
 public class EntitySchemaElement {
 
 	private String name;
+	private String capitalizedName;
 	private String title;
 	private String type;
+	private boolean optional;
 	
 }
