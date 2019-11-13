@@ -17,7 +17,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 	
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :userName is null or c.userName like %:userName% )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :userName is null or c.userName like %:userName% )"
 			+ "and ( :firstName is null or c.firstName like %:firstName% )"
 			+ "and ( :lastName is null or c.lastName like %:lastName% )"
 			+ "and ( :userRole is null or c.userRole like %:userRole% )"
@@ -25,6 +26,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 			+ "and ( :conditionsAccepted is null or c.conditionsAccepted = :conditionsAccepted )")
 	
 	public Page<Account> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("userName") String userName, 
 			@Param("firstName") String firstName,
 			@Param("lastName") String lastName,

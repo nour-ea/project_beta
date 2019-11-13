@@ -1,54 +1,89 @@
-#navigation {
-	min-height: 80vh;
-}
-.sidenav > li {
-	 list-style-type: none;		
+body {
+  overflow-x: hidden;
 }
 
-/* The sidebar menu */
-.sidenav {
-	position: relative;
-	height: 100%; /* Full-height: remove this if you want "auto" height */
-	width: 250px; /* Set the width of the sidebar */
-	top: 0;
-	left: 0;
-	background-color: #090c14;
-	padding: 20px 6px 6px 6px;
+#sidebar-wrapper {
+  background-color: #000000;
+  font-weight: bold;
+  min-height: 80vh !important;
+  margin-left: -15rem;
+  -webkit-transition: margin .25s ease-out;
+  -moz-transition: margin .25s ease-out;
+  -o-transition: margin .25s ease-out;
+  transition: margin .25s ease-out;
+}
+
+#sidebar-wrapper .list-group {
+  width: 15rem;
+  padding-left:15px;
 }
 
 /* The navigation menu links */
-.sidenav a {
-	padding: 6px 8px 6px 16px;
-	text-decoration: none;
-	display: block;
+#sidebar-wrapper .list-group-item {
+	background-color: #000000;
 	color: #F1F1F1;
-	margin-left: 16px;
+	font-size:15px;
+	padding: 10px 10px 10px 10px;
 }
 
 /* When you mouse over the navigation links, change their color */
-.sidenav a:hover {
+#sidebar-wrapper .list-group-item:hover {
 	color: #090c14;
 	background-color: #F1F1F1;	
 	
 }
 
-.sidenav .disabled-link {
-	color: #5a5a5a;
+#page-content-wrapper {
+  min-width: 100vw;
 }
 
-
 /*When navigation link corresponds to open section*/
-.sidenav .currentNav {
+#sidebar-wrapper .currentNav {
 	color: #090c14;
 	background-color: #F1F1F1;	
 }
 
+#sidebar-wrapper .disabled-link {
+	color: #5a5a5a;
+}
+
+#sidebar-wrapper .btn-black{
+	color: #F1F1F1;
+	background-color: black;
+}
+
+#sidebar-wrapper .btn-black:hover{
+	color: black;
+	background-color: #F1F1F1;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+  
+   #page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -15rem;
+  }
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
-	.sidenav {
+	#sidebar-wrapper .list-group {
 		padding-top: 15px;
 	}
-	.sidenav a {
-		font-size: 18px;
+	#sidebar-wrapper .list-group-item {
+		font-size: 12px;
 	}
 }
+
+

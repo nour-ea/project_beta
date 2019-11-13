@@ -17,7 +17,8 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
 	
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :name is null or c.name like %:name% )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :name is null or c.name like %:name% )"
 			+ "and ( :category is null or c.category like %:category% )"
 			+ "and ( :type is null or c.type like %:type% )"
 			+ "and ( :format is null or c.format like %:format% )"
@@ -27,6 +28,7 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
 			+ "and ( :sizeMin is null or :sizeMax is null or (c.size between :sizeMin and :sizeMax) )")
 	
 	public Page<Media> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("name") String name, 
 			@Param("category") String category,
 			@Param("type") String type,

@@ -40,6 +40,9 @@ public class Display extends Auditable implements Serializable {
     
     @Column(name = "name", length = 128, nullable = false, unique=true)
     private String name;
+    
+    @Column(name = "partner_id")
+    private Long partnerId;
 
     @Column(name = "category", length = 128, nullable = false)
     private String category;
@@ -89,6 +92,6 @@ public class Display extends Auditable implements Serializable {
     private boolean smart;
  
     @ManyToMany(mappedBy = "displays", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-    private List<Program> programs;    
+    private List<Program> programs;
 	
 }

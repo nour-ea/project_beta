@@ -45,7 +45,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.access("hasAnyRole('ROLE_CLIENT', 'ROLE_PARTNER', 'ROLE_ADMIN')");
 
 			// Pages only for ADMIN
+			http.authorizeRequests().antMatchers("/portal/dashboard").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/partners").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/displays").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/clients").access("hasAnyRole('ROLE_ADMIN')");
+			http.authorizeRequests().antMatchers("/portal/campaigns").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/playlists").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/medias").access("hasAnyRole('ROLE_ADMIN')");
 			http.authorizeRequests().antMatchers("/portal/playlists").access("hasAnyRole('ROLE_ADMIN')");
@@ -64,14 +68,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.loginProcessingUrl("/portal_login")
 			.usernameParameter("userName")//
 			.passwordParameter("password")
-			.defaultSuccessUrl("/portal")
+			.defaultSuccessUrl("/portal/dashboard")
 			.failureUrl("/login?error=true")//
 
 
 			.and()
 			.logout()
 			.logoutUrl("/logout")
-			.logoutSuccessUrl("/")
+			.logoutSuccessUrl("/login")
 			.deleteCookies("JSESSIONID")
 
 			.and()

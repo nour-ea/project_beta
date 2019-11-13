@@ -18,7 +18,7 @@ public class MainController {
 	//
 	@RequestMapping("/")
 	public String welcome() {
-		return "welcome";
+		return "login";
 	}
 	
 	
@@ -37,16 +37,31 @@ public class MainController {
 		return "portal/403";
 	}
 	
-	@RequestMapping("/portal")
+	@RequestMapping("/portal/dashboard")
 	public String portal() {
-		return "portal/portal";
+		return "portal/dashboard";
 	}
 
+	@RequestMapping("/portal/partners")
+	public String partners() {
+		return "portal/partners";
+	}
+	
 	@RequestMapping("/portal/displays")
 	public String displays() {
 		return "portal/displays";
 	}
 
+	@RequestMapping("/portal/clients")
+	public String clients() {
+		return "portal/clients";
+	}
+	
+	@RequestMapping("/portal/campaigns")
+	public String campaigns() {
+		return "portal/campaigns";
+	}
+	
 	@RequestMapping("/portal/medias")
 	public String medias() {
 		return "portal/medias";
@@ -77,14 +92,19 @@ public class MainController {
 		return "portal/settings";
 	}
 
-	@RequestMapping("/portal/createAccount")
-	public String createAccount() {
-		return "portal/createAccount";
-	}
-
-	@RequestMapping("/portal/accountInfo")
+	@RequestMapping("/portal/profile")
 	public String accountInfo() {
-		return "portal/accountInfo";
+		return "portal/profile";
 	}
 
+	@RequestMapping("/createAccount")
+	public String createAccount() {
+		return "website/createAccount";
+	}
+
+	@RequestMapping("/createCampaign")
+	public String createCampaign() {
+		return "website/createCampaign";
+	}
+	
 }

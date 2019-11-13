@@ -24,7 +24,6 @@
 			<groupId>com.platformia</groupId>
 			<artifactId>winkwide-core</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>

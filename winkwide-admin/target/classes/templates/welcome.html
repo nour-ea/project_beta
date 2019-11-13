@@ -1,114 +1,88 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Bienvenue sur WinkWide</title>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 <th:block th:include="includes/_include"></th:block>
 
+  <style>
+  body {
+    position: relative; 
+  }
+  .section1 {color: #fff; background-color: #1E88E5;}
+  .section2 {color: #fff; background-color: #673ab7;}
+  </style>
 </head>
-
 <body>
-	<!-- The background video -->
-	<video autoplay muted loop id="backgroundVideo" src="" type="video/mp4"></video>
 
 	<!-- Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+	<nav id="mainNav" class="navbar navbar-expand-lg navbar-dark fixed-top">
 		<div class="container-fluid text-white">
 			<a class="navbar-brand" href="#"><img class="float-right"
 				src="/img/icons/logo.png" height="65" width="65"></a>
 
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
-				aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar"
+				aria-controls="myNavbar" aria-expanded="false" aria-label="Toggle navigation">
+				<i class="fa fa-bars fa-fw"></i>
 			</button>
-
-			<div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-				<ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-					<li class="nav-item"><a class="nav-link" href="#">Notre Réseau d'Ecrans</a></li>
-					<li class="nav-item"><a class="nav-link" href="localhost:40001/tv">Devenez Partenaire</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">Aide</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">Inscription</a></li>
-					<li class="nav-item"><a class="nav-link" href="/login">Connexion</a></li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-
-
-	<header class="masthead text-center text-white d-flex bg-welcome small">
-
-		<div class="container-fluid my-auto">
-			<div class="row h-100" style="margin-top:100px">
-				
-				<div class="col-lg-3 col-sm-5 m-3 mt-auto bg-light rounded p-3">
-
-				     <div class="w-100 mb-3">
-				     
-				         <h6 class="text-dark float-center"> Lancez votre Campagne Pub <br>sur le réseau d'écrans WinkWide&reg </h6>
-				     </div>
 			
-				      
-			         <form method="POST" th:action="@{/}">
-							                   
-					         <div class="form-group form-row">
-					          <div class="col-md-8" >
-					            <input type="text" name="firstName" class="form-control form-control-sm" placeholder="Raison Sociale" required>
-				   	          </div>
-				
-					          <div class="col-md-4" >
-					            <input type="text" name="lastName" class="form-control form-control-sm" placeholder="ICE" required>
-				   	          </div>
-							</div>
-					      
-					        <div class="form-group" >
-					            <input type="email" name="userName" class="form-control form-control-sm" placeholder="Adresse email" required>
-					        </div>
-				
-					        <div class="form-group" >
-					            <input type="password" name="password" class="form-control form-control-sm" placeholder="Mot de passe" ng-model="accountForm.password" required>
-					        </div>
-					        
-					        <div class="form-group" >
-					            <input type="password" name="confirmPassword" class="form-control form-control-sm" placeholder="Confirmer mot de passe" required>
-					        </div>
 
-					        <div class="form-group" >
-					            <textarea type="text" name="" class="form-control form-control-sm" placeholder="Objet de la Campagne Pub, 			Durée, Impressions cibles..."  required></textarea>
-					        </div>
-
-					        <div class="form-group" >
-					            <label class="text-dark"> <text class="font-weight-bold">Uploadez votre Media de pub</text> <br> (jpeg, jpg, gif, mp4) </label>
-					            <input type="file" name="" class="form-control form-control-sm" placeholder="Média (jpeg, jpg, gif, mp4)" required>
-					        </div>
-					        
-				
-							<div class="form-group">
-							    <div class="form-check">
-							      <input type="checkbox" name="conditionsAccepted" class="form-check-input" required>
-							      <label class="form-check-label text-dark"> J'accepte les <a href="#"> termes et conditions </a> </label>
-							      <br>
-							    </div>
-							</div>
-					        
-							<div class="form-group mt-2">
-								<button type="submit" class="btn btn-primary w-100" ng-disabled="userForm.$invalid" >Lancer ma Campagne</button>				
-							</div>
-			         </form>
-
-				</div>
-				
-				<div class="col-lg-8 mx-auto" style="margin-top:150px">
-					<h2 class="">
-						<strong>Réseau&nbsp d’Affichage&nbsp  Digital </strong>
-					</h2>
-					<br>
-				</div>
-			</div>
+		<div id="myNavbar" class="collapse navbar-collapse" >
+			<ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+				<li class="nav-item"><a class="nav-link" href="#processus"
+					data-toggle="collapse" data-target=".navbar-collapse.show">Comment ça marche </a></li>
+				<li class="nav-item"><a class="nav-link" href="#reseau"
+					data-toggle="collapse" data-target=".navbar-collapse.show">Réseaux d'Ecrans </a></li>
+				<li class="nav-item"><a class="nav-link" href="#campagne"
+					data-toggle="collapse" data-target=".navbar-collapse.show">Lancez une Campagne </a></li>
+				<li class="nav-item"><a class="nav-link" href="#partenaire"
+					data-toggle="collapse" data-target=".navbar-collapse.show">Devenez Partenaire </a></li>	
+				<li class="nav-item"><a class="nav-link" href="#contact"
+					data-toggle="collapse" data-target=".navbar-collapse.show">Contact </a></li>						
+				<li class="nav-item"><a class="nav-link" href="/login">Connexion </a></li>
+			</ul>
 		</div>
-	</header>
+	</div>
+</nav>
+
+
 	
-	<th:block th:include="portal/_footer"></th:block>
+<div id="welcome" class="container-fluid section1">
+
+	<div class="centered-div" >
+		<span class="display-2 font-weight-bold">WinkWide</span>
+		<br><br>
+		<span class="h1">Le Réseau d’Affichage Digital Indoor </span>
+		<br><br><br>
+		<a class="btn btn-primary btn-lg rounded-pill" href="#processus"
+			data-toggle="collapse" data-target=".navbar-collapse.show"><span class="mx-3 ">Lancer une Campagne Pub</span></a>
+	</div>
+</div>
+<div id="processus" class="container-fluid section2">
+  <h1>Section 1</h1>
+  <p>Click on the different Section links in the navbar to see the smooth scrolling effect.</p>
+</div>
+<div id="reseau" class="container-fluid section2">
+  <h1>Section 2</h1>
+  <p>Click on the different Section links in the navbar to see the smooth scrolling effect.</p>
+</div>
+<div id="campagne" class="container-fluid section1">
+  <h1>Section 3</h1>
+  <p>Click on the different Section links in the navbar to see the smooth scrolling effect.</p>
+</div>
+<div id="partenaire" class="container-fluid section2">
+  <h1>Section 4 Submenu 1</h1>
+  <p>Click on the different Section links in the navbar to see the smooth scrolling effect.</p>
+</div>
+<div id="contact" class="container-fluid section1">
+  <h1>Section 4 Submenu 2</h1>
+  <p>Click on the different Section links in the navbar to see the smooth scrolling effect.</p>
+</div>
 
 
+
+<th:block th:include="portal/_footer"></th:block>
 </body>
 </html>
+

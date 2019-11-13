@@ -86,7 +86,7 @@ public class SmartTVSyncController {
 
 			// get programs & their media url lists (ONLY Current and Futur Programs)
 			List<Program> programs = programRepo
-					.findByCustomFilters(null, dispId, null, null, LocalDateTime.now(), LocalDateTime.of(2100, 1, 1, 0, 0), null).getContent();
+					.findByCustomFilters(null, null, dispId, null, null, LocalDateTime.now(), LocalDateTime.of(2100, 1, 1, 0, 0), null).getContent();
 
 			// some sanitization
 			for (Program program : programs) {

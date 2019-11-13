@@ -8,12 +8,14 @@
 
 </head>
 
-<body ng-cloak ng-app="portalApp" ng-controller="crudCtrl as vm">
+<body  ng-cloak ng-app="portalApp" ng-controller="crudCtrl as vm">
 	<th:block th:include="portal/_header"></th:block>
 		
-		<section class="row" id="mainContent">
+		<section class="w-100" id="mainContent">
+		<div class="d-flex" id="wrapper">
+			
 			<th:block th:include="portal/_navigation"></th:block>
-			<div class="col m-4">
+			<div class="container-fluid m-2" id="page-content-wrapper">
 			
 				<!-- CONTEXT INFORMATION -->
 				<div class="row m-2 rounded bg-light" id="contextRow">
@@ -29,13 +31,13 @@
 				
 				
 				<!-- SPECIFIC FILTERS and Create Button -->
-				<div class="row m-2 rounded bg-light">
+				<div class="row m-2 rounded bg-light" id="specificFiltersRow">
 					<div class="m-2 w-100">
 						
 							<!-- add specific filters here -->
 							<div class="form-row pt-2" ng-form name="specificForm">
 			
-								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left">
+								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-md-3">
 									<small>Filter by Media and/or Display</small>
 									<div>										
 										<input type="text" name="mediaId" class="form-control form-control-sm mt-1" placeholder="media Id"
@@ -50,14 +52,14 @@
 									</div>
 								</div>
 											
-								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-md-3">
 									<small>Filter by start time</small>
 									<div class="input-append date form_datetime row">
-										<div class="col-sm-10 pr-0">
+										<div class="col-10 pr-0">
 										<input type="text" name="startTimeMin" class="form-control form-control-sm small mt-1 " readonly  placeholder="min start time" 
 											ng-model="specificFilters.startTimeMin" ng-change="setGridData()">
 										</div>
-										<div class="col-sm-2 p-1">
+										<div class="col-2 p-1">
 											<div class="mt-1">
 												<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
     												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
@@ -65,11 +67,11 @@
     										</div>																											
 									</div>
 									<div class="input-append date form_datetime row">
-										<div class="col-sm-10 pr-0">
+										<div class="col-10 pr-0">
 										<input type="text" name="startTimeMax" class="form-control form-control-sm small mt-1 " readonly  placeholder="max start time" 
 											ng-model="specificFilters.startTimeMax" ng-change="setGridData()">
 										</div>
-										<div class="col-sm-2 p-1">
+										<div class="col-2 p-1">
 											<div class="mt-1">
 												<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
     												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
@@ -78,14 +80,14 @@
 									</div>
 								</div>
 
-								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-md-3">
 									<small>Filter by end time</small>
 									<div class="input-append date form_datetime row">
-										<div class="col-sm-10 pr-0">
+										<div class="col-10 pr-0">
 										<input type="text" name="endTimeMin" class="form-control form-control-sm small mt-1 " readonly  placeholder="min end time" 
 											ng-model="specificFilters.endTimeMin" ng-change="setGridData()">
 										</div>
-										<div class="col-sm-2 p-1">
+										<div class="col-2 p-1">
 											<div class="mt-1">
 												<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
     												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
@@ -93,11 +95,11 @@
     										</div>																											
 									</div>
 									<div class="input-append date form_datetime row">
-										<div class="col-sm-10 pr-0">
+										<div class="col-10 pr-0">
 										<input type="text" name="endTimeMax" class="form-control form-control-sm small mt-1 " readonly  placeholder="max end time" 
 											ng-model="specificFilters.endTimeMax" ng-change="setGridData()">
 										</div>
-										<div class="col-sm-2 p-1">
+										<div class="col-2 p-1">
 											<div class="mt-1">
 												<span class="add-on"><i class="icon-remove fa fa-remove"></i></span>
     												<span class="add-on"><i class="icon-calendar fa fa-calendar"></i></span>
@@ -118,8 +120,14 @@
 				
 				
 				<!-- CRUD Table and Modals-->
-				<th:block th:include="includes/_crudTable"></th:block>
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100" id="tableRow">
+						<th:block th:include="includes/_crudTable"></th:block>
+					</div>
+				</div>
 															
+			</div>
+			
 			</div>
 		</section>
 

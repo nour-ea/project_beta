@@ -4,16 +4,18 @@
 <meta charset="UTF-8">
 <title>WinkWide</title>
 <th:block th:include="includes/_include"></th:block>
-<script th:src="@{/apps/crudApp.js}"></script>
+<script th:src="@{/apps/portalApp.js}"></script>
 
 </head>
 
-<body  ng-app="crudApp" ng-controller="crudCtrl as vm">
+<body  ng-cloak ng-app="portalApp" ng-controller="crudCtrl as vm">
 	<th:block th:include="portal/_header"></th:block>
 		
-		<section class="row" id="mainContent">
+		<section class="w-100" id="mainContent">
+		<div class="d-flex" id="wrapper">
+			
 			<th:block th:include="portal/_navigation"></th:block>
-			<div class="col m-4">
+			<div class="container-fluid m-2" id="page-content-wrapper">
 			
 				<!-- CONTEXT INFORMATION -->
 				<div class="row m-2 rounded bg-light" id="contextRow">
@@ -27,11 +29,13 @@
 				<div class="row m-2 rounded bg-light">
 					<div class="m-2 w-100">
 						
-							<p class="text-danger">Sorry, you cannot access this page</p>
+							<h7 class="text-danger"><i class=" h4 fa fa-exclamation-triangle"></i> &nbsp; Sorry, you cannot access this page. Please contact your Admin!</h7>
 					</div>
 				</div>
 															
 			</div>
+			
+		</div>
 		</section>
 
 	<th:block th:include="portal/_footer"></th:block>

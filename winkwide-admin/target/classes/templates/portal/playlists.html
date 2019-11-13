@@ -8,12 +8,14 @@
 
 </head>
 
-<body ng-cloak ng-app="portalApp" ng-controller="crudCtrl as vm">
+<body  ng-cloak ng-app="portalApp" ng-controller="crudCtrl as vm">
 	<th:block th:include="portal/_header"></th:block>
 		
-		<section class="row" id="mainContent">
+		<section class="w-100" id="mainContent">
+		<div class="d-flex" id="wrapper">
+			
 			<th:block th:include="portal/_navigation"></th:block>
-			<div class="col m-4">
+			<div class="container-fluid m-2" id="page-content-wrapper">
 			
 				<!-- CONTEXT INFORMATION -->
 				<div class="row m-2 rounded bg-light" id="contextRow">
@@ -29,13 +31,13 @@
 				
 				
 				<!-- SPECIFIC FILTERS and Create Button -->
-				<div class="row m-2 rounded bg-light">
+				<div class="row m-2 rounded bg-light" id="specificFiltersRow">
 					<div class="m-2 w-100">
 						
 							<!-- add specific filters here -->
 							<div class="form-row pt-2" ng-form name="specificForm">
 			
-								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-3">
+								<div class="col-lg-3 col-md-2 col-sm-6 mb-2 mb-md-0 float-left mr-md-3">
 									<small>Filter by duration (seconds)</small>
 									<div>
 										<input type="text" name="durationMin" class="form-control form-control-sm mt-1" placeholder="min duration" 
@@ -49,7 +51,7 @@
 									</div>
 								</div>
 								
-								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left">
+								<div class="col-lg-3 col-md-3 col-sm-6 mb-2 mb-md-0 float-left mr-md-3">
 									<small>Filter by media Id</small>
 									<div>										
 										<input type="text" name="mediaId" class="form-control form-control-sm mt-1" placeholder="media Id" 
@@ -71,8 +73,14 @@
 				
 				
 				<!-- CRUD Table and Modals-->
-				<th:block th:include="includes/_crudTable"></th:block>
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100" id="tableRow">
+						<th:block th:include="includes/_crudTable"></th:block>
+					</div>
+				</div>
 															
+			</div>
+			
 			</div>
 		</section>
 

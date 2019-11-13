@@ -9,15 +9,17 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.platformia.winkwide.core.model.Auditable;
+import com.platformia.winkwide.core.utils.MyRandomNumericGenerator;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +34,8 @@ public class Program extends Auditable implements Serializable {
 	private static final long serialVersionUID = -7262692782376526578L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(generator = MyRandomNumericGenerator.generatorName)
+    @GenericGenerator(name = MyRandomNumericGenerator.generatorName, strategy = "com.platformia.winkwide.core.utils.MyRandomNumericGenerator")
     @Column(name = "id", nullable = false)
     private Long id;
     

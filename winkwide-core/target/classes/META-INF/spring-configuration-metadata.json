@@ -50,36 +50,43 @@
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.admin.settings.display-sync-warning-delay",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.admin.settings.max-display-loop-time",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.admin.settings.max-display-spots",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.admin.settings.max-displays",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.admin.settings.max-medias",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AdminSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.admin.settings.max-storage-size",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": false,
       "name": "winkwide.app.settings.alternate-media-categories",
       "type": "java.lang.Boolean"
     },
@@ -95,31 +102,37 @@
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": false,
       "name": "winkwide.app.settings.auto-sleep-active",
       "type": "java.lang.Boolean"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": false,
       "name": "winkwide.app.settings.offline-mode-active",
       "type": "java.lang.Boolean"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": false,
       "name": "winkwide.app.settings.recording-active",
       "type": "java.lang.Boolean"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.app.settings.refresh-period",
       "type": "java.lang.Integer"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": false,
       "name": "winkwide.app.settings.remote-logging-active",
       "type": "java.lang.Boolean"
     },
     {
       "sourceType": "com.platformia.winkwide.core.utils.AppSettingsProperties",
+      "defaultValue": 0,
       "name": "winkwide.app.settings.sync-period",
       "type": "java.lang.Integer"
     }

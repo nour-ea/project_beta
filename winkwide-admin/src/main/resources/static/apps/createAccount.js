@@ -28,7 +28,8 @@ app.controller("CreateAccountController", function($scope, $http) {
 	// HTTP POST methods for add account  
 	// Call: http://localhost:8080/account
 	$scope.createAccount = function() {
-
+		$(".se-pre-con").show();
+		
 		$http({
 			method : "POST",
 			url : '/api/accounts',
@@ -51,12 +52,11 @@ app.controller("CreateAccountController", function($scope, $http) {
 			$scope.userForm.userName.$error.alreadyUsed = false;
 			$scope.userForm.userName.$invalid = false;
 			$scope.userForm.userName.$error.email = false;
-			$(".se-pre-con").show();
 			setTimeout(function(){
 				$(".se-pre-con").fadeOut("slow");
 				_clearFormData();
 				window.location.href = '/login'; 
-				}, 17000);
+				}, 5000);
 
 		}
 	
@@ -81,6 +81,8 @@ app.controller("CreateAccountController", function($scope, $http) {
 		}
 		else
 			createAlert(main_section, "danger","Sorry: " + status + "\n" + message + "\n" + errors.toString(), null);
+		
+		$(".se-pre-con").fadeOut("slow");
 	}
 	
 	// Clear the form

@@ -19,12 +19,14 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 	
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :name is null or c.name like %:name% )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :name is null or c.name like %:name% )"
 			+ "and ( :displayId is null or (exists (select 1 from c.displays dp where ( dp.id = :displayId) ) ))"
 			+ "and ( :startTimeMin is null or :startTimeMax is null or (c.startTime between :startTimeMin and :startTimeMax) )"
 			+ "and ( :endTimeMin is null or :endTimeMax is null or (c.endTime between :endTimeMin and :endTimeMax) )")
 	
 	public Page<Program> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("name") String name, 
 			@Param("displayId") Long displayId,
 			@Param("startTimeMin") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startTimeMin,

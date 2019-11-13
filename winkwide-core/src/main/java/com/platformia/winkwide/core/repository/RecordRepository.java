@@ -17,7 +17,8 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 	
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :displayId is null or c.displayId = :displayId )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :displayId is null or c.displayId = :displayId )"
 			+ "and ( :mediaId is null or c.mediaId = :mediaId )"
 			+ "and ( :displayName is null or c.displayName like %:displayName% )"
 			+ "and ( :mediaName is null or c.mediaName like %:mediaName% )"
@@ -25,6 +26,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 			+ "and ( :endTimeMin is null or :endTimeMax is null or (c.endTime between :endTimeMin and :endTimeMax) )")
 	
 	public Page<Record> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("displayId") Long displayId,
 			@Param("mediaId") Long mediaId, 
 			@Param("displayName") String displayName,

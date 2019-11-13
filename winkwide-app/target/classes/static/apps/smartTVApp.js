@@ -82,16 +82,16 @@ app.controller('smartCtrl', ['$scope', 'CRUDService', 'STOREService', 'UTILSServ
 		
 		//set Settings from server
 		CRUDService.getData('/sync/settings').success(function(data){
-			//$scope.syncPeriod = data.syncPeriod;
-			//$scope.refreshPeriod = data.refreshPeriod;
-			//$scope.recordingActive = data.recordingActive;
-			//$scope.autoSleepActive = data.autoSleepActive;
-			//$scope.autoOnTime = data.autoOnTime;
-			//$scope.autoOffTime = data.autoOffTime;
+			$scope.syncPeriod = data.syncPeriod;
+			$scope.refreshPeriod = data.refreshPeriod;
+			$scope.recordingActive = data.recordingActive;
+			$scope.autoSleepActive = data.autoSleepActive;
+			$scope.autoOnTime = data.autoOnTime;
+			$scope.autoOffTime = data.autoOffTime;
 			$scope.alternateMediaCategories = data.alternateMediaCategories
 		
-			//remoteLoggingActive = data.remoteLoggingActive;
-			//offlineModeActive = data.offlineModeActive;
+			remoteLoggingActive = data.remoteLoggingActive;
+			offlineModeActive = data.offlineModeActive;
 			
 			//setting Media Categories from server
 			CRUDService.getData('/sync/mediaCategories').success(function(res){										

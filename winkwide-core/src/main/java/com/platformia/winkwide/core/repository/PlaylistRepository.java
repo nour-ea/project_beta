@@ -18,11 +18,13 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
 	
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :name is null or c.name like %:name% )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :name is null or c.name like %:name% )"
 			+ "and ( :mediaId is null or (exists (select 1 from Spot sp where ( sp.playlist.id = c.id and sp.media.id = :mediaId) ) ))"
 			+ "and ( :durationMin is null or :durationMax is null or (c.duration between :durationMin and :durationMax) )")
 	
 	public Page<Playlist> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("name") String name, 
 			@Param("mediaId") Long mediaId,
 			@Param("durationMin") Long durationMin,

@@ -1,5 +1,6 @@
 .footer {
-    background-color: #090c14;
+    z-index: -1000;
+    background-color: #000000;
     color: #878c94;
     min-height: 10vh !important;
     position: relative;

@@ -289,7 +289,7 @@ public class MediaRepositoryController {
 			break;
 		case "NotEmpty.media.file":
 			message = "You must specify a media file! (accepted formats: jpeg, jpg, png, mp4, mp3, html)";
-			errors.add("\"file\": \"NotValid.media.file\"");
+			errors.add("\"file\": \"NotEmpty.media.file\"");
 			break;
 		case "NotValid.media.fileFormat":
 			message = "Media file format not accepted! (accepted formats: jpeg, jpg, png, mp4, mp3, html)";
@@ -297,7 +297,7 @@ public class MediaRepositoryController {
 			break;
 		case "NotEmpty.media.thumbFile":
 			message = "You must specify a media thumbnail file! (accepted formats: jpeg, jpg, png, gif)";
-			errors.add("\"thumbFile\": \"NotValid.media.thumbFile\"");
+			errors.add("\"thumbFile\": \"NotEmpty.media.thumbFile\"");
 			break;
 		case "NotValid.media.thumbFileFormat":
 			message = "Media thumbnail file format not accepted! (accepted formats: jpeg, jpg, png, gif)";

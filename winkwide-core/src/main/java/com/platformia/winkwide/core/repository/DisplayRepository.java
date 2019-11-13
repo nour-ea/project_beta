@@ -19,7 +19,9 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :name is null or c.name like %:name% )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :name is null or c.name like %:name% )"
+			+ "and ( :partnerId is null or c.partnerId = partnerId )"
 			+ "and ( :category is null or c.category like %:category% )"
 			+ "and ( :area is null or c.area like %:area% )"
 			+ "and ( :phone is null or c.phone like %:phone% )"
@@ -39,7 +41,9 @@ public interface DisplayRepository extends JpaRepository<Display, Long> {
 			+ "and ( :lastSyncTimeMin is null or :lastSyncTimeMax is null or (c.lastSyncTime between :lastSyncTimeMin and :lastSyncTimeMax) )")
 	
 	public Page<Display> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("name") String name,
+			@Param("partnerId") Integer partnerId,
 			@Param("category") String category,
 			@Param("area") String area,
 			@Param("phone") String phone,

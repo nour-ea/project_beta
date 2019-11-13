@@ -1,41 +1,25 @@
-<div id="navigation" class="font-weight-bold" >
-            <ul class="sidenav " >
-                <li>
-                    <a class="disabled-link" href="/portal" ng-class="{ 'currentNav' : currentPath === '/portal/partners' }" ><i class="fa fa-handshake fa-fw"></i> &nbsp Partners</a>
-                </li>
-                <li>
-                    <a href="/portal/displays" ng-class="{ 'currentNav' : currentPath === '/portal/displays' }" ><i class="fa fa-desktop fa-fw"></i> &nbsp Displays</a>
-                </li>
-                <li>
-                    <hr>
-                </li>
-                <li>
-                    <a class="disabled-link" href="/portal" ng-class="{ 'currentNav' : currentPath === '/portal/clients' }" ><i class="fa fa-address-book fa-fw"></i> &nbsp Clients</a>
-                </li>
-                <li>
-                    <a class="disabled-link" href="/portal" ng-class="{ 'currentNav' : currentPath === '/portal/campaigns' }" ><i class="fa fa-bullhorn fa-fw"></i> &nbsp Campaigns</a>
-                </li>
-                <li>
-                    <a href="/portal/medias" ng-class="{ 'currentNav' : currentPath === '/portal/medias' }" ><i class="fa fa-image fa-fw"></i> &nbsp Medias</a>
-                </li>
-				<li>
-                    <a href="/portal/playlists" ng-class="{ 'currentNav' : currentPath === '/portal/playlists' }" ><i class="fa fa-play fa-fw"></i> &nbsp Playlists</a>
-                </li>
-                <li>
-                <li>
-                    <hr>
-                </li>
-                    <a href="/portal/programs" ng-class="{ 'currentNav' : currentPath === '/portal/programs' }" ><i class="fa fa-calendar-alt fa-fw"></i> &nbsp Programs</a>
-                </li>
-                <li>
-                    <a href="/portal/records" ng-class="{ 'currentNav' : currentPath === '/portal/records' }" ><i class="fa fa-file fa-fw"></i> &nbsp Records</a>
-                </li>
-                <li>
-                    <hr>
-                </li>
-                <li>
-                    <a href="/portal/billing" ng-class="{ 'currentNav' : currentPath === '/portal/billing' }" ><i class="fa fa-file-invoice-dollar fa-fw"></i> &nbsp Billing</a>
-                </li>
 
-            </ul>
-</div>
+
+	<!-- Sidebar -->
+    <div class="border-right" id="sidebar-wrapper">
+		  <div class="list-group">
+		    <a id="sidebarClose" class="btn btn-black float-right p-0" style="width:25px; margin-left:200px"><i class="fa fa-times fa-fw"></i></a>
+		  </div>
+		  
+	      <div class="list-group list-group-flush">
+	        	        
+	        <a class="list-group-item list-group-item-action " href="/portal/partners" ng-class="{ 'currentNav' : currentPath === '/portal/partners' }" ><i class="fa fa-handshake fa-fw"></i> &nbsp Partners</a>
+	        <a class="list-group-item list-group-item-action " href="/portal/displays" ng-class="{ 'currentNav' : currentPath === '/portal/displays' }" ><i class="fa fa-desktop fa-fw"></i> &nbsp Displays</a>
+	        <hr>
+	        <a class="list-group-item list-group-item-action " href="/portal/clients" ng-class="{ 'currentNav' : currentPath === '/portal/clients' }" ><i class="fa fa-address-book fa-fw"></i> &nbsp Clients</a> 
+	        <a class="list-group-item list-group-item-action " href="/portal/campaigns" ng-class="{ 'currentNav' : currentPath === '/portal/campaigns' }" ><i class="fa fa-bullhorn fa-fw"></i> &nbsp Campaigns</a>
+	        <hr> 
+	        <a class="list-group-item list-group-item-action " href="/portal/medias" ng-class="{ 'currentNav' : currentPath === '/portal/medias' }" ><i class="fa fa-photo-video fa-fw"></i> &nbsp Medias</a> 
+	        <a class="list-group-item list-group-item-action " href="/portal/playlists" ng-class="{ 'currentNav' : currentPath === '/portal/playlists' }" ><i class="fa fa-play fa-fw"></i> &nbsp Playlists</a>
+	        <a class="list-group-item list-group-item-action " href="/portal/programs" ng-class="{ 'currentNav' : currentPath === '/portal/programs' }" ><i class="fa fa-calendar-alt fa-fw"></i> &nbsp Programs</a>
+	        <a class="list-group-item list-group-item-action " href="/portal/records" ng-class="{ 'currentNav' : currentPath === '/portal/records' }" ><i class="fa fa-file fa-fw"></i> &nbsp Records</a>
+	        <a class="list-group-item list-group-item-action " href="/portal/billing" ng-class="{ 'currentNav' : currentPath === '/portal/billing' }" ><i class="fa fa-file-invoice-dollar fa-fw"></i> &nbsp Billing</a>
+	      </div>
+	    </div>
+	<!-- /#sidebar-wrapper -->
+	

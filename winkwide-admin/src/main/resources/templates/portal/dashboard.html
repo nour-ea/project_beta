@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>WinkWide</title>
+<th:block th:include="includes/_include"></th:block>
+
+<!-- angular js app -->
+<script th:src="@{/apps/dashboard.js}"></script>
+
+</head>
+
+<body ng-app="Dashboard" ng-controller="DashboardController" ng-cloak>
+	<th:block th:include="portal/_header"></th:block>
+		
+		<section class="w-100" id="mainContent">
+		<div class="d-flex" id="wrapper">
+			
+			<th:block th:include="portal/_navigation"></th:block>
+			<div class="container-fluid m-2" id="page-content-wrapper">
+			
+				<!-- CONTEXT INFORMATION -->
+				<div class="row m-2 rounded bg-light" id="contextRow">
+					<div class="col m-2 ml-auto">	
+					<p class="text-primary font-weight-bold float-left" href="/portal/dashboard"> Dashboard </p>
+					</div>
+						
+				</div>
+				
+
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+						
+							<p>Welcome to WinWide Administration Portal.</p>
+							<p>To manage the WinkWide Network, please choose an Administration Section on the left panel.</p>
+					</div>
+				</div>
+				
+				<div class="row m-2 rounded bg-light">
+					<div class="m-2 w-100">
+							<strong>Network Data Overview</strong>
+					</div>
+					<div class="col-md-4 col-12 m-2">
+						<div class="chart-container" style="position: relative; max-height:80vh; max-width:80vw">
+							<canvas id="displaysCategoriesChart" width="300" height="300"></canvas>
+						</div>
+					</div>
+					<div class="col-md-2 col-2 m-2">
+					</div>
+					<div class="col-md-4 col-12">
+						<div class="chart-container" style="position: relative; max-height:80vh; max-width:80vw">
+							<canvas id="mediasCategoriesChart" width="300" height="300"></canvas>
+						</div>
+					</div>
+				</div>
+															
+			</div>
+		</div>
+		</section>
+
+	<th:block th:include="portal/_footer"></th:block>
+
+</body>
+</html>

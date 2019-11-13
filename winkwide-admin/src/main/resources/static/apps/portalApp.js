@@ -40,6 +40,18 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 			
 			//Default Setting for Display Sync Warning Delay (in hours)
 			$scope.displaySyncWarningDelay = 24;
+			
+			//handle navbar hide show effect on main grid
+			angular.element(sidebarToggle).click(function (e) {
+				setTimeout(function(){
+					$scope.gridApi.core.handleWindowResize();	
+				}, 600);
+			});			
+			angular.element(sidebarClose).click(function (e) {
+				setTimeout(function(){
+					$scope.gridApi.core.handleWindowResize();	
+				}, 600);
+			});		
 		}
 		
 		//Function to get Settings Lists : Areas, Categories, etc.
@@ -137,7 +149,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 		var actionButtonsHTML = '<div class="m-1">' + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
 				
 		// Download
-		var downloadButtonHTML = '<a href="{{row.entity.url}}" download="{{row.entity.id}}_{{row.entity.name}}" class="btn btn-sm btn-success ml-1"><i class="fa fa-download"></i></a>';
+		var downloadButtonHTML = '<a href="{{row.entity.url}}" download="{{row.entity.id}}_{{row.entity.name}}" class="btn btn-sm btn-info ml-1"><i class="fa fa-download"></i></a>';
 		var actionDownloadButtonsHTML = '<div class="m-1">' + downloadButtonHTML + viewButtonHTML + editButtonHTML + deleteButtonHTML + '</div>';
 		
 		// Define HTML template for media thumbnails
@@ -155,7 +167,7 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 				angular.forEach(data, function(value, key) {	
 					// SPECIFIC for media thumbnail
 					if(value.name=='thumbUrl' && $scope.targetObject == 'media')
-						this.unshift({ field: value.name , name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering:false, pinnedLeft:true, width: '*', minWidth:150 });
+						this.unshift({ field: value.name , name: 'Thumbnail', cellTemplate: thumbnailHTML, enableFiltering:false, pinnedLeft:true, width: '*', minWidth:100 });
 					// ---------------------------------------
 					
 					//SPECIFIC for display lastSyncTime
@@ -184,6 +196,8 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100 });
 					else if(value.name!=='id' && [ 'int', 'Long', 'Double', 'BigDecimal'].includes(value.type))
 						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', minWidth:100 });
+					else if(value.name=='id')
+						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', width:60 });
 					else if(value.type=='boolean')
 						this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', minWidth:100,
 							filter: {
@@ -195,11 +209,10 @@ app.controller('crudCtrl', ['$scope','objectModel', 'CRUDService', 'uiGridConsta
 					}, columnList);
 				
 				//put Ids at the end of the table
-				angular.forEach(data, function(value, key) {
-					if(value.name=='id')
-						this.push({ field: value.name , name: value.title, enableFiltering:false, width: '*', width:100 });
-
-					}, columnList);
+				//angular.forEach(data, function(value, key) {
+				//	if(value.name=='id')
+				//		this.push({ field: value.name , name: value.title, enableFiltering:true, width: '*', width:100 });
+				//	}, columnList);
 
 				
 				// create an Actions column (view, edit, delete) - except for records

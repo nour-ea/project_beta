@@ -18,11 +18,13 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
 	
 	@RestResource(path = "customFilters", rel = "customFilters")
 	@Query("select c from #{#entityName} c where"
-			+ "    ( :playlistId is null or c.playlist.id = :playlistId )"
+			+ "    ( :id is null or c.id = :id )"
+			+ "and ( :playlistId is null or c.playlist.id = :playlistId )"
 			+ "and ( :mediaId is null or c.media.id = :mediaId )"
 			+ "and ( :durationMin is null or :durationMax is null or (c.duration between :durationMin and :durationMax) )")
 	
 	public Page<Spot> findByCustomFilters(
+			@Param("id") Long id,
 			@Param("playlistId") Long playlistId,
 			@Param("mediaId") Long mediaId, 
 			@Param("durationMin") Long durationMin,
